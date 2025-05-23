@@ -1,11 +1,29 @@
 import { Button } from "@/components/Button";
-import { ResizablePanel } from "@/components/Resizable";
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from "@/components/Resizable";
 import { ActivityIcon, ExternalLinkIcon } from "lucide-react";
-import type { FC } from "react";
+import { useRef, useState, type FC } from "react";
+import type { ImperativePanelHandle } from "react-resizable-panels";
 
 export const Preview: FC = () => {
+	const errorPanelRef = useRef<ImperativePanelHandle>(null);
+	const onCollapseError = () => {
+		errorPanelRef.current?.collapse();
+	};
+	const [overlayOpacity, setOverlayOpacity] = useState(() => 50);
+
 	return (
-		<ResizablePanel className="flex flex-col items-start gap-6 p-8">
+		<ResizablePanel className="relative flex flex-col items-start gap-6 p-8">
+			<div
+				className="pointer-events-none absolute top-0 left-0 h-full w-full bg-black"
+				style={{ opacity: overlayOpacity / 100 }}
+			>
+				{/* OVERLAY */}
+			</div>
+
 			<div className="flex w-full items-center justify-between">
 				<p className="font-semibold text-3xl text-content-primary">
 					Parameters
@@ -16,7 +34,11 @@ export const Preview: FC = () => {
 			<div className="flex h-full w-full items-center justify-center rounded-xl border p-4">
 				<div className="flex flex-col items-center justify-center gap-3">
 					<div className="flex items-center justify-center rounded-[6px] bg-highlight-sky p-2">
-						<ActivityIcon className="text-content-invert" width={24} height={24} />
+						<ActivityIcon
+							className="text-content-invert"
+							width={24}
+							height={24}
+						/>
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
@@ -33,7 +55,7 @@ export const Preview: FC = () => {
 							href="#todo"
 							className="flex items-center gap-0.5 text-content-link text-sm"
 						>
-							Read the docs{" "}
+							Read the docs
 							<span className="inline">
 								<ExternalLinkIcon width={16} />
 							</span>
@@ -41,6 +63,29 @@ export const Preview: FC = () => {
 					</div>
 				</div>
 			</div>
+
+			<ResizablePanelGroup
+				direction="vertical"
+				className="pointer-events-none absolute top-0 left-0"
+			>
+				<ResizablePanel aria-hidden className="pointer-events-none">
+					{/* EMPTY */}
+				</ResizablePanel>
+				<ResizableHandle
+					onClick={onCollapseError}
+					className="flex h-4 min-h-4 w-full items-center justify-center rounded-t-xl bg-[#AA5253]"
+					withHandle={true}
+				/>
+				<ResizablePanel
+					ref={errorPanelRef}
+					className="bg-surface-secondary"
+					collapsible={true}
+					collapsedSize={0}
+					onResize={(size) => {
+						setOverlayOpacity(() => size);
+					}}
+				></ResizablePanel>
+			</ResizablePanelGroup>
 		</ResizablePanel>
 	);
 };
