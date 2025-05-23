@@ -1,10 +1,10 @@
 import {
-	Logo,
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
-} from "@/components";
+} from "@/components/Resizable";
 import { Editor } from "./Editor";
+import { Logo } from "./components/Logo";
 
 export const App = () => {
 	return (

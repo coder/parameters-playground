@@ -1,4 +1,4 @@
-import { ResizablePanel } from "@/components";
+import { ResizablePanel } from "@/components/Resizable";
 import { Button } from "@/components/Button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
 // @ts-expect-error TODO: figure this out and fix
