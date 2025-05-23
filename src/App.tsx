@@ -1,10 +1,7 @@
-import {
-	ResizableHandle,
-	ResizablePanel,
-	ResizablePanelGroup,
-} from "@/components/Resizable";
+import { ResizableHandle, ResizablePanelGroup } from "@/components/Resizable";
 import { Editor } from "./Editor";
 import { Logo } from "./components/Logo";
+import { Preview } from "./Preview";
 
 export const App = () => {
 	return (
@@ -54,7 +51,7 @@ export const App = () => {
 				<ResizableHandle className="bg-surface-quaternary" />
 
 				{/* PREVIEW */}
-				<ResizablePanel>Two</ResizablePanel>
+				<Preview />
 			</ResizablePanelGroup>
 		</main>
 	);
