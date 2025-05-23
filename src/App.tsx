@@ -7,6 +7,7 @@ import {
 } from "@/components";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
 import { FileJsonIcon, SettingsIcon, SparklesIcon } from "lucide-react";
+import { Editor } from "./Editor";
 
 export const App = () => {
 	return (
@@ -51,37 +52,11 @@ export const App = () => {
 			{/* CONTENT */}
 			<ResizablePanelGroup direction={"horizontal"}>
 				{/* EDITOR */}
-				<ResizablePanel className="itesm-start flex flex-col">
-					<div className="flex w-full items-center justify-between border-b border-b-surface-quaternary pr-3">
-						<div className="flex">
-							<button className="flex w-fit min-w-[120px] items-center gap-1 border-x bg-surface-secondary px-4 py-3 text-content-primary transition-colors hover:bg-surface-tertiary">
-								<FileJsonIcon className="w-[18px] min-w-[18px]" />
-								<span className="w-full text-sm">Code</span>
-							</button>
+				<Editor />
 
-							<Tooltip>
-								<TooltipTrigger asChild={true}>
-									<button
-										disabled={true}
-										className="flex w-fit min-w-[120px] cursor-not-allowed items-center gap-1 px-4 py-3 text-content-secondary"
-									>
-										<SettingsIcon className="w-[18px] min-w-[18px]" />
-										<span className="w-full text-sm">Variables</span>
-									</button>
-								</TooltipTrigger>
-								<TooltipContent>Coming soon</TooltipContent>
-							</Tooltip>
-						</div>
+				<ResizableHandle className="bg-surface-quaternary" />
 
-						<Button variant="outline" size="sm">
-							<SparklesIcon /> Format
-						</Button>
-					</div>
-				</ResizablePanel>
-
-				<ResizableHandle className="divide-surface-quaternary" />
-
-				{/* PReVIEW */}
+				{/* PREVIEW */}
 				<ResizablePanel>Two</ResizablePanel>
 			</ResizablePanelGroup>
 		</main>

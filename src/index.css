@@ -99,3 +99,32 @@
     margin-right: 0 !important;
   }
 }
+
+/*
+ * TODO: figure out how to move this all into tailwind
+ */
+
+.editor {
+  color: hsl(var(--content-primary));
+  counter-reset: line;
+  padding-top: 12px !important;
+}
+
+.editor #codeArea {
+  outline: none;
+  padding-left: 60px !important;
+  padding-top: 12px !important;
+}
+
+.editor pre {
+  padding-left: 60px !important;
+}
+
+.editor .editorLineNumber {
+  position: absolute;
+  left: 0px;
+  color: hsl(var(--content-secondary));
+  text-align: right;
+  width: 40px;
+  font-weight: 100;
+}

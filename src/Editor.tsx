@@ -1,0 +1,73 @@
+import { ResizablePanel } from "@/components";
+import { Button } from "@/components/Button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
+// @ts-expect-error TODO: figure this out and fix
+import { highlight, languages } from "prismjs/components/prism-core";
+import { type FC, useState } from "react";
+import CodeEditor from "react-simple-code-editor";
+import "prismjs/components/prism-hcl";
+import "prismjs/themes/prism.css";
+import { FileJsonIcon, SettingsIcon, SparklesIcon } from "lucide-react";
+
+// Adds line numbers to the highlight.
+const hightlightWithLineNumbers = (input: string, language: unknown) =>
+	highlight(input, language)
+		.split("\n")
+		.map(
+			(line: string, i: number) =>
+				`<span class='editorLineNumber'>${i + 1}</span>${line}`,
+		)
+		.join("\n");
+
+export const Editor: FC = () => {
+	const [code, setCode] = useState(() => defaultCode);
+	return (
+		<ResizablePanel className="flex flex-col items-start">
+			{/* EDITOR TOP BAR */}
+			<div className="flex w-full items-center justify-between border-b border-b-surface-quaternary pr-3">
+				<div className="flex">
+					<button className="flex w-fit min-w-[120px] items-center gap-1 border-x bg-surface-secondary px-4 py-3 text-content-primary transition-colors hover:bg-surface-tertiary">
+						<FileJsonIcon className="w-[18px] min-w-[18px]" />
+						<span className="w-full text-sm">Code</span>
+					</button>
+
+					<Tooltip>
+						<TooltipTrigger asChild={true}>
+							<button
+								disabled={true}
+								className="flex w-fit min-w-[120px] cursor-not-allowed items-center gap-1 px-4 py-3 text-content-secondary"
+							>
+								<SettingsIcon className="w-[18px] min-w-[18px]" />
+								<span className="w-full text-sm">Variables</span>
+							</button>
+						</TooltipTrigger>
+						<TooltipContent>Coming soon</TooltipContent>
+					</Tooltip>
+				</div>
+
+				<Button variant="outline" size="sm">
+					<SparklesIcon /> Format
+				</Button>
+			</div>
+
+			{/* CODE EDITOR */}
+			<div className="h-full w-full overflow-y-scroll bg-surface-secondary font-mono">
+				<CodeEditor
+					value={code}
+					onValueChange={(code) => setCode(() => code)}
+					highlight={(code) => hightlightWithLineNumbers(code, languages.hcl)}
+					textareaId="codeArea"
+					className="editor pt-3"
+				/>
+			</div>
+		</ResizablePanel>
+	);
+};
+
+const defaultCode = `terraform {
+  required_providers {
+    coder = {
+      source = "coder/coder"
+    }
+  }
+}`;
