@@ -9,17 +9,18 @@ import { useRef, useState, type FC } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
 
 export const Preview: FC = () => {
+	const [errorPanelSize, setErrorPanelSize] = useState(() => 50);
 	const errorPanelRef = useRef<ImperativePanelHandle>(null);
+
 	const onCollapseError = () => {
 		errorPanelRef.current?.collapse();
 	};
-	const [overlayOpacity, setOverlayOpacity] = useState(() => 50);
 
 	return (
 		<ResizablePanel className="relative flex flex-col items-start gap-6 p-8">
 			<div
 				className="pointer-events-none absolute top-0 left-0 h-full w-full bg-black"
-				style={{ opacity: overlayOpacity / 100 }}
+				style={{ opacity: errorPanelSize / 100 }}
 			>
 				{/* OVERLAY */}
 			</div>
@@ -82,7 +83,7 @@ export const Preview: FC = () => {
 					collapsible={true}
 					collapsedSize={0}
 					onResize={(size) => {
-						setOverlayOpacity(() => size);
+						setErrorPanelSize(() => size);
 					}}
 				></ResizablePanel>
 			</ResizablePanelGroup>
