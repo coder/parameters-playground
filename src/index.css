@@ -108,6 +108,7 @@
   color: hsl(var(--content-primary));
   counter-reset: line;
   padding-top: 12px !important;
+  min-height: 100%;
 }
 
 .editor #codeArea {

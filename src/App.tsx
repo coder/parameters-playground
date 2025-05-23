@@ -1,12 +1,9 @@
 import {
-	Button,
 	Logo,
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@/components";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
-import { FileJsonIcon, SettingsIcon, SparklesIcon } from "lucide-react";
 import { Editor } from "./Editor";
 
 export const App = () => {

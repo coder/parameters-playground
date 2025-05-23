@@ -3,11 +3,11 @@ import { Button } from "@/components/Button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
 // @ts-expect-error TODO: figure this out and fix
 import { highlight, languages } from "prismjs/components/prism-core";
-import { type FC, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 import CodeEditor from "react-simple-code-editor";
 import "prismjs/components/prism-hcl";
 import "prismjs/themes/prism.css";
-import { FileJsonIcon, SettingsIcon, SparklesIcon } from "lucide-react";
+import { CheckIcon, CopyIcon, FileJsonIcon, SettingsIcon } from "lucide-react";
 
 // Adds line numbers to the highlight.
 const hightlightWithLineNumbers = (input: string, language: unknown) =>
@@ -21,6 +21,31 @@ const hightlightWithLineNumbers = (input: string, language: unknown) =>
 
 export const Editor: FC = () => {
 	const [code, setCode] = useState(() => defaultCode);
+
+	const [codeCopied, setCodeCopied] = useState(() => false);
+	const copyTimeoutId = useRef<ReturnType<typeof setTimeout> | undefined>(
+		undefined,
+	);
+
+	const onCopy = () => {
+		navigator.clipboard.writeText(code);
+		setCodeCopied(() => true);
+	};
+
+	useEffect(() => {
+		if (!codeCopied) {
+			return;
+		}
+
+		clearTimeout(copyTimeoutId.current);
+
+		copyTimeoutId.current = setTimeout(() => {
+			setCodeCopied(() => false);
+		}, 1000);
+
+		return () => clearTimeout(copyTimeoutId.current);
+	}, [codeCopied]);
+
 	return (
 		<ResizablePanel className="flex flex-col items-start">
 			{/* EDITOR TOP BAR */}
@@ -45,8 +70,8 @@ export const Editor: FC = () => {
 					</Tooltip>
 				</div>
 
-				<Button variant="outline" size="sm">
-					<SparklesIcon /> Format
+				<Button variant="outline" size="sm" onClick={onCopy}>
+					{codeCopied ? <CheckIcon /> : <CopyIcon />} Copy
 				</Button>
 			</div>
 

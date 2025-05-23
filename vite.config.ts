@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import path from "node:path";
 
 // https://vite.dev/config/
@@ -7,7 +8,12 @@ export default defineConfig({
 	server: {
 		allowedHosts: [".coder"],
 	},
-	plugins: [react()],
+	plugins: [
+		react(),
+		basicSsl({
+			name: "test",
+		}),
+	],
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
