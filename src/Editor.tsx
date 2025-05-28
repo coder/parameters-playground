@@ -125,7 +125,7 @@ export const Editor: FC = () => {
 			{/* CODE EDITOR */}
 			<div className="relative h-full w-full">
 				<Button
-					className="absolute top-3 right-3 z-50"
+					className="absolute top-3 right-3 z-10"
 					variant="subtle"
 					size="sm"
 					onClick={onCopy}
