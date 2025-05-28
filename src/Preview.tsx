@@ -4,14 +4,19 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@/components/Resizable";
-import { ActivityIcon, ExternalLinkIcon } from "lucide-react";
+import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react";
 import { useRef, useState, type FC } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
 import { useStore } from "@/store";
 
 export const Preview: FC = () => {
+	const $isWasmLoaded = useStore((state) => state.isWasmLoaded);
+
 	return (
 		<ResizablePanel className="relative flex flex-col items-start gap-6 p-8">
+			{!$isWasmLoaded ? (<div className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center backdrop-blur-sm">
+				<WasmLoading />
+			</div>) : null}
 			<div className="flex w-full items-center justify-between">
 				<p className="font-semibold text-3xl text-content-primary">
 					Parameters
@@ -103,5 +108,21 @@ const ErrorPane = () => {
 				></ResizablePanel>
 			</ResizablePanelGroup>
 		</>
+	);
+};
+
+const WasmLoading: FC = () => {
+	return (
+		<div className="flex w-full max-w-xs flex-col items-center justify-center gap-2 rounded-xl border border-[#38BDF8] bg-surface-tertiary p-4">
+			<LoaderIcon className="animate-spin text-content-primary" />
+			<div className="text-center">
+				<p className="font-semibold text-content-primary text-xl">
+					Loading Assets
+				</p>
+				<p className="text-content-secondary text-sm">
+					Add some copy here to explain that this will only take a few moments
+				</p>
+			</div>
+		</div>
 	);
 };

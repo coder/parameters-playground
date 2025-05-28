@@ -96,42 +96,18 @@ export const App = () => {
 				</div>
 			</nav>
 
-			<div className="relative h-full w-full">
-				{!$isWasmLoaded ? (
-					<div className="absolute top-0 left-0 z-30 flex h-full w-full items-center justify-center backdrop-blur-sm">
-						<WasmLoading />
-					</div>
-				) : null}
+			<ResizablePanelGroup
+				aria-hidden={!$isWasmLoaded}
+				direction={"horizontal"}
+			>
+				{/* EDITOR */}
+				<Editor />
 
-				<ResizablePanelGroup
-					aria-hidden={!$isWasmLoaded}
-					direction={"horizontal"}
-				>
-					{/* EDITOR */}
-					<Editor />
+				<ResizableHandle className="bg-surface-quaternary" />
 
-					<ResizableHandle className="bg-surface-quaternary" />
-
-					{/* PREVIEW */}
-					<Preview />
-				</ResizablePanelGroup>
-			</div>
+				{/* PREVIEW */}
+				<Preview />
+			</ResizablePanelGroup>
 		</main>
-	);
-};
-
-const WasmLoading: FC = () => {
-	return (
-		<div className="flex w-full max-w-xs flex-col items-center justify-center gap-2 rounded-xl border border-[#38BDF8] bg-surface-tertiary p-4">
-			<LoaderIcon className="animate-spin text-content-primary" />
-			<div className="text-center">
-				<p className="font-semibold text-content-primary text-xl">
-					Loading Assets
-				</p>
-				<p className="text-content-secondary text-sm">
-					Add some copy here to explain that this will only take a few moments
-				</p>
-			</div>
-		</div>
 	);
 };
