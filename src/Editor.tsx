@@ -1,10 +1,28 @@
 import { Button } from "@/components/Button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuPortal,
+	DropdownMenuTrigger,
+} from "@/components/DropdownMenu";
 import { ResizablePanel } from "@/components/Resizable";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
+import { useStore } from "@/store";
+import {
+	BookIcon,
+	CheckIcon,
+	ChevronDownIcon,
+	CopyIcon,
+	FileJsonIcon,
+	SettingsIcon,
+	ToggleLeftIcon,
+	RadioIcon,
+	SquareMousePointerIcon,
+	TextCursorInputIcon,
+} from "lucide-react";
 import { type FC, useEffect, useRef, useState } from "react";
 import CodeEditor from "react-simple-code-editor";
-import { useStore } from "@/store";
-import { CheckIcon, CopyIcon, FileJsonIcon, SettingsIcon } from "lucide-react";
 
 // The following imports can't be re-ordered otherwise things break
 import { highlight, languages } from "prismjs/components/prism-core";
@@ -73,20 +91,56 @@ export const Editor: FC = () => {
 					</Tooltip>
 				</div>
 
-				<Button variant="outline" size="sm" onClick={onCopy}>
-					{codeCopied ? <CheckIcon /> : <CopyIcon />} Copy
-				</Button>
+				<DropdownMenu>
+					<DropdownMenuTrigger className="flex w-fit min-w-[140px] cursor-pointer items-center justify-between rounded-md border bg-surface-primary px-2 py-1.5 text-content-secondary transition-colors hover:text-content-primary data-[state=open]:text-content-primary">
+						<div className="flex items-center justify-center gap-2">
+							<BookIcon width={18} height={18} />
+							<p className="text-xs">Examples</p>
+						</div>
+						<ChevronDownIcon width={18} height={18} />
+					</DropdownMenuTrigger>
+
+					<DropdownMenuPortal>
+						<DropdownMenuContent align="start">
+							<DropdownMenuItem>
+								<TextCursorInputIcon width={24} height={24} />
+								Text input
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<SquareMousePointerIcon width={24} height={24} />
+								Multi-select
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<RadioIcon width={24} height={24} />
+								Radio
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<ToggleLeftIcon width={24} height={24} /> Switches
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenuPortal>
+				</DropdownMenu>
 			</div>
 
 			{/* CODE EDITOR */}
-			<div className="h-full w-full overflow-y-scroll bg-surface-secondary font-mono">
-				<CodeEditor
-					value={$code}
-					onValueChange={(code) => $setCode(code)}
-					highlight={(code) => hightlightWithLineNumbers(code, languages.hcl)}
-					textareaId="codeArea"
-					className="editor pt-3"
-				/>
+			<div className="relative h-full w-full">
+				<Button
+					className="absolute top-3 right-3 z-50"
+					variant="subtle"
+					size="sm"
+					onClick={onCopy}
+				>
+					{codeCopied ? <CheckIcon /> : <CopyIcon />} Copy
+				</Button>
+				<div className="h-full w-full overflow-y-scroll bg-surface-secondary font-mono">
+					<CodeEditor
+						value={$code}
+						onValueChange={(code) => $setCode(code)}
+						highlight={(code) => hightlightWithLineNumbers(code, languages.hcl)}
+						textareaId="codeArea"
+						className="editor pt-3"
+					/>
+				</div>
 			</div>
 		</ResizablePanel>
 	);
