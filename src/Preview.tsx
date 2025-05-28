@@ -10,17 +10,20 @@ import type { ImperativePanelHandle } from "react-resizable-panels";
 import { useStore } from "@/store";
 
 export const Preview: FC = () => {
-	const $isWasmLoaded = useStore((state) => state.isWasmLoaded);
+	const $wasmState = useStore((state) => state.wasmState);
 
 	return (
 		<ResizablePanel className="relative">
-			{!$isWasmLoaded ? (
+			{$wasmState !== "loaded" ? (
 				<div className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center backdrop-blur-sm">
-					<WasmLoading />
+					{$wasmState === "loading" ? <WasmLoading /> : <WasmError />}
 				</div>
 			) : null}
 
-			<div aria-hidden={!$isWasmLoaded} className="flex h-full w-full flex-col items-start gap-6 p-8">
+			<div
+				aria-hidden={$wasmState !== "loaded"}
+				className="flex h-full w-full flex-col items-start gap-6 p-8"
+			>
 				<div className="flex w-full items-center justify-between">
 					<p className="font-semibold text-3xl text-content-primary">
 						Parameters
@@ -122,12 +125,25 @@ const WasmLoading: FC = () => {
 			<LoaderIcon className="animate-spin text-content-primary" />
 			<div className="text-center">
 				<p className="font-semibold text-content-primary text-xl">
-					Loading Assets
+					Loading assets
 				</p>
 				<p className="text-content-secondary text-sm">
 					Add some copy here to explain that this will only take a few moments
 				</p>
 			</div>
+		</div>
+	);
+};
+
+const WasmError: FC = () => {
+	return (
+		<div className="flex w-full max-w-xs flex-col items-center justify-center gap-2 rounded-xl border border-border-destructive bg-surface-tertiary p-4 text-center">
+			<p className="font-semibold text-content-primary text-xl">
+				Unable to load assets{" "}
+			</p>
+			<p className="text-content-destructive text-sm">
+				Add some copy here to explain that this will only take a few moments
+			</p>
 		</div>
 	);
 };

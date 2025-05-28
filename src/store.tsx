@@ -8,19 +8,21 @@ const defaultCode = `terraform {
   }
 }`;
 
+type WasmState = "loaded" | "loading" | "error";
+
 type State = {
 	code: string;
-	isWasmLoaded: boolean;
+	wasmState: WasmState;
 	error?: string;
 	setCode: (code: string) => void;
 	setError: (error: string) => void;
-	setIsWasmLoaded: (isWasmLoaded: boolean) => void;
+	setWasmState: (wasmState: WasmState) => void;
 };
 
 export const useStore = create<State>()((set) => ({
 	code: defaultCode,
-	isWasmLoaded: false,
+	wasmState: "loading",
 	setCode: (code) => set((_) => ({ code })),
 	setError: (error) => set((_) => ({ error })),
-	setIsWasmLoaded: (isWasmLoaded) => set((_) => ({ isWasmLoaded })),
+	setWasmState: (wasmState) => set((_) => ({ wasmState })),
 }));

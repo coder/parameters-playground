@@ -3,11 +3,10 @@ import { Editor } from "./Editor";
 import { Logo } from "./components/Logo";
 import { Preview } from "./Preview";
 import { useStore } from "@/store";
-import { useEffect, type FC } from "react";
+import { useEffect } from "react";
 
 // Glue code required to be able to run wasm compiled Go code.
 import "@/utils/wasm_exec.js";
-import { LoaderIcon } from "lucide-react";
 
 type GoPreviewDef = (v: unknown) => Promise<string>;
 
@@ -32,8 +31,8 @@ declare class Go {
 }
 
 export const App = () => {
-	const $isWasmLoaded = useStore((state) => state.isWasmLoaded);
-	const $setIsWasmLoaded = useStore((state) => state.setIsWasmLoaded);
+	const $wasmState = useStore((state) => state.wasmState);
+	const $setWasmState = useStore((state) => state.setWasmState);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
@@ -46,13 +45,14 @@ export const App = () => {
 				);
 
 				goWasm.run(result.instance);
-				$setIsWasmLoaded(true);
+				$setWasmState("loaded");
 			} catch (e) {
+				$setWasmState("error");
 				console.error(e);
 			}
 		};
 
-		if (!$isWasmLoaded) {
+		if ($wasmState !== "loaded") {
 			initWasm();
 		}
 	}, []);
@@ -97,7 +97,7 @@ export const App = () => {
 			</nav>
 
 			<ResizablePanelGroup
-				aria-hidden={!$isWasmLoaded}
+				aria-hidden={!$wasmState}
 				direction={"horizontal"}
 			>
 				{/* EDITOR */}
