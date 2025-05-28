@@ -1,13 +1,15 @@
-import { ResizablePanel } from "@/components/Resizable";
 import { Button } from "@/components/Button";
+import { ResizablePanel } from "@/components/Resizable";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
-// @ts-expect-error TODO: figure this out and fix
-import { highlight, languages } from "prismjs/components/prism-core";
 import { type FC, useEffect, useRef, useState } from "react";
 import CodeEditor from "react-simple-code-editor";
+import { useStore } from "@/store";
+import { CheckIcon, CopyIcon, FileJsonIcon, SettingsIcon } from "lucide-react";
+
+// The following imports can't be re-ordered otherwise things break
+import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-hcl";
 import "prismjs/themes/prism.css";
-import { CheckIcon, CopyIcon, FileJsonIcon, SettingsIcon } from "lucide-react";
 
 // Adds line numbers to the highlight.
 const hightlightWithLineNumbers = (input: string, language: unknown) =>
@@ -20,7 +22,8 @@ const hightlightWithLineNumbers = (input: string, language: unknown) =>
 		.join("\n");
 
 export const Editor: FC = () => {
-	const [code, setCode] = useState(() => defaultCode);
+	const $code = useStore((state) => state.code);
+	const $setCode = useStore((state) => state.setCode);
 
 	const [codeCopied, setCodeCopied] = useState(() => false);
 	const copyTimeoutId = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -28,7 +31,7 @@ export const Editor: FC = () => {
 	);
 
 	const onCopy = () => {
-		navigator.clipboard.writeText(code);
+		navigator.clipboard.writeText($code);
 		setCodeCopied(() => true);
 	};
 
@@ -78,8 +81,8 @@ export const Editor: FC = () => {
 			{/* CODE EDITOR */}
 			<div className="h-full w-full overflow-y-scroll bg-surface-secondary font-mono">
 				<CodeEditor
-					value={code}
-					onValueChange={(code) => setCode(() => code)}
+					value={$code}
+					onValueChange={(code) => $setCode(code)}
 					highlight={(code) => hightlightWithLineNumbers(code, languages.hcl)}
 					textareaId="codeArea"
 					className="editor pt-3"
@@ -88,11 +91,3 @@ export const Editor: FC = () => {
 		</ResizablePanel>
 	);
 };
-
-const defaultCode = `terraform {
-  required_providers {
-    coder = {
-      source = "coder/coder"
-    }
-  }
-}`;

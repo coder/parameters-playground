@@ -7,24 +7,11 @@ import {
 import { ActivityIcon, ExternalLinkIcon } from "lucide-react";
 import { useRef, useState, type FC } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
+import { useStore } from "@/store";
 
 export const Preview: FC = () => {
-	const [errorPanelSize, setErrorPanelSize] = useState(() => 50);
-	const errorPanelRef = useRef<ImperativePanelHandle>(null);
-
-	const onCollapseError = () => {
-		errorPanelRef.current?.collapse();
-	};
-
 	return (
 		<ResizablePanel className="relative flex flex-col items-start gap-6 p-8">
-			<div
-				className="pointer-events-none absolute top-0 left-0 h-full w-full bg-black"
-				style={{ opacity: errorPanelSize / 100 }}
-			>
-				{/* OVERLAY */}
-			</div>
-
 			<div className="flex w-full items-center justify-between">
 				<p className="font-semibold text-3xl text-content-primary">
 					Parameters
@@ -65,6 +52,34 @@ export const Preview: FC = () => {
 				</div>
 			</div>
 
+			<ErrorPane />
+		</ResizablePanel>
+	);
+};
+
+const ErrorPane = () => {
+	const $error = useStore((state) => state.error);
+
+	const [errorPanelSize, setErrorPanelSize] = useState(() => 50);
+	const errorPanelRef = useRef<ImperativePanelHandle>(null);
+
+	const onCollapseError = () => {
+		errorPanelRef.current?.collapse();
+	};
+
+	if (!$error) {
+		return null;
+	}
+
+	return (
+		<>
+			<div
+				className="pointer-events-none absolute top-0 left-0 h-full w-full bg-black"
+				style={{ opacity: errorPanelSize / 100 }}
+			>
+				{/* OVERLAY */}
+			</div>
+
 			<ResizablePanelGroup
 				direction="vertical"
 				className="pointer-events-none absolute top-0 left-0"
@@ -87,6 +102,6 @@ export const Preview: FC = () => {
 					}}
 				></ResizablePanel>
 			</ResizablePanelGroup>
-		</ResizablePanel>
+		</>
 	);
 };
