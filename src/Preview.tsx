@@ -28,7 +28,7 @@ export const Preview: FC = () => {
 					<Button variant="destructive">Reset form</Button>
 				</div>
 
-				<div className="flex h-full w-full items-center justify-center rounded-xl border p-4">
+				<div className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4">
 					<div className="flex flex-col items-center justify-center gap-3">
 						<div className="flex items-center justify-center rounded-[6px] bg-highlight-sky p-2">
 							<ActivityIcon
