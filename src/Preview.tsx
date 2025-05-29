@@ -1,16 +1,46 @@
 import { Button } from "@/components/Button";
-import {
-	ResizableHandle,
-	ResizablePanel,
-	ResizablePanelGroup,
-} from "@/components/Resizable";
+import { ResizablePanel } from "@/components/Resizable";
 import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react";
-import { useRef, useState, type FC } from "react";
-import type { ImperativePanelHandle } from "react-resizable-panels";
+import { useEffect, useState, type FC } from "react";
 import { useStore } from "@/store";
+import { useDebouncedValue } from "@/hooks/debounce";
+import { cn } from "@/utils/cn";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
+	const $code = useStore((state) => state.code);
+	const $setError = useStore((state) => state.setError);
+
+	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
+
+	const [output, setOutput] = useState<string | null>(() => null);
+
+	useEffect(() => {
+		if (!window.go_preview) {
+			return;
+		}
+
+		const getOutput = async () => {
+			try {
+				const output = await window.go_preview?.(debouncedCode);
+
+				if (output === undefined) {
+					console.error("Something went wrong");
+				} else {
+					setOutput(() => output);
+				}
+			} catch (e) {
+				console.error(e);
+				if (e instanceof Error) {
+					$setError(`${e.name}: ${e.message}`);
+				} else {
+					$setError("Something went wrong");
+				}
+			}
+		};
+
+		getOutput();
+	}, [debouncedCode, $setError]);
 
 	return (
 		<ResizablePanel className="relative">
@@ -31,37 +61,13 @@ export const Preview: FC = () => {
 					<Button variant="destructive">Reset form</Button>
 				</div>
 
-				<div className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4">
-					<div className="flex flex-col items-center justify-center gap-3">
-						<div className="flex items-center justify-center rounded-[6px] bg-highlight-sky p-2">
-							<ActivityIcon
-								className="text-content-invert"
-								width={24}
-								height={24}
-							/>
-						</div>
-
-						<div className="flex flex-col items-center gap-2">
-							<div className="flex max-w-[258px] flex-col items-center gap-1">
-								<p className="text-nowrap text-center font-semibold text-2xl text-content-primary">
-									Parameters Playground
-								</p>
-								<p className="text-center font-medium text-content-secondary text-sm">
-									Create dynamic parameters here, I need to figure out a better
-									copy.
-								</p>
-							</div>
-							<a
-								href="#todo"
-								className="flex items-center gap-0.5 text-content-link text-sm"
-							>
-								Read the docs
-								<span className="inline">
-									<ExternalLinkIcon width={16} />
-								</span>
-							</a>
-						</div>
-					</div>
+				<div
+					className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4"
+					style={{
+						opacity: isDebouncing ? 0.5 : 1,
+					}}
+				>
+					{output ? output : <PreviewEmptyState />}
 				</div>
 			</div>
 
@@ -70,15 +76,39 @@ export const Preview: FC = () => {
 	);
 };
 
+const PreviewEmptyState = () => {
+	return (
+		<div className="flex flex-col items-center justify-center gap-3">
+			<div className="flex items-center justify-center rounded-[6px] bg-highlight-sky p-2">
+				<ActivityIcon className="text-content-invert" width={24} height={24} />
+			</div>
+
+			<div className="flex flex-col items-center gap-2">
+				<div className="flex max-w-[258px] flex-col items-center gap-1">
+					<p className="text-nowrap text-center font-semibold text-2xl text-content-primary">
+						Parameters Playground
+					</p>
+					<p className="text-center font-medium text-content-secondary text-sm">
+						Create dynamic parameters here, I need to figure out a better copy.
+					</p>
+				</div>
+				<a
+					href="#todo"
+					className="flex items-center gap-0.5 text-content-link text-sm"
+				>
+					Read the docs
+					<span className="inline">
+						<ExternalLinkIcon width={16} />
+					</span>
+				</a>
+			</div>
+		</div>
+	);
+};
+
 const ErrorPane = () => {
 	const $error = useStore((state) => state.error);
-
-	const [errorPanelSize, setErrorPanelSize] = useState(() => 50);
-	const errorPanelRef = useRef<ImperativePanelHandle>(null);
-
-	const onCollapseError = () => {
-		errorPanelRef.current?.collapse();
-	};
+	const $toggleShowError = useStore((state) => state.toggleShowError);
 
 	if (!$error) {
 		return null;
@@ -87,34 +117,43 @@ const ErrorPane = () => {
 	return (
 		<>
 			<div
-				className="pointer-events-none absolute top-0 left-0 h-full w-full bg-black"
-				style={{ opacity: errorPanelSize / 100 }}
+				aria-hidden={true}
+				className={cn(
+					"pointer-events-none absolute top-0 left-0 h-full w-full transition-all",
+					$error.show && "bg-black/50",
+				)}
 			>
 				{/* OVERLAY */}
 			</div>
 
-			<ResizablePanelGroup
-				direction="vertical"
-				className="pointer-events-none absolute top-0 left-0"
+			<div
+				className={cn(
+					"absolute bottom-0 left-0 w-full",
+					$error.show && "h-2/3",
+				)}
 			>
-				<ResizablePanel aria-hidden className="pointer-events-none">
-					{/* EMPTY */}
-				</ResizablePanel>
-				<ResizableHandle
-					onClick={onCollapseError}
+				<button
 					className="flex h-4 min-h-4 w-full items-center justify-center rounded-t-xl bg-[#AA5253]"
-					withHandle={true}
-				/>
-				<ResizablePanel
-					ref={errorPanelRef}
-					className="bg-surface-secondary"
-					collapsible={true}
-					collapsedSize={0}
-					onResize={(size) => {
-						setErrorPanelSize(() => size);
-					}}
-				></ResizablePanel>
-			</ResizablePanelGroup>
+					onClick={$toggleShowError}
+				>
+					<div className="h-0.5 w-2/3 max-w-32 rounded-full bg-white/40"></div>
+				</button>
+
+				<div
+					aria-hidden={!$error.show}
+					className={cn(
+						"flex h-full flex-col gap-6 bg-surface-secondary p-6",
+						!$error.show && "pointer-events-none h-0 p-0",
+					)}
+				>
+					<p className="font-semibold text-content-primary text-xl">
+						An error has occurred
+					</p>
+					<p className="rounded-xl bg-surface-tertiary p-3 font-mono text-content-primary text-xs">
+						{$error.message}
+					</p>
+				</div>
+			</div>
 		</>
 	);
 };
