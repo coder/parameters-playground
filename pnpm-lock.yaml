@@ -56,6 +56,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
+      valibot:
+        specifier: ^1.1.0
+        version: 1.1.0(typescript@5.8.3)
       zustand:
         specifier: ^5.0.5
         version: 5.0.5(@types/react@19.1.4)(react@19.1.0)
@@ -1831,6 +1834,14 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  valibot@1.1.0:
+    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   vite@6.3.5:
     resolution: {integrity: sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -3532,6 +3543,10 @@ snapshots:
       '@types/react': 19.1.4
 
   util-deprecate@1.0.2: {}
+
+  valibot@1.1.0(typescript@5.8.3):
+    optionalDependencies:
+      typescript: 5.8.3
 
   vite@6.3.5(@types/node@22.15.21)(jiti@1.21.7)(yaml@2.8.0):
     dependencies:
