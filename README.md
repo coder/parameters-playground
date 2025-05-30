@@ -1,54 +1,44 @@
-# React + TypeScript + Vite
+<!-- markdownlint-disable MD041 -->
+<div align="center">
+  <a href="https://coder.com#gh-light-mode-only">
+    <img src="./.github/assets/images/logo-black.png" alt="Coder Logo Light" style="width: 128px">
+  </a>
+  <a href="https://coder.com#gh-dark-mode-only">
+    <img src="./.github/assets/images/logo-white.png" alt="Coder Logo Dark" style="width: 128px">
+  </a>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<h1>
+  Interactive Template Editor
+</h1>
 
-Currently, two official plugins are available:
+<br>
+<br>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[Coder Repo](https://github.com/coder/coder) |
+[Docs](https://coder.com/docs) |
+[Why Coder](https://coder.com/why) |
+[Premium](https://coder.com/pricing#compare-plans)
 
-## Expanding the ESLint configuration
+[![discord](https://img.shields.io/discord/747933592273027093?label=discord)](https://discord.gg/coder)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9511/badge)](https://www.bestpractices.dev/projects/9511)
+[![license](https://img.shields.io/github/license/coder/preview)](./LICENSE)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+</div>
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+<!--Should update this with the new cool form options -->
+<p align="center">
+  <img src="./.github/assets/images/hero-image.png" alt="Coder Hero Image">
+</p>
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+<!-- TODO: Add a usage section that links to coder/coder doc for how to use the `preview` command in coder cli -->
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Support
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+Do you have a workspace template that has incorrect parameters? Please open
+[workspace template behavior issue](https://github.com/coder/preview/issues/new?template=workspace-template-bug-report.md).
+
+For other bugs, feature requests, etc, feel free to
+[open an issue](https://github.com/coder/preview/issues/new).
+
+[Join our Discord](https://discord.gg/coder) to provide feedback on in-progress
+features and chat with the community using Coder!
