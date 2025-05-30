@@ -29,11 +29,28 @@ func main() {
 	<-done
 }
 
+type previewOutput struct {
+	Output preview.Output             `json:"output"`
+	Diags  []types.FriendlyDiagnostic `json:"diags"`
+}
+
 func tfpreview(this js.Value, p []js.Value) any {
 	defer func() {
+		// Return a panic as a diagnostic if one occurs.
 		if r := recover(); r != nil {
-			// Panic happened, do something
-			return fmt.Sprintf("Something went wrong: %v", r)
+			data, _ := json.Marshal(previewOutput{
+				Output: preview.Output{},
+				Diags: []types.FriendlyDiagnostic{
+					{
+						Severity: types.DiagnosticSeverityError,
+						Summary:  "A panic occurred",
+						Detail:   fmt.Sprintf("%v", r),
+						Extra:    types.DiagnosticExtra{},
+					},
+				},
+			})
+
+			return js.ValueOf(string(data))
 		}
 	}()
 
@@ -53,9 +70,9 @@ func tfpreview(this js.Value, p []js.Value) any {
 		Logger:          logger,
 	}, tf)
 
-	data, _ := json.Marshal(map[string]any{
-		"output": output,
-		"diags":  diags,
+	data, _ := json.Marshal(previewOutput{
+		Output: output,
+		Diags:  diags,
 	})
 
 	return js.ValueOf(string(data))
