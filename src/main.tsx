@@ -1,3 +1,4 @@
+// @ts-expect-error TODO: create types for this
 import "@fontsource-variable/inter";
 import { TooltipProvider } from "@/components/Tooltip";
 import { StrictMode } from "react";

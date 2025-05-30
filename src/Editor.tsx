@@ -25,8 +25,10 @@ import { type FC, useEffect, useRef, useState } from "react";
 import CodeEditor from "react-simple-code-editor";
 
 // The following imports can't be re-ordered otherwise things break
+// @ts-expect-error TODO: create types for this
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-hcl";
+// @ts-expect-error TODO: create types for this
 import "prismjs/themes/prism.css";
 
 // Adds line numbers to the highlight.
