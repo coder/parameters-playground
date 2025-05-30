@@ -84,7 +84,7 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 		Diags:      types.Diagnostics(diags),
 		ParserLogs: buf.String(),
 	})
-	var _ = pOutput
+
 	return js.ValueOf(string(data))
 }
 
