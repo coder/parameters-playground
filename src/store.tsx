@@ -14,7 +14,7 @@ type State = {
 	code: string;
 	wasmState: WasmState;
 	error?: {
-		message: string;
+		message?: string;
 		show: boolean;
 	};
 	setCode: (code: string) => void;
@@ -26,16 +26,28 @@ type State = {
 export const useStore = create<State>()((set) => ({
 	code: defaultCode,
 	wasmState: "loading",
-	error: {
-		message: "wibble: wobble",
-		show: true,
-	},
+	// error: {
+	// 	message: "wibble: wobble",
+	// 	show: false,
+	// },
 	setCode: (code) => set((_) => ({ code })),
 	setError: (message) =>
-		set((state) => ({ error: { message, show: state.error?.show ?? false } })),
+		set((state) => {
+			// If there is currently no error, then we want to show this new error
+			const error = state.error ?? { show: true };
+
+			return {
+				error: { ...error, message },
+			};
+		}),
 	toggleShowError: () =>
-		set((state) => ({
-			error: { show: !state.error?.show, message: state.error?.message ?? "" },
-		})),
+		set((state) => {
+			return {
+				error: {
+					show: !(state.error?.show ?? true),
+					message: state.error?.message ?? "",
+				},
+			};
+		}),
 	setWasmState: (wasmState) => set((_) => ({ wasmState })),
 }));

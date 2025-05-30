@@ -1,10 +1,10 @@
 import { Button } from "@/components/Button";
 import { ResizablePanel } from "@/components/Resizable";
-import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react";
-import { useEffect, useState, type FC } from "react";
-import { useStore } from "@/store";
 import { useDebouncedValue } from "@/hooks/debounce";
+import { useStore } from "@/store";
 import { cn } from "@/utils/cn";
+import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react"
+import { type FC, useEffect, useState } from "react";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -129,7 +129,7 @@ const ErrorPane = () => {
 			<div
 				className={cn(
 					"absolute bottom-0 left-0 w-full",
-					$error.show && "h-2/3",
+					$error.show && "h-auto",
 				)}
 			>
 				<button

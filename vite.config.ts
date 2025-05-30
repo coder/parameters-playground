@@ -6,7 +6,7 @@ import path from "node:path";
 // https://vite.dev/config/
 export default defineConfig({
 	server: {
-		allowedHosts: [".coder"],
+		allowedHosts: [".coder", ".ngrok"],
 	},
 	plugins: [
 		react(),
