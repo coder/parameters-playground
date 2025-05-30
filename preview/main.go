@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"path/filepath"
 	"syscall/js"
 
+	"github.com/hashicorp/hcl/v2"
 	"github.com/spf13/afero"
 
 	"github.com/coder/preview"
@@ -30,19 +32,25 @@ func main() {
 }
 
 type previewOutput struct {
-	Output preview.Output             `json:"output"`
-	Diags  []types.FriendlyDiagnostic `json:"diags"`
+	Output *preview.Output   `json:"output"`
+	Diags  types.Diagnostics `json:"diags"`
+	// ParserLogs are trivy logs that occur during parsing the
+	// Terraform files. This is useful for debugging issues with the
+	// invalid terraform syntax.
+	ParserLogs string `json:"parser_logs,omitempty"`
 }
 
-func tfpreview(this js.Value, p []js.Value) any {
+func tfpreview(this js.Value, p []js.Value) (output any) {
+	var buf bytes.Buffer
 	defer func() {
 		// Return a panic as a diagnostic if one occurs.
 		if r := recover(); r != nil {
 			data, _ := json.Marshal(previewOutput{
-				Output: preview.Output{},
-				Diags: []types.FriendlyDiagnostic{
+				Output:     nil,
+				ParserLogs: buf.String(),
+				Diags: types.Diagnostics{
 					{
-						Severity: types.DiagnosticSeverityError,
+						Severity: hcl.DiagError,
 						Summary:  "A panic occurred",
 						Detail:   fmt.Sprintf("%v", r),
 						Extra:    types.DiagnosticExtra{},
@@ -50,7 +58,7 @@ func tfpreview(this js.Value, p []js.Value) any {
 				},
 			})
 
-			return js.ValueOf(string(data))
+			output = js.ValueOf(string(data))
 		}
 	}()
 
@@ -59,10 +67,11 @@ func tfpreview(this js.Value, p []js.Value) any {
 		return err
 	}
 
-	// TODO: Capture the logger into a bytes.Buffer, and return this
-	// 	as a string in the output?
-	logger := slog.New(slog.DiscardHandler)
-	output, diags := preview.Preview(context.Background(), preview.Input{
+	logger := slog.New(slog.NewTextHandler(&buf, &slog.HandlerOptions{
+		AddSource: false,
+		Level:     slog.LevelDebug,
+	}))
+	pOutput, diags := preview.Preview(context.Background(), preview.Input{
 		PlanJSONPath:    "",
 		PlanJSON:        nil,
 		ParameterValues: nil,
@@ -71,10 +80,11 @@ func tfpreview(this js.Value, p []js.Value) any {
 	}, tf)
 
 	data, _ := json.Marshal(previewOutput{
-		Output: output,
-		Diags:  diags,
+		Output:     pOutput,
+		Diags:      types.Diagnostics(diags),
+		ParserLogs: buf.String(),
 	})
-
+	var _ = pOutput
 	return js.ValueOf(string(data))
 }
 

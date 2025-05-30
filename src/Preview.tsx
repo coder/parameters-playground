@@ -22,7 +22,9 @@ export const Preview: FC = () => {
 
 		const getOutput = async () => {
 			try {
-				const output = await window.go_preview?.(debouncedCode);
+				const output = await window.go_preview?.({
+					"main.tf": debouncedCode
+				});
 
 				if (output === undefined) {
 					console.error("Something went wrong");
