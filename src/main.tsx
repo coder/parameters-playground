@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/Tooltip";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App.tsx";
+import { ThemeProvider } from "@/contexts/theme.tsx";
 
 const root = document.getElementById("root");
 
@@ -12,9 +13,11 @@ if (!root) {
 } else {
 	createRoot(root).render(
 		<StrictMode>
-			<TooltipProvider>
-				<App />
-			</TooltipProvider>
+			<ThemeProvider>
+				<TooltipProvider>
+					<App />
+				</TooltipProvider>
+			</ThemeProvider>
 		</StrictMode>,
 	);
 }

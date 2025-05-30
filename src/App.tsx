@@ -1,12 +1,22 @@
+import { Editor } from "@/Editor";
+import { Preview } from "@/Preview";
+import { Logo } from "@/components/Logo";
 import { ResizableHandle, ResizablePanelGroup } from "@/components/Resizable";
-import { Editor } from "./Editor";
-import { Logo } from "./components/Logo";
-import { Preview } from "./Preview";
 import { useStore } from "@/store";
-import { useEffect } from "react";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuPortal,
+	DropdownMenuTrigger,
+} from "@/components/DropdownMenu";
+import { type FC, useEffect, useMemo } from "react";
 
 // Glue code required to be able to run wasm compiled Go code.
 import "@/utils/wasm_exec.js";
+import { useTheme } from "@/contexts/theme";
+import { MoonIcon, SunIcon, SunMoonIcon } from "lucide-react";
+import { Button } from "./components/Button";
 
 type GoPreviewDef = (v: unknown) => Promise<string>;
 
@@ -93,13 +103,11 @@ export const App = () => {
 					>
 						Support
 					</a>
+					<ThemeSelector />
 				</div>
 			</nav>
 
-			<ResizablePanelGroup
-				aria-hidden={!$wasmState}
-				direction={"horizontal"}
-			>
+			<ResizablePanelGroup aria-hidden={!$wasmState} direction={"horizontal"}>
 				{/* EDITOR */}
 				<Editor />
 
@@ -109,5 +117,44 @@ export const App = () => {
 				<Preview />
 			</ResizablePanelGroup>
 		</main>
+	);
+};
+
+const ThemeSelector: FC = () => {
+	const { theme, setTheme } = useTheme();
+
+	const Icon = useMemo(() => {
+		if (theme === "system") {
+			return SunMoonIcon;
+		}
+
+		if (theme === "dark") {
+			return MoonIcon;
+		}
+
+		return SunIcon;
+	}, [theme]);
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild={true}>
+				<Button variant="subtle" size="icon-lg">
+					<Icon height={24} width={24} />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuPortal>
+				<DropdownMenuContent align="end">
+					<DropdownMenuItem onClick={() => setTheme("dark")}>
+						<MoonIcon width={24} height={24} /> Dark
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => setTheme("light")}>
+						<SunIcon width={24} height={24} /> Light
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => setTheme("system")}>
+						<SunMoonIcon width={24} height={24} /> System
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenuPortal>
+		</DropdownMenu>
 	);
 };
