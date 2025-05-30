@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"path/filepath"
 	"syscall/js"
 
@@ -29,22 +30,34 @@ func main() {
 }
 
 func tfpreview(this js.Value, p []js.Value) any {
+	defer func() {
+		if r := recover(); r != nil {
+			// Panic happened, do something
+			return fmt.Sprintf("Something went wrong: %v", r)
+		}
+	}()
+
 	tf, err := fileTreeFS(p[0])
 	if err != nil {
 		return err
 	}
 
+	// TODO: Capture the logger into a bytes.Buffer, and return this
+	// 	as a string in the output?
+	logger := slog.New(slog.DiscardHandler)
 	output, diags := preview.Preview(context.Background(), preview.Input{
 		PlanJSONPath:    "",
 		PlanJSON:        nil,
 		ParameterValues: nil,
 		Owner:           types.WorkspaceOwner{},
+		Logger:          logger,
 	}, tf)
 
 	data, _ := json.Marshal(map[string]any{
 		"output": output,
 		"diags":  diags,
 	})
+
 	return js.ValueOf(string(data))
 }
 
