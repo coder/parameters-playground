@@ -3,13 +3,16 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"path/filepath"
 	"syscall/js"
 
+	"github.com/hashicorp/hcl/v2"
 	"github.com/spf13/afero"
 
 	"github.com/coder/preview"
@@ -28,23 +31,60 @@ func main() {
 	<-done
 }
 
-func tfpreview(this js.Value, p []js.Value) any {
+type previewOutput struct {
+	Output *preview.Output   `json:"output"`
+	Diags  types.Diagnostics `json:"diags"`
+	// ParserLogs are trivy logs that occur during parsing the
+	// Terraform files. This is useful for debugging issues with the
+	// invalid terraform syntax.
+	ParserLogs string `json:"parser_logs,omitempty"`
+}
+
+func tfpreview(this js.Value, p []js.Value) (output any) {
+	var buf bytes.Buffer
+	defer func() {
+		// Return a panic as a diagnostic if one occurs.
+		if r := recover(); r != nil {
+			data, _ := json.Marshal(previewOutput{
+				Output:     nil,
+				ParserLogs: buf.String(),
+				Diags: types.Diagnostics{
+					{
+						Severity: hcl.DiagError,
+						Summary:  "A panic occurred",
+						Detail:   fmt.Sprintf("%v", r),
+						Extra:    types.DiagnosticExtra{},
+					},
+				},
+			})
+
+			output = js.ValueOf(string(data))
+		}
+	}()
+
 	tf, err := fileTreeFS(p[0])
 	if err != nil {
 		return err
 	}
 
-	output, diags := preview.Preview(context.Background(), preview.Input{
+	logger := slog.New(slog.NewTextHandler(&buf, &slog.HandlerOptions{
+		AddSource: false,
+		Level:     slog.LevelDebug,
+	}))
+	pOutput, diags := preview.Preview(context.Background(), preview.Input{
 		PlanJSONPath:    "",
 		PlanJSON:        nil,
 		ParameterValues: nil,
 		Owner:           types.WorkspaceOwner{},
+		Logger:          logger,
 	}, tf)
 
-	data, _ := json.Marshal(map[string]any{
-		"output": output,
-		"diags":  diags,
+	data, _ := json.Marshal(previewOutput{
+		Output:     pOutput,
+		Diags:      types.Diagnostics(diags),
+		ParserLogs: buf.String(),
 	})
+
 	return js.ValueOf(string(data))
 }
 
