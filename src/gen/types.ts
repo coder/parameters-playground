@@ -102,10 +102,20 @@ export interface ParameterValidation {
 }
 
 // From apitypes/apitypes.go
+export interface ParserLog {
+    time: string;
+    level: string;
+    msg: string;
+    prefix: string;
+    root: string;
+    err: string;
+}
+
+// From apitypes/apitypes.go
 export interface PreviewOutput {
     output: Output | null;
     diags: Diagnostics;
-    parser_logs?: string;
+    parser_logs?: ParserLog[];
 }
 
 // From types/tags.go

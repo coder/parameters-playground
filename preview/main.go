@@ -3,14 +3,15 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io/fs"
 	"log/slog"
 	"path/filepath"
+	"sync"
 	"syscall/js"
+	"time"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/spf13/afero"
@@ -34,13 +35,13 @@ func main() {
 }
 
 func tfpreview(this js.Value, p []js.Value) (output any) {
-	var buf bytes.Buffer
+	l := NewLogger()
 	defer func() {
 		// Return a panic as a diagnostic if one occurs.
 		if r := recover(); r != nil {
 			data, _ := json.Marshal(apitypes.PreviewOutput{
 				Output:     nil,
-				ParserLogs: buf.String(),
+				ParserLogs: l.entries,
 				Diags: types.Diagnostics{
 					{
 						Severity: hcl.DiagError,
@@ -60,10 +61,8 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 		return err
 	}
 
-	logger := slog.New(slog.NewTextHandler(&buf, &slog.HandlerOptions{
-		AddSource: false,
-		Level:     slog.LevelDebug,
-	}))
+	handler := slog.NewJSONHandler(l, nil)
+	logger := slog.New(handler)
 	pOutput, diags := preview.Preview(context.Background(), preview.Input{
 		PlanJSONPath:    "",
 		PlanJSON:        nil,
@@ -75,7 +74,7 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 	data, _ := json.Marshal(apitypes.PreviewOutput{
 		Output:     pOutput,
 		Diags:      types.Diagnostics(diags),
-		ParserLogs: buf.String(),
+		ParserLogs: l.entries,
 	})
 
 	return js.ValueOf(string(data))
@@ -117,4 +116,32 @@ func loadTree(mem afero.Fs, fileTree map[string]any, path ...string) {
 			fmt.Printf("unknown type %T for %q\n", v, k)
 		}
 	}
+}
+
+type Logger struct {
+	mu      sync.Mutex
+	entries []apitypes.ParserLog
+}
+
+func NewLogger() *Logger {
+	return &Logger{
+		entries: make([]apitypes.ParserLog, 0),
+	}
+}
+
+func (l *Logger) Write(p []byte) (n int, err error) {
+	var entry apitypes.ParserLog
+	if err := json.Unmarshal(p, &entry); err != nil {
+		entry = apitypes.ParserLog{
+			Time:    time.Now(),
+			Level:   "unknown",
+			Message: string(p),
+		}
+	}
+
+	l.mu.Lock()
+	l.entries = append(l.entries, entry)
+	l.mu.Unlock()
+
+	return len(p), nil
 }

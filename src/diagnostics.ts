@@ -1,4 +1,9 @@
-import type { FriendlyDiagnostic, Parameter, PreviewOutput } from "./gen/types";
+import type {
+	FriendlyDiagnostic,
+	Parameter,
+	ParserLog,
+	PreviewOutput,
+} from "./gen/types";
 
 type FriendlyDiagnosticWithoutKind = Omit<FriendlyDiagnostic, "extra">;
 
@@ -24,15 +29,15 @@ export const outputToDiagnostics = (output: PreviewOutput): Diagnostic[] => {
 	const parameterDiags = (output.output?.Parameters ?? []).flatMap(
 		parameterToDiagnostics,
 	);
-
 	const topLevelDiags: TopLevelDiagnostic[] = output.diags
 		.filter((d) => d !== null)
 		.map((d) => ({
 			kind: "top-level",
 			...d,
 		}));
+	const diagsFromLogs = logsToDiagnostics(output.parser_logs ?? []);
 
-	return [...topLevelDiags, ...parameterDiags];
+	return [...diagsFromLogs, ...topLevelDiags, ...parameterDiags];
 };
 
 const parameterToDiagnostics = (parameter: Parameter): ParameterDiagnostic[] =>
@@ -42,4 +47,16 @@ const parameterToDiagnostics = (parameter: Parameter): ParameterDiagnostic[] =>
 			kind: "parameter",
 			parameterName: parameter.name,
 			...d,
+		}));
+
+const logsToDiagnostics = (logs: ParserLog[]): TopLevelDiagnostic[] =>
+	logs
+		// Non-error level logs seem to either be redundant with given diagnostics or
+		// not useful so for now we filter them out
+		.filter((log) => log.level === "ERROR")
+		.map((log) => ({
+			kind: "top-level",
+			severity: log.level,
+			summary: log.msg,
+			detail: log.err,
 		}));

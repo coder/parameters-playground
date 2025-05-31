@@ -104,17 +104,36 @@ export const Preview: FC = () => {
 				>
 					{output ? (
 						<div className="flex flex-col gap-4">
-							<p className=" w-fit break-all text-content-primary">
-								{JSON.stringify(output.output?.Parameters, null, 2)}
-							</p>
+							<div className="flex w-fit flex-col gap-3">
+								<p className="font-semibold text-content-primary text-xl">
+									Parameters
+								</p>
+								<p className=" w-fit break-all text-content-primary">
+									{JSON.stringify(output.output?.Parameters, null, 2)}
+								</p>
+							</div>
 
-							<p className=" w-fit break-all text-content-primary">
-								{JSON.stringify(output.diags, null, 2)}
-							</p>
+							<div className="flex w-fit flex-col gap-3">
+								<p className="font-semibold text-content-primary text-xl">
+									Diagnostics
+								</p>
+								<p className=" w-fit break-all text-content-primary">
+									{JSON.stringify(output.diags, null, 2)}
+								</p>
+							</div>
 
-							<p className=" w-fit break-all text-content-primary">
-								{output.parser_logs}
-							</p>
+							<div className="flex w-fit flex-col gap-3">
+								<p className="font-semibold text-content-primary text-xl">
+									Logs
+								</p>
+								<div className="flex flex-col gap-2">
+									{output.parser_logs?.map((log, index) => (
+										<p key={index} className="-indent-4 pl-4">
+											{log.time} {log.level}: {log.msg} - {log.err}
+										</p>
+									))}
+								</div>
+							</div>
 						</div>
 					) : (
 						<PreviewEmptyState />
