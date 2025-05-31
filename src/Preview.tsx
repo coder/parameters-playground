@@ -128,7 +128,7 @@ export const Preview: FC = () => {
 								</p>
 								<div className="flex flex-col gap-2">
 									{output.parser_logs?.map((log, index) => (
-										<p key={index} className="-indent-4 pl-4">
+										<p key={index} className="-indent-4 pl-4 text-content-primary">
 											{log.time} {log.level}: {log.msg} - {log.err}
 										</p>
 									))}
