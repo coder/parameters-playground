@@ -175,10 +175,9 @@ const ErrorPane = () => {
 			 */}
 			<div
 				aria-hidden={true}
-				role="alertdialog"
 				className={cn(
-					"absolute top-0 left-0 h-full w-full transition-all",
-					$errors.show && "bg-black/20 dark:bg-black/50",
+					"absolute top-0 left-0 hidden h-full w-full transition-all",
+					$errors.show && "block cursor-pointer bg-black/20 dark:bg-black/50",
 				)}
 				onClick={() => {
 					$toggleShowError(false);
@@ -188,6 +187,7 @@ const ErrorPane = () => {
 			</div>
 
 			<div
+				role="alertdialog"
 				className={cn(
 					"absolute bottom-0 left-0 w-full",
 					$errors.show && "h-auto",
