@@ -70,9 +70,9 @@ export const Editor: FC = () => {
 	}, [codeCopied]);
 
 	return (
-		<ResizablePanel className="flex flex-col items-start">
+		<ResizablePanel className="relative flex flex-col items-start">
 			{/* EDITOR TOP BAR */}
-			<div className="flex w-full items-center justify-between border-b border-b-surface-quaternary pr-3">
+			<div className="flex h-12 w-full items-center justify-between border-b border-b-surface-quaternary pr-3">
 				<div className="flex">
 					<button className="flex w-fit min-w-[120px] items-center gap-1 border-x bg-surface-secondary px-4 py-3 text-content-primary transition-colors hover:bg-surface-tertiary">
 						<FileJsonIcon className="w-[18px] min-w-[18px]" />
@@ -125,24 +125,25 @@ export const Editor: FC = () => {
 			</div>
 
 			{/* CODE EDITOR */}
-			<div className="relative h-full w-full overflow-y-scroll">
+			<div className="absolute mt-12 flex h-full w-full justify-end p-3">
 				<Button
-					className="absolute top-3 right-3 z-10"
+					className="z-10"
 					variant="subtle"
 					size="sm"
 					onClick={onCopy}
 				>
 					{codeCopied ? <CheckIcon /> : <CopyIcon />} Copy
 				</Button>
-				<div className="h-full w-full bg-surface-secondary font-mono">
-					<CodeEditor
-						value={$code}
-						onValueChange={(code) => $setCode(code)}
-						highlight={(code) => hightlightWithLineNumbers(code, languages.hcl)}
-						textareaId="codeArea"
-						className="editor pt-3"
-					/>
-				</div>
+			</div>
+
+			<div className="h-full w-full overflow-y-scroll bg-surface-secondary font-mono">
+				<CodeEditor
+					value={$code}
+					onValueChange={(code) => $setCode(code)}
+					highlight={(code) => hightlightWithLineNumbers(code, languages.hcl)}
+					textareaId="codeArea"
+					className="editor pt-3"
+				/>
 			</div>
 		</ResizablePanel>
 	);

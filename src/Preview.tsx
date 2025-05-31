@@ -1,5 +1,6 @@
 import { Button } from "@/components/Button";
 import { ResizablePanel } from "@/components/Resizable";
+import { useTheme } from "@/contexts/theme";
 import {
 	type Diagnostic,
 	type InternalDiagnostic,
@@ -10,7 +11,8 @@ import { useDebouncedValue } from "@/hooks/debounce";
 import { useStore } from "@/store";
 import { cn } from "@/utils/cn";
 import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react";
-import { type FC, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { type FC, useEffect, useMemo, useState } from "react";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -87,9 +89,23 @@ export const Preview: FC = () => {
 				)}
 			>
 				<div className="flex w-full items-center justify-between">
-					<p className="font-semibold text-3xl text-content-primary">
-						Parameters
-					</p>
+					<div className="flex items-center justify-center gap-4">
+						<p className="font-semibold text-3xl text-content-primary">
+							Parameters
+						</p>
+
+						<AnimatePresence>
+							{isDebouncing && $wasmState === "loaded" ? (
+								<motion.div
+									initial={{ opacity: 0, scale: 0.75 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.75 }}
+								>
+									<LoaderIcon className="animate-spin text-content-primary" />
+								</motion.div>
+							) : null}
+						</AnimatePresence>
+					</div>
 					<Button variant="destructive">Reset form</Button>
 				</div>
 
@@ -98,9 +114,6 @@ export const Preview: FC = () => {
 						"flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4",
 						output && "block overflow-y-scroll",
 					)}
-					style={{
-						opacity: isDebouncing && $wasmState === "loaded" ? 0.5 : 1,
-					}}
 				>
 					{output ? (
 						<div className="flex flex-col gap-4">
@@ -183,60 +196,75 @@ const ErrorPane = () => {
 	const $errors = useStore((state) => state.errors);
 	const $toggleShowError = useStore((state) => state.toggleShowError);
 
-	if ($errors.diagnostics.length === 0) {
-		return null;
-	}
+	const hasErrors = useMemo(() => $errors.diagnostics.length > 0, [$errors]);
 
 	return (
 		<>
-			{/*
-			 * biome-ignore lint/a11y/useKeyWithClickEvents: key events don't seem to
-			 * work for divs, and I'm otherwise not sure how to make this element
-			 * more accesible. But I think it's fine since the functionality is able to
-			 * be used with the button.
-			 */}
-			<div
-				aria-hidden={true}
-				className={cn(
-					"absolute top-0 left-0 hidden h-full w-full transition-all",
-					$errors.show && "block cursor-pointer bg-black/20 dark:bg-black/50",
-				)}
-				onClick={() => {
-					$toggleShowError(false);
-				}}
-			>
-				{/* OVERLAY */}
-			</div>
+			<AnimatePresence propagate={true}>
+				{$errors.show && hasErrors ? (
+					// lint/a11y/useKeyWithClickEvents: key events don't seem to
+					// work for divs, and I'm otherwise not sure how to make this element
+					// more accesible. But I think it's fine since the functionality is able to
+					// be used with the button below.
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						aria-hidden={true}
+						className="absolute top-0 left-0 h-full w-full cursor-pointer bg-black/10 dark:bg-black/50"
+						onClick={() => {
+							$toggleShowError(false);
+						}}
+					>
+						{/* OVERLAY */}
+					</motion.div>
+				) : null}
+			</AnimatePresence>
 
-			<div
-				role="alertdialog"
-				className={cn(
-					"absolute bottom-0 left-0 flex max-h-[60%] w-full flex-col justify-start",
-					$errors.show && "h-auto",
-				)}
-			>
-				<button
-					className="flex h-4 min-h-4 w-full items-center justify-center rounded-t-xl bg-border-destructive"
-					onClick={() => $toggleShowError()}
-					aria-label={$errors.show ? "Hide error dialog" : "Show error dialog"}
-				>
-					<div className="h-0.5 w-2/3 max-w-32 rounded-full bg-white/40"></div>
-				</button>
+			<AnimatePresence propagate={true}>
+				{hasErrors ? (
+					<motion.div
+						role="alertdialog"
+						transition={{
+							when: "afterChildren",
+						}}
+						exit={{ opacity: 0 }}
+						className={cn(
+							"absolute bottom-0 left-0 flex max-h-[60%] w-full flex-col justify-start",
+							$errors.show && "h-auto",
+						)}
+					>
+						<motion.button
+							className="flex h-4 min-h-4 w-full items-center justify-center rounded-t-xl bg-border-destructive"
+							onClick={() => $toggleShowError()}
+							aria-label={
+								$errors.show ? "Hide error dialog" : "Show error dialog"
+							}
+						>
+							<div className="h-0.5 w-2/3 max-w-32 rounded-full bg-white/40"></div>
+						</motion.button>
 
-				<div
-					aria-hidden={!$errors.show}
-					className={cn(
-						"flex flex-col gap-6 overflow-y-scroll bg-surface-secondary p-6",
-						!$errors.show && "pointer-events-none h-0 p-0",
-					)}
-				>
-					<div className="flex w-full flex-col gap-3">
-						{$errors.diagnostics.map((diagnostic, index) => (
-							<ErrorBlock diagnostic={diagnostic} key={index} />
-						))}
-					</div>
-				</div>
-			</div>
+						<AnimatePresence propagate={true}>
+							{$errors.show ? (
+								<motion.div
+									initial={{ height: 0 }}
+									animate={{
+										height: "auto",
+									}}
+									exit={{ height: 0 }}
+									className="flex flex-col gap-6 overflow-y-scroll bg-surface-secondary"
+								>
+									<div className="flex w-full flex-col gap-3 p-6">
+										{$errors.diagnostics.map((diagnostic, index) => (
+											<ErrorBlock diagnostic={diagnostic} key={index} />
+										))}
+									</div>
+								</motion.div>
+							) : null}
+						</AnimatePresence>
+					</motion.div>
+				) : null}
+			</AnimatePresence>
 		</>
 	);
 };
