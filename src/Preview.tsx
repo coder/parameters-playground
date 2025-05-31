@@ -1,6 +1,5 @@
 import { Button } from "@/components/Button";
 import { ResizablePanel } from "@/components/Resizable";
-import { useTheme } from "@/contexts/theme";
 import {
 	type Diagnostic,
 	type InternalDiagnostic,
@@ -274,7 +273,7 @@ type ErroBlockPorps = {
 };
 const ErrorBlock: FC<ErroBlockPorps> = ({ diagnostic }) => {
 	return (
-		<div className="rounded-xl bg-surface-tertiary p-3 font-mono text-content-primary text-sm leading-normal">
+		<div className="w-full rounded-xl bg-surface-tertiary p-3 font-mono text-content-primary text-sm leading-normal">
 			<p
 				className={cn(
 					"text-content-destructive",
