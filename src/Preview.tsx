@@ -21,7 +21,7 @@ export const Preview: FC = () => {
 
 	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
 
-	const [output, setOutput] = useState<PreviewOutput | null>(() => null);
+	const [_output, setOutput] = useState<PreviewOutput | null>(() => null);
 
 	useEffect(() => {
 		if (!window.go_preview) {
@@ -111,48 +111,9 @@ export const Preview: FC = () => {
 				<div
 					className={cn(
 						"flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4",
-						output && "block overflow-y-scroll",
 					)}
 				>
-					{output ? (
-						<div className="flex flex-col gap-4">
-							<div className="flex w-fit flex-col gap-3">
-								<p className="font-semibold text-content-primary text-xl">
-									Parameters
-								</p>
-								<p className=" w-fit break-all text-content-primary">
-									{JSON.stringify(output.output?.Parameters, null, 2)}
-								</p>
-							</div>
-
-							<div className="flex w-fit flex-col gap-3">
-								<p className="font-semibold text-content-primary text-xl">
-									Diagnostics
-								</p>
-								<p className=" w-fit break-all text-content-primary">
-									{JSON.stringify(output.diags, null, 2)}
-								</p>
-							</div>
-
-							<div className="flex w-fit flex-col gap-3">
-								<p className="font-semibold text-content-primary text-xl">
-									Logs
-								</p>
-								<div className="flex flex-col gap-2">
-									{output.parser_logs?.map((log, index) => (
-										<p
-											key={index}
-											className="-indent-4 pl-4 text-content-primary"
-										>
-											{log.time} {log.level}: {log.msg} - {log.err}
-										</p>
-									))}
-								</div>
-							</div>
-						</div>
-					) : (
-						<PreviewEmptyState />
-					)}
+					<PreviewEmptyState />
 				</div>
 			</div>
 
