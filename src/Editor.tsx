@@ -125,7 +125,7 @@ export const Editor: FC = () => {
 			</div>
 
 			{/* CODE EDITOR */}
-			<div className="relative h-full w-full">
+			<div className="relative h-full w-full overflow-y-scroll">
 				<Button
 					className="absolute top-3 right-3 z-10"
 					variant="subtle"
@@ -134,7 +134,7 @@ export const Editor: FC = () => {
 				>
 					{codeCopied ? <CheckIcon /> : <CopyIcon />} Copy
 				</Button>
-				<div className="h-full w-full overflow-y-scroll bg-surface-secondary font-mono">
+				<div className="h-full w-full bg-surface-secondary font-mono">
 					<CodeEditor
 						value={$code}
 						onValueChange={(code) => $setCode(code)}

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { Diagnostic } from "@/diagnostics";
 
 const defaultCode = `terraform {
   required_providers {
@@ -10,42 +11,44 @@ const defaultCode = `terraform {
 
 type WasmState = "loaded" | "loading" | "error";
 
+type ErrorsState = {
+	diagnostics: Diagnostic[];
+	show: boolean;
+};
+const defaultErrorsState: ErrorsState = {
+	diagnostics: [],
+	show: true,
+};
+
 type State = {
 	code: string;
 	wasmState: WasmState;
-	error?: {
-		message?: string;
-		show: boolean;
-	};
+	errors: ErrorsState;
 	setCode: (code: string) => void;
-	setError: (error: string) => void;
-	toggleShowError: () => void;
+	setError: (diagnostics: Diagnostic[]) => void;
+	toggleShowError: (open?: boolean) => void;
 	setWasmState: (wasmState: WasmState) => void;
 };
 
 export const useStore = create<State>()((set) => ({
 	code: defaultCode,
 	wasmState: "loading",
-	// error: {
-	// 	message: "wibble: wobble",
-	// 	show: false,
-	// },
+	errors: defaultErrorsState,
 	setCode: (code) => set((_) => ({ code })),
-	setError: (message) =>
+	setError: (data) =>
 		set((state) => {
-			// If there is currently no error, then we want to show this new error
-			const error = state.error ?? { show: true };
-
+			const errors = state.errors ?? defaultErrorsState;
 			return {
-				error: { ...error, message },
+				errors: { ...errors, diagnostics: data },
 			};
 		}),
-	toggleShowError: () =>
+	toggleShowError: (open) =>
 		set((state) => {
+			const errors = state.errors ?? defaultErrorsState;
 			return {
-				error: {
-					show: !(state.error?.show ?? true),
-					message: state.error?.message ?? "",
+				errors: {
+					...errors,
+					show: open !== undefined ? open : !errors.show,
 				},
 			};
 		}),
