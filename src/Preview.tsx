@@ -89,9 +89,23 @@ export const Preview: FC = () => {
 				)}
 			>
 				<div className="flex w-full items-center justify-between">
-					<p className="font-semibold text-3xl text-content-primary">
-						Parameters
-					</p>
+					<div className="flex items-center justify-center gap-4">
+						<p className="font-semibold text-3xl text-content-primary">
+							Parameters
+						</p>
+
+						<AnimatePresence>
+							{isDebouncing && $wasmState === "loaded" ? (
+								<motion.div
+									initial={{ opacity: 0, scale: 0.75 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.75 }}
+								>
+									<LoaderIcon className="animate-spin text-content-primary" />
+								</motion.div>
+							) : null}
+						</AnimatePresence>
+					</div>
 					<Button variant="destructive">Reset form</Button>
 				</div>
 
@@ -100,9 +114,6 @@ export const Preview: FC = () => {
 						"flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4",
 						output && "block overflow-y-scroll",
 					)}
-					style={{
-						opacity: isDebouncing && $wasmState === "loaded" ? 0.5 : 1,
-					}}
 				>
 					{output ? (
 						<div className="flex flex-col gap-4">
@@ -217,7 +228,7 @@ const ErrorPane = () => {
 						transition={{
 							when: "afterChildren",
 						}}
-						exit={{ opacity: 0}}
+						exit={{ opacity: 0 }}
 						className={cn(
 							"absolute bottom-0 left-0 flex max-h-[60%] w-full flex-col justify-start",
 							$errors.show && "h-auto",
