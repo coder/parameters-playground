@@ -167,12 +167,22 @@ const ErrorPane = () => {
 
 	return (
 		<>
+			{/*
+			 * biome-ignore lint/a11y/useKeyWithClickEvents: key events don't seem to
+			 * work for divs, and I'm otherwise not sure how to make this element
+			 * more accesible. But I think it's fine since the functionality is able to
+			 * be used with the button.
+			 */}
 			<div
 				aria-hidden={true}
+				role="alertdialog"
 				className={cn(
-					"pointer-events-none absolute top-0 left-0 h-full w-full transition-all",
+					"absolute top-0 left-0 h-full w-full transition-all",
 					$errors.show && "bg-black/20 dark:bg-black/50",
 				)}
+				onClick={() => {
+					$toggleShowError(false);
+				}}
 			>
 				{/* OVERLAY */}
 			</div>
@@ -185,7 +195,8 @@ const ErrorPane = () => {
 			>
 				<button
 					className="flex h-4 min-h-4 w-full items-center justify-center rounded-t-xl bg-border-destructive"
-					onClick={$toggleShowError}
+					onClick={() => $toggleShowError()}
+					aria-label={$errors.show ? "Hide error dialog" : "Show error dialog"}
 				>
 					<div className="h-0.5 w-2/3 max-w-32 rounded-full bg-white/40"></div>
 				</button>

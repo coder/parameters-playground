@@ -26,7 +26,7 @@ type State = {
 	errors: ErrorsState;
 	setCode: (code: string) => void;
 	setError: (diagnostics: Diagnostic[]) => void;
-	toggleShowError: () => void;
+	toggleShowError: (open?: boolean) => void;
 	setWasmState: (wasmState: WasmState) => void;
 };
 
@@ -42,13 +42,13 @@ export const useStore = create<State>()((set) => ({
 				errors: { ...errors, diagnostics: data },
 			};
 		}),
-	toggleShowError: () =>
+	toggleShowError: (open) =>
 		set((state) => {
 			const errors = state.errors ?? defaultErrorsState;
 			return {
 				errors: {
 					...errors,
-					show: !errors.show,
+					show: open !== undefined ? open : !errors.show,
 				},
 			};
 		}),
