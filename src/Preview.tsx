@@ -199,7 +199,7 @@ const ErrorPane = () => {
 				aria-hidden={true}
 				className={cn(
 					"absolute top-0 left-0 hidden h-full w-full transition-all",
-					$errors.show && "block cursor-pointer bg-black/20 dark:bg-black/50",
+					$errors.show && "block cursor-pointer bg-black/10 dark:bg-black/50",
 				)}
 				onClick={() => {
 					$toggleShowError(false);
