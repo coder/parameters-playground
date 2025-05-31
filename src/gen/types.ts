@@ -5,7 +5,17 @@ export interface Block {
 }
 
 // From types/diagnostics.go
-export type Diagnostics = (unknown | null)[];
+export interface DiagnosticExtra {
+    code: string;
+    // empty interface{} type, falling back to unknown
+    Wrapped: unknown;
+}
+
+// From types/diagnostics.go
+export type DiagnosticSeverityString = string;
+
+// From types/diagnostics.go
+export type Diagnostics = (FriendlyDiagnostic | null)[];
 
 // From hcl/structure.go
 export interface File {
@@ -13,6 +23,14 @@ export interface File {
     Bytes: string;
     // empty interface{} type, falling back to unknown
     Nav: unknown;
+}
+
+// From apitypes/apitypes.go
+export interface FriendlyDiagnostic {
+    severity: DiagnosticSeverityString;
+    summary: string;
+    detail: string;
+    extra: DiagnosticExtra;
 }
 
 // From apitypes/apitypes.go

@@ -62,9 +62,12 @@ func typeMappings(gen *guts.GoParser) error {
 	gen.IncludeCustomDeclaration(map[string]guts.TypeOverride{
 		// opt.Bool can return 'null' if unset
 		"tailscale.com/types/opt.Bool": config.OverrideNullable(config.OverrideLiteral(bindings.KeywordBoolean)),
+		// Replace the hcl packag's Diagnostic with preview's FriendlyDiagnostic.
+		// This is needed because when the preview package's re-exported Diagnostic
+		// type is marshalled it's converted into FriendlyDiagnostic.
 		"github.com/hashicorp/hcl/v2.Diagnostic": func() bindings.ExpressionType {
 			return bindings.Reference(bindings.Identifier{
-				Name:    "unknown",
+				Name:    "FriendlyDiagnostic",
 				Package: nil,
 				Prefix:  "",
 			})

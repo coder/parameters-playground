@@ -15,3 +15,5 @@ type PreviewOutput struct {
 }
 
 type NullHCLString = types.NullHCLString
+
+type FriendlyDiagnostic = types.FriendlyDiagnostic

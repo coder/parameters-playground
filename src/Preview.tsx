@@ -1,11 +1,16 @@
 import { Button } from "@/components/Button";
 import { ResizablePanel } from "@/components/Resizable";
+import {
+	type Diagnostic,
+	type InternalDiagnostic,
+	outputToDiagnostics,
+} from "@/diagnostics";
+import type { PreviewOutput } from "@/gen/types";
 import { useDebouncedValue } from "@/hooks/debounce";
 import { useStore } from "@/store";
 import { cn } from "@/utils/cn";
 import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react";
 import { type FC, useEffect, useState } from "react";
-import type { PreviewOutput } from "@/gen/types";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -32,13 +37,27 @@ export const Preview: FC = () => {
 				} else {
 					const output = JSON.parse(rawOutput) as PreviewOutput;
 					setOutput(() => output);
+					$setError(outputToDiagnostics(output));
 				}
 			} catch (e) {
 				console.error(e);
 				if (e instanceof Error) {
-					$setError(`${e.name}: ${e.message}`);
+					const diagnostic: InternalDiagnostic = {
+						severity: "error",
+						summary: e.name,
+						detail: e.message,
+						kind: "internal",
+					};
+					$setError([diagnostic]);
 				} else {
-					$setError("Something went wrong");
+					const diagnostic: InternalDiagnostic = {
+						severity: "error",
+						summary: "Error",
+						detail: "Something went wrong",
+						kind: "internal",
+					};
+
+					$setError([diagnostic]);
 				}
 			}
 		};
@@ -130,10 +149,10 @@ const PreviewEmptyState = () => {
 };
 
 const ErrorPane = () => {
-	const $error = useStore((state) => state.error);
+	const $errors = useStore((state) => state.errors);
 	const $toggleShowError = useStore((state) => state.toggleShowError);
 
-	if (!$error) {
+	if ($errors.diagnostics.length === 0) {
 		return null;
 	}
 
@@ -143,7 +162,7 @@ const ErrorPane = () => {
 				aria-hidden={true}
 				className={cn(
 					"pointer-events-none absolute top-0 left-0 h-full w-full transition-all",
-					$error.show && "bg-black/50",
+					$errors.show && "bg-black/20 dark:bg-black/50",
 				)}
 			>
 				{/* OVERLAY */}
@@ -152,32 +171,59 @@ const ErrorPane = () => {
 			<div
 				className={cn(
 					"absolute bottom-0 left-0 w-full",
-					$error.show && "h-auto",
+					$errors.show && "h-auto",
 				)}
 			>
 				<button
-					className="flex h-4 min-h-4 w-full items-center justify-center rounded-t-xl bg-[#AA5253]"
+					className="flex h-4 min-h-4 w-full items-center justify-center rounded-t-xl bg-border-destructive"
 					onClick={$toggleShowError}
 				>
 					<div className="h-0.5 w-2/3 max-w-32 rounded-full bg-white/40"></div>
 				</button>
 
 				<div
-					aria-hidden={!$error.show}
+					aria-hidden={!$errors.show}
 					className={cn(
 						"flex h-full flex-col gap-6 bg-surface-secondary p-6",
-						!$error.show && "pointer-events-none h-0 p-0",
+						!$errors.show && "pointer-events-none h-0 p-0",
 					)}
 				>
 					<p className="font-semibold text-content-primary text-xl">
 						An error has occurred
 					</p>
-					<p className="rounded-xl bg-surface-tertiary p-3 font-mono text-content-primary text-xs">
-						{$error.message}
-					</p>
+					<div className="flex w-full flex-col gap-3">
+						{$errors.diagnostics.map((diagnostic, index) => (
+							<ErrorBlock diagnostic={diagnostic} key={index} />
+						))}
+					</div>
 				</div>
 			</div>
 		</>
+	);
+};
+
+type ErroBlockPorps = {
+	diagnostic: Diagnostic;
+};
+const ErrorBlock: FC<ErroBlockPorps> = ({ diagnostic }) => {
+	return (
+		<div className="rounded-xl bg-surface-tertiary p-3 font-mono text-content-primary text-sm leading-normal">
+			<p
+				className={cn(
+					"text-content-destructive",
+					diagnostic.severity === "warning" && "text-content-warning",
+				)}
+			>
+				<span className="uppercase">
+					<strong>{diagnostic.severity}</strong>
+				</span>
+				{diagnostic.kind === "parameter"
+					? ` (${diagnostic.parameterName})`
+					: null}
+				: {diagnostic.summary}
+			</p>
+			<p>{diagnostic.detail}</p>
+		</div>
 	);
 };
 
