@@ -128,7 +128,10 @@ export const Preview: FC = () => {
 								</p>
 								<div className="flex flex-col gap-2">
 									{output.parser_logs?.map((log, index) => (
-										<p key={index} className="-indent-4 pl-4 text-content-primary">
+										<p
+											key={index}
+											className="-indent-4 pl-4 text-content-primary"
+										>
 											{log.time} {log.level}: {log.msg} - {log.err}
 										</p>
 									))}
@@ -208,7 +211,7 @@ const ErrorPane = () => {
 			<div
 				role="alertdialog"
 				className={cn(
-					"absolute bottom-0 left-0 w-full",
+					"absolute bottom-0 left-0 flex max-h-[60%] w-full flex-col justify-start",
 					$errors.show && "h-auto",
 				)}
 			>
@@ -223,13 +226,10 @@ const ErrorPane = () => {
 				<div
 					aria-hidden={!$errors.show}
 					className={cn(
-						"flex h-full flex-col gap-6 bg-surface-secondary p-6",
+						"flex flex-col gap-6 overflow-y-scroll bg-surface-secondary p-6",
 						!$errors.show && "pointer-events-none h-0 p-0",
 					)}
 				>
-					<p className="font-semibold text-content-primary text-xl">
-						An error has occurred
-					</p>
 					<div className="flex w-full flex-col gap-3">
 						{$errors.diagnostics.map((diagnostic, index) => (
 							<ErrorBlock diagnostic={diagnostic} key={index} />
