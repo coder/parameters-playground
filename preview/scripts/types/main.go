@@ -7,7 +7,6 @@ import (
 	"github.com/coder/guts"
 	"github.com/coder/guts/bindings"
 	"github.com/coder/guts/config"
-	"golang.org/x/xerrors"
 )
 
 func main() {
@@ -23,7 +22,7 @@ func main() {
 
 	referencePackages := map[string]string{
 		"github.com/coder/preview":                              "Output",
-		"github.com/coder/preview/types":                        "FriendlyDiagnostic",
+		"github.com/coder/preview/types":                        "Paramater",
 		"github.com/hashicorp/hcl/v2":                           "File",
 		"github.com/hashicorp/hcl/v2/hclwrite":                  "Expression",
 		"github.com/zclconf/go-cty/cty":                         "Value",
@@ -38,11 +37,6 @@ func main() {
 		}
 	}
 
-	// err = gen.IncludeReference("github.com/coder/preview/types", "FriendlyDiagnostic")
-	// if err != nil {
-	// 	log.Fatalf("include reference package %q: %v", "github.com/coder/preview/types", err)
-	// }
-
 	err = typeMappings(gen)
 	if err != nil {
 		log.Fatalf("type mappings: %v", err)
@@ -55,7 +49,11 @@ func main() {
 		log.Fatalf("to typescript: %v", err)
 	}
 
-	fmt.Println(ts.Serialize())
+	output, err := ts.Serialize()
+	if err != nil {
+		log.Fatalf("serialize: %v", err)
+	}
+	_, _ = fmt.Println(output)
 }
 
 func typeMappings(gen *guts.GoParser) error {
@@ -65,10 +63,16 @@ func typeMappings(gen *guts.GoParser) error {
 		"github.com/coder/coder/v2/codersdk.NullTime": config.OverrideNullable(config.OverrideLiteral(bindings.KeywordString)),
 		// opt.Bool can return 'null' if unset
 		"tailscale.com/types/opt.Bool": config.OverrideNullable(config.OverrideLiteral(bindings.KeywordBoolean)),
-		// hcl diagnostics should be cast to `preview.FriendlyDiagnostic`
 		"github.com/hashicorp/hcl/v2.Diagnostic": func() bindings.ExpressionType {
 			return bindings.Reference(bindings.Identifier{
-				Name:    "FriendlyDiagnostic",
+				Name:    "unknown",
+				Package: nil,
+				Prefix:  "",
+			})
+		},
+		"github.com/hashicorp/hcl/v2.Body": func() bindings.ExpressionType {
+			return bindings.Reference(bindings.Identifier{
+				Name:    "unknown",
 				Package: nil,
 				Prefix:  "",
 			})
@@ -81,24 +85,6 @@ func typeMappings(gen *guts.GoParser) error {
 			})
 		},
 	})
-
-	err := gen.IncludeCustom(map[string]string{
-		// Serpent fields should be converted to their primitive types
-		"github.com/coder/serpent.Regexp":         "string",
-		"github.com/coder/serpent.StringArray":    "string",
-		"github.com/coder/serpent.String":         "string",
-		"github.com/coder/serpent.YAMLConfigPath": "string",
-		"github.com/coder/serpent.Strings":        "[]string",
-		"github.com/coder/serpent.Int64":          "int64",
-		"github.com/coder/serpent.Bool":           "bool",
-		"github.com/coder/serpent.Duration":       "int64",
-		"github.com/coder/serpent.URL":            "string",
-		"github.com/coder/serpent.HostPort":       "string",
-		"encoding/json.RawMessage":                "map[string]string",
-	})
-	if err != nil {
-		return xerrors.Errorf("include custom: %w", err)
-	}
 
 	return nil
 }

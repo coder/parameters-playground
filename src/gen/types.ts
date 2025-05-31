@@ -6,83 +6,11 @@ export interface BlockBlock {
 
 // From hcl/structure.go
 export interface FileFile {
-    Body: FileBody;
+    Body: unknown;
     Bytes: string;
     // empty interface{} type, falling back to unknown
     Nav: unknown;
 }
-
-// From types/diagnostics.go
-export type FriendlyDiagnosticDiagnostics = (FriendlyDiagnostic | null)[];
-
-// From types/parameter.go
-export interface FriendlyDiagnosticParameter extends FriendlyDiagnosticParameterData {
-    value: NullHCLString;
-    diagnostics: FriendlyDiagnosticDiagnostics;
-}
-
-// From types/parameter.go
-export interface FriendlyDiagnosticParameterData {
-    name: string;
-    display_name: string;
-    description: string;
-    type: FriendlyDiagnosticParameterType;
-    form_type: ParameterFormTypeParameterFormType;
-    styling: FriendlyDiagnosticParameterStyling;
-    mutable: boolean;
-    default_value: NullHCLString;
-    icon: string;
-    options: (FriendlyDiagnosticParameterOption | null)[];
-    validations: (FriendlyDiagnosticParameterValidation | null)[];
-    required: boolean;
-    order: number;
-    ephemeral: boolean;
-}
-
-// From types/parameter.go
-export interface FriendlyDiagnosticParameterOption {
-    name: string;
-    description: string;
-    value: NullHCLString;
-    icon: string;
-}
-
-// From types/parameter.go
-export interface FriendlyDiagnosticParameterStyling {
-    placeholder?: string | null;
-    disabled?: boolean | null;
-    label?: string | null;
-}
-
-// From types/enum.go
-export type FriendlyDiagnosticParameterType = string;
-
-// From types/parameter.go
-export interface FriendlyDiagnosticParameterValidation {
-    validation_error: string;
-    validation_regex: string | null;
-    validation_min: number | null;
-    validation_max: number | null;
-    validation_monotonic: string | null;
-}
-
-// From types/tags.go
-export interface FriendlyDiagnosticTag {
-    Key: NullHCLString;
-    Value: NullHCLString;
-}
-
-// From types/tags.go
-export interface FriendlyDiagnosticTagBlock {
-    Tags: FriendlyDiagnosticTags;
-    Block: BlockBlock | null;
-}
-
-// From types/tags.go
-export type FriendlyDiagnosticTagBlocks = FriendlyDiagnosticTagBlock[];
-
-// From types/tags.go
-export type FriendlyDiagnosticTags = FriendlyDiagnosticTag[];
 
 // From apitypes/apitypes.go
 export interface NullHCLString {
@@ -93,10 +21,82 @@ export interface NullHCLString {
 // From preview/preview.go
 export interface OutputOutput {
     ModuleOutput: ValueValue;
-    Parameters: FriendlyDiagnosticParameter[];
-    WorkspaceTags: FriendlyDiagnosticTagBlocks;
+    Parameters: ParamaterParameter[];
+    WorkspaceTags: ParamaterTagBlocks;
     Files: Record<string, FileFile | null> | null;
 }
+
+// From types/diagnostics.go
+export type ParamaterDiagnostics = (unknown | null)[];
+
+// From types/parameter.go
+export interface ParamaterParameter extends ParamaterParameterData {
+    value: NullHCLString;
+    diagnostics: ParamaterDiagnostics;
+}
+
+// From types/parameter.go
+export interface ParamaterParameterData {
+    name: string;
+    display_name: string;
+    description: string;
+    type: ParamaterParameterType;
+    form_type: ParameterFormTypeParameterFormType;
+    styling: ParamaterParameterStyling;
+    mutable: boolean;
+    default_value: NullHCLString;
+    icon: string;
+    options: (ParamaterParameterOption | null)[];
+    validations: (ParamaterParameterValidation | null)[];
+    required: boolean;
+    order: number;
+    ephemeral: boolean;
+}
+
+// From types/parameter.go
+export interface ParamaterParameterOption {
+    name: string;
+    description: string;
+    value: NullHCLString;
+    icon: string;
+}
+
+// From types/parameter.go
+export interface ParamaterParameterStyling {
+    placeholder?: string | null;
+    disabled?: boolean | null;
+    label?: string | null;
+}
+
+// From types/enum.go
+export type ParamaterParameterType = string;
+
+// From types/parameter.go
+export interface ParamaterParameterValidation {
+    validation_error: string;
+    validation_regex: string | null;
+    validation_min: number | null;
+    validation_max: number | null;
+    validation_monotonic: string | null;
+}
+
+// From types/tags.go
+export interface ParamaterTag {
+    Key: NullHCLString;
+    Value: NullHCLString;
+}
+
+// From types/tags.go
+export interface ParamaterTagBlock {
+    Tags: ParamaterTags;
+    Block: BlockBlock | null;
+}
+
+// From types/tags.go
+export type ParamaterTagBlocks = ParamaterTagBlock[];
+
+// From types/tags.go
+export type ParamaterTags = ParamaterTag[];
 
 // From provider/formtype.go
 export type ParameterFormTypeParameterFormType = string;
@@ -104,7 +104,7 @@ export type ParameterFormTypeParameterFormType = string;
 // From apitypes/apitypes.go
 export interface PreviewOutput {
     output: OutputOutput | null;
-    diags: FriendlyDiagnosticDiagnostics;
+    diags: ParamaterDiagnostics;
     parser_logs?: string;
 }
 
@@ -112,4 +112,4 @@ export interface PreviewOutput {
 export interface ValueValue {
 }
 
- <nil>
+
