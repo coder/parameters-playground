@@ -21,8 +21,6 @@ import (
 	"github.com/coder/parameters-playground/preview/apitypes"
 )
 
-type Foo struct{}
-
 func main() {
 	// Create a channel to keep the Go program alive
 	done := make(chan struct{})
