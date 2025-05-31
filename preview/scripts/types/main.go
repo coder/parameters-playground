@@ -21,14 +21,14 @@ func main() {
 	}
 
 	referencePackages := map[string]string{
-		"github.com/coder/preview":                              "Output",
-		"github.com/coder/preview/types":                        "Paramater",
-		"github.com/hashicorp/hcl/v2":                           "File",
-		"github.com/hashicorp/hcl/v2/hclwrite":                  "Expression",
-		"github.com/zclconf/go-cty/cty":                         "Value",
-		"github.com/aquasecurity/trivy/pkg/iac/terraform":       "Block",
-		"github.com/coder/terraform-provider-coder/v2/provider": "ParameterFormType",
-		"github.com/zclconf/go-cty/cty/function":                "Function"}
+		"github.com/coder/preview":                              "",
+		"github.com/coder/preview/types":                        "",
+		"github.com/hashicorp/hcl/v2":                           "",
+		"github.com/hashicorp/hcl/v2/hclwrite":                  "",
+		"github.com/zclconf/go-cty/cty":                         "",
+		"github.com/aquasecurity/trivy/pkg/iac/terraform":       "",
+		"github.com/coder/terraform-provider-coder/v2/provider": "",
+		"github.com/zclconf/go-cty/cty/function":                ""}
 
 	for pkg, prefix := range referencePackages {
 		err = gen.IncludeReference(pkg, prefix)
@@ -60,7 +60,6 @@ func typeMappings(gen *guts.GoParser) error {
 	gen.IncludeCustomDeclaration(config.StandardMappings())
 
 	gen.IncludeCustomDeclaration(map[string]guts.TypeOverride{
-		"github.com/coder/coder/v2/codersdk.NullTime": config.OverrideNullable(config.OverrideLiteral(bindings.KeywordString)),
 		// opt.Bool can return 'null' if unset
 		"tailscale.com/types/opt.Bool": config.OverrideNullable(config.OverrideLiteral(bindings.KeywordBoolean)),
 		"github.com/hashicorp/hcl/v2.Diagnostic": func() bindings.ExpressionType {

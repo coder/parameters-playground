@@ -5,9 +5,7 @@ import { useStore } from "@/store";
 import { cn } from "@/utils/cn";
 import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react";
 import { type FC, useEffect, useState } from "react";
-import * as v from "valibot";
-
-// const OutputSchema = 
+import type { PreviewOutput } from "@/gen/types";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -16,7 +14,7 @@ export const Preview: FC = () => {
 
 	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
 
-	const [output, setOutput] = useState<string | null>(() => null);
+	const [output, setOutput] = useState<PreviewOutput | null>(() => null);
 
 	useEffect(() => {
 		if (!window.go_preview) {
@@ -25,13 +23,14 @@ export const Preview: FC = () => {
 
 		const getOutput = async () => {
 			try {
-				const output = await window.go_preview?.({
+				const rawOutput = await window.go_preview?.({
 					"main.tf": debouncedCode,
 				});
 
-				if (output === undefined) {
+				if (rawOutput === undefined) {
 					console.error("Something went wrong");
 				} else {
+					const output = JSON.parse(rawOutput) as PreviewOutput;
 					setOutput(() => output);
 				}
 			} catch (e) {
@@ -67,12 +66,31 @@ export const Preview: FC = () => {
 				</div>
 
 				<div
-					className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4"
+					className={cn(
+						"flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4",
+						output && "block overflow-y-scroll",
+					)}
 					style={{
 						opacity: isDebouncing && $wasmState === "loaded" ? 0.5 : 1,
 					}}
 				>
-					{output ? output : <PreviewEmptyState />}
+					{output ? (
+						<div className="flex flex-col gap-4">
+							<p className=" w-fit break-all text-content-primary">
+								{JSON.stringify(output.output?.Parameters, null, 2)}
+							</p>
+
+							<p className=" w-fit break-all text-content-primary">
+								{JSON.stringify(output.diags, null, 2)}
+							</p>
+
+							<p className=" w-fit break-all text-content-primary">
+								{output.parser_logs}
+							</p>
+						</div>
+					) : (
+						<PreviewEmptyState />
+					)}
 				</div>
 			</div>
 
