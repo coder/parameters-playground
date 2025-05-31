@@ -17,7 +17,11 @@ import (
 
 	"github.com/coder/preview"
 	"github.com/coder/preview/types"
+
+	"github.com/coder/parameters-playground/preview/apitypes"
 )
+
+type Foo struct{}
 
 func main() {
 	// Create a channel to keep the Go program alive
@@ -31,21 +35,12 @@ func main() {
 	<-done
 }
 
-type previewOutput struct {
-	Output *preview.Output   `json:"output"`
-	Diags  types.Diagnostics `json:"diags"`
-	// ParserLogs are trivy logs that occur during parsing the
-	// Terraform files. This is useful for debugging issues with the
-	// invalid terraform syntax.
-	ParserLogs string `json:"parser_logs,omitempty"`
-}
-
 func tfpreview(this js.Value, p []js.Value) (output any) {
 	var buf bytes.Buffer
 	defer func() {
 		// Return a panic as a diagnostic if one occurs.
 		if r := recover(); r != nil {
-			data, _ := json.Marshal(previewOutput{
+			data, _ := json.Marshal(apitypes.PreviewOutput{
 				Output:     nil,
 				ParserLogs: buf.String(),
 				Diags: types.Diagnostics{
@@ -79,7 +74,7 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 		Logger:          logger,
 	}, tf)
 
-	data, _ := json.Marshal(previewOutput{
+	data, _ := json.Marshal(apitypes.PreviewOutput{
 		Output:     pOutput,
 		Diags:      types.Diagnostics(diags),
 		ParserLogs: buf.String(),

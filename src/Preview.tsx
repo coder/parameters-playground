@@ -3,8 +3,11 @@ import { ResizablePanel } from "@/components/Resizable";
 import { useDebouncedValue } from "@/hooks/debounce";
 import { useStore } from "@/store";
 import { cn } from "@/utils/cn";
-import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react"
+import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react";
 import { type FC, useEffect, useState } from "react";
+import * as v from "valibot";
+
+// const OutputSchema = 
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -23,7 +26,7 @@ export const Preview: FC = () => {
 		const getOutput = async () => {
 			try {
 				const output = await window.go_preview?.({
-					"main.tf": debouncedCode
+					"main.tf": debouncedCode,
 				});
 
 				if (output === undefined) {
@@ -66,7 +69,7 @@ export const Preview: FC = () => {
 				<div
 					className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4"
 					style={{
-						opacity: isDebouncing ? 0.5 : 1,
+						opacity: isDebouncing && $wasmState === "loaded" ? 0.5 : 1,
 					}}
 				>
 					{output ? output : <PreviewEmptyState />}
