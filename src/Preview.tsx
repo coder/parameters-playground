@@ -15,6 +15,7 @@ import { type FC, useEffect, useState } from "react";
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
 	const $code = useStore((state) => state.code);
+	const $errors = useStore((state) => state.errors);
 	const $setError = useStore((state) => state.setError);
 
 	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
@@ -74,8 +75,16 @@ export const Preview: FC = () => {
 			) : null}
 
 			<div
-				aria-hidden={$wasmState !== "loaded"}
-				className="flex h-full w-full flex-col items-start gap-6 p-8"
+				aria-hidden={
+					$wasmState !== "loaded" ||
+					($errors.show && $errors.diagnostics.length > 0)
+				}
+				className={cn(
+					"flex h-full w-full flex-col items-start gap-6 p-8",
+					($wasmState !== "loaded" ||
+						($errors.show && $errors.diagnostics.length > 0)) &&
+						"pointer-events-none",
+				)}
 			>
 				<div className="flex w-full items-center justify-between">
 					<p className="font-semibold text-3xl text-content-primary">
