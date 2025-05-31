@@ -13,3 +13,8 @@ type PreviewOutput struct {
 	// invalid terraform syntax.
 	ParserLogs string `json:"parser_logs,omitempty"`
 }
+
+type NullHCLString struct {
+	Value string `json:"value"`
+	Valid bool   `json:"valid"`
+}

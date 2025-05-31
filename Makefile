@@ -8,7 +8,7 @@ build/preview.wasm: $(GO_SRC_FILES)
 .PHONY: gen-types
 gen-types: src/gen/types.ts
 
-src/gen/types.ts: preview/scripts/types/main.go
+src/gen/types.ts: preview/scripts/types/main.go preview/apitypes/apitypes.go
 	mkdir -p src/gen
 	go run -C ./preview/scripts/types main.go > $@
 	touch "$@"
