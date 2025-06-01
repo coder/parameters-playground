@@ -5,6 +5,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App.tsx";
 import { ThemeProvider } from "@/contexts/theme.tsx";
+import { BrowserRouter } from "react-router";
 
 const root = document.getElementById("root");
 
@@ -13,11 +14,13 @@ if (!root) {
 } else {
 	createRoot(root).render(
 		<StrictMode>
-			<ThemeProvider>
-				<TooltipProvider>
-					<App />
-				</TooltipProvider>
-			</ThemeProvider>
+			<BrowserRouter>
+				<ThemeProvider>
+					<TooltipProvider>
+						<App />
+					</TooltipProvider>
+				</ThemeProvider>
+			</BrowserRouter>
 		</StrictMode>,
 	);
 }

@@ -1,5 +1,6 @@
 import { Button } from "@/components/Button";
 import { ResizablePanel } from "@/components/Resizable";
+import * as Tabs from "@/components/Tabs";
 import {
 	type Diagnostic,
 	type InternalDiagnostic,
@@ -9,9 +10,16 @@ import type { PreviewOutput } from "@/gen/types";
 import { useDebouncedValue } from "@/hooks/debounce";
 import { useStore } from "@/store";
 import { cn } from "@/utils/cn";
-import { ActivityIcon, ExternalLinkIcon, LoaderIcon } from "lucide-react";
+import {
+	ActivityIcon,
+	BugIcon,
+	ExternalLinkIcon,
+	LoaderIcon,
+	PlayIcon,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { type FC, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -20,8 +28,10 @@ export const Preview: FC = () => {
 	const $setError = useStore((state) => state.setError);
 
 	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
-
 	const [_output, setOutput] = useState<PreviewOutput | null>(() => null);
+
+	const [params] = useSearchParams();
+	const isDebug = useMemo(() => params.has("debug"), [params]);
 
 	useEffect(() => {
 		if (!window.go_preview) {
@@ -68,57 +78,62 @@ export const Preview: FC = () => {
 	}, [debouncedCode, $setError]);
 
 	return (
-		<ResizablePanel className="relative">
-			{$wasmState !== "loaded" ? (
-				<div className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center backdrop-blur-sm">
-					{$wasmState === "loading" ? <WasmLoading /> : <WasmError />}
-				</div>
-			) : null}
-
-			<div
-				aria-hidden={
-					$wasmState !== "loaded" ||
-					($errors.show && $errors.diagnostics.length > 0)
-				}
-				className={cn(
-					"flex h-full w-full flex-col items-start gap-6 p-8",
-					($wasmState !== "loaded" ||
-						($errors.show && $errors.diagnostics.length > 0)) &&
-						"pointer-events-none",
-				)}
-			>
-				<div className="flex w-full items-center justify-between">
-					<div className="flex items-center justify-center gap-4">
-						<p className="font-semibold text-3xl text-content-primary">
-							Parameters
-						</p>
-
-						<AnimatePresence>
-							{isDebouncing && $wasmState === "loaded" ? (
-								<motion.div
-									initial={{ opacity: 0, scale: 0.75 }}
-									animate={{ opacity: 1, scale: 1 }}
-									exit={{ opacity: 0, scale: 0.75 }}
-								>
-									<LoaderIcon className="animate-spin text-content-primary" />
-								</motion.div>
-							) : null}
-						</AnimatePresence>
+		<Tabs.Root defaultValue="preview" asChild={true}>
+			<ResizablePanel className="relative flex flex-col">
+				{$wasmState !== "loaded" ? (
+					<div className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center backdrop-blur-sm">
+						{$wasmState === "loading" ? <WasmLoading /> : <WasmError />}
 					</div>
-					<Button variant="destructive">Reset form</Button>
-				</div>
+				) : null}
 
-				<div
-					className={cn(
-						"flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4",
-					)}
-				>
-					<PreviewEmptyState />
-				</div>
-			</div>
+				<Tabs.List className={!isDebug ? "hidden" : undefined}>
+					<Tabs.Trigger value="preview" icon={PlayIcon} label="Preview" />
+					<Tabs.Trigger value="debug" icon={BugIcon} label="Debugger" />
+				</Tabs.List>
 
-			<ErrorPane />
-		</ResizablePanel>
+				<Tabs.Content value="preview" asChild={true}>
+					<div
+						aria-hidden={
+							$wasmState !== "loaded" ||
+							($errors.show && $errors.diagnostics.length > 0)
+						}
+						className={cn(
+							"flex h-full w-full flex-col items-start gap-6 p-8",
+							($wasmState !== "loaded" ||
+								($errors.show && $errors.diagnostics.length > 0)) &&
+								"pointer-events-none",
+						)}
+					>
+						<div className="flex w-full items-center justify-between">
+							<div className="flex items-center justify-center gap-4">
+								<p className="font-semibold text-3xl text-content-primary">
+									Parameters
+								</p>
+
+								<AnimatePresence>
+									{isDebouncing && $wasmState === "loaded" ? (
+										<motion.div
+											initial={{ opacity: 0, scale: 0.75 }}
+											animate={{ opacity: 1, scale: 1 }}
+											exit={{ opacity: 0, scale: 0.75 }}
+										>
+											<LoaderIcon className="animate-spin text-content-primary" />
+										</motion.div>
+									) : null}
+								</AnimatePresence>
+							</div>
+							<Button variant="destructive">Reset form</Button>
+						</div>
+
+						<div className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4">
+							<PreviewEmptyState />
+						</div>
+					</div>
+				</Tabs.Content>
+
+				<ErrorPane />
+			</ResizablePanel>
+		</Tabs.Root>
 	);
 };
 

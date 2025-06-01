@@ -39,7 +39,7 @@ export const Trigger: FC<TriggerProps> = ({
 		<Tabs.Trigger
 			{...rest}
 			className={cn(
-				"flex min-w-[120px] items-center gap-2 border-x border-x-transparent px-4 py-3 text-center text-content-secondary text-sm transition-colors hover:bg-surface-secondary hover:text-content-primary data-[disabled]:cursor-not-allowed data-[state=active]:border-x-border data-[state=active]:bg-surface-secondary data-[state=active]:text-content-primary data-[disabled]:hover:bg-inherit data-[disabled]:hover:text-content-secondary data-[state=active]:last:border-r-transparent data-[state=active]:first:border-l-transparent",
+				"flex min-w-[120px] items-center gap-2 border-x border-x-transparent px-4 py-3 text-center text-content-secondary text-sm transition-colors hover:bg-surface-secondary hover:text-content-primary data-[disabled]:cursor-not-allowed data-[state=active]:border-x-border data-[state=active]:bg-surface-secondary data-[state=active]:text-content-primary data-[disabled]:hover:bg-inherit data-[disabled]:hover:text-content-secondary data-[state=active]:first:border-l-transparent",
 				className,
 			)}
 		>
