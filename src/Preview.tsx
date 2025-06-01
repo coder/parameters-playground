@@ -361,8 +361,14 @@ const LogsEmptyState = () => {
 
 type LogProps = { log: ParserLog };
 const Log: FC<LogProps> = ({ log }) => {
+	const [showTable, setShowTable] = useState(() => false);
+
 	return (
-		<Dialog.Root modal={true}>
+		<Dialog.Root
+			modal={true}
+			open={showTable}
+			onOpenChange={(show) => setShowTable(() => show)}
+		>
 			<Dialog.Trigger
 				className={cn(
 					"group grid h-fit min-h-10 w-full grid-cols-8 items-center border-b border-l-4 border-l-content-destructive hover:bg-surface-primary",
@@ -380,53 +386,81 @@ const Log: FC<LogProps> = ({ log }) => {
 				</p>
 			</Dialog.Trigger>
 
-			<Dialog.Portal>
-				<Dialog.Overlay className="fixed top-0 left-0 h-full w-full bg-black/50" />
-				<Dialog.Content className="fixed top-0 right-0 flex h-full w-full max-w-md flex-col justify-start gap-3 border-l bg-surface-primary p-4">
-					<div>
-						<Dialog.Close asChild={true}>
-							<Button variant="outline" size="icon" className="float-right">
-								<XIcon />
-							</Button>
-						</Dialog.Close>
-					</div>
-					<div className="flex w-full flex-col overflow-clip rounded-lg border font-mono text-content-primary text-xs">
-						<div className="grid grid-cols-8 border-b bg-surface-secondary">
-							<div className="col-span-2 flex min-h-10 items-center border-r px-2 py-1">
-								<p className="text-left uppercase">field</p>
-							</div>
-							<div className="col-span-6 flex min-h-10 items-center px-2 py-1">
-								<p className="text-left uppercase">value</p>
-							</div>
-						</div>
-						{Object.entries(log).map(([key, value], index) => {
-							const displayValue = JSON.stringify(value);
-
-							return (
-								<div
-									key={index}
-									className="grid grid-cols-8 border-b last:border-b-0"
+			<Dialog.Portal forceMount={true}>
+				<AnimatePresence propagate={true}>
+					{showTable ? (
+						<>
+							<Dialog.Overlay asChild={true}>
+								<motion.div
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									className="fixed top-0 left-0 z-10 h-full w-full bg-black/50"
+								/>
+							</Dialog.Overlay>
+							<Dialog.Content asChild={true}>
+								<motion.div
+									initial={{ opacity: 0, transform: "translateX(100px)" }}
+									animate={{ opacity: 1, transform: "translateX(0px)" }}
+									exit={{ opacity: 0, transform: "translateX(100px)" }}
+									className="fixed top-0 right-0 z-20 flex h-full w-full max-w-md flex-col justify-start gap-6 border-l bg-surface-primary p-4"
 								>
-									<div className="col-span-2 flex min-h-10 items-center border-r px-2 py-1">
-										<p className="text-left">{key}</p>
+									<div className="flex items-center justify-between">
+										<p className="font-semibold text-2xl text-content-primary">Log</p>
+										<Dialog.Close asChild={true}>
+											<Button
+												variant="outline"
+												size="icon"
+												className="float-right"
+											>
+												<XIcon />
+											</Button>
+										</Dialog.Close>
 									</div>
-									<div className="col-span-6 flex min-h-10 items-center px-2 py-1">
-										<p
-											className={cn(
-												"text-left",
-												value === "" && "text-content-secondary italic",
-											)}
-										>
-											{value === ""
-												? "<empty string>"
-												: displayValue.substring(1, displayValue.length - 1)}
-										</p>
+									<div className="flex w-full flex-col overflow-clip rounded-lg border font-mono text-content-primary text-xs">
+										<div className="grid grid-cols-8 border-b bg-surface-secondary">
+											<div className="col-span-2 flex min-h-8 items-center border-r px-2 py-1">
+												<p className="text-left uppercase">field</p>
+											</div>
+											<div className="col-span-6 flex min-h-8 items-center px-2 py-1">
+												<p className="text-left uppercase">value</p>
+											</div>
+										</div>
+										{Object.entries(log).map(([key, value], index) => {
+											const displayValue = JSON.stringify(value);
+
+											return (
+												<div
+													key={index}
+													className="grid grid-cols-8 border-b last:border-b-0"
+												>
+													<div className="col-span-2 flex min-h-8 items-center border-r px-2 py-1">
+														<p className="text-left">{key}</p>
+													</div>
+													<div className="col-span-6 flex min-h-8 items-center px-2 py-1">
+														<p
+															className={cn(
+																"text-left",
+																value === "" && "text-content-secondary italic",
+															)}
+														>
+															{value === ""
+																? "<empty string>"
+																: displayValue.substring(
+																		1,
+																		displayValue.length - 1,
+																	)}
+														</p>
+													</div>
+												</div>
+											);
+										})}
 									</div>
-								</div>
-							);
-						})}
-					</div>
-				</Dialog.Content>
+								</motion.div>
+							</Dialog.Content>
+						</>
+					) : null}
+				</AnimatePresence>
 			</Dialog.Portal>
 		</Dialog.Root>
 	);
