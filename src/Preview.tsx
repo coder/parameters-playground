@@ -18,6 +18,7 @@ import { cn } from "@/utils/cn";
 import {
 	ActivityIcon,
 	BugIcon,
+	DownloadIcon,
 	ExternalLinkIcon,
 	LoaderIcon,
 	PlayIcon,
@@ -25,7 +26,14 @@ import {
 	XIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { type FC, useEffect, useMemo, useState } from "react";
+import {
+	type FC,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useSearchParams } from "react-router";
 
 export const Preview: FC = () => {
@@ -39,6 +47,20 @@ export const Preview: FC = () => {
 
 	const [params] = useSearchParams();
 	const isDebug = useMemo(() => params.has("debug"), [params]);
+
+
+	const onDownloadOutput = useCallback(() => {
+		const blob = new Blob([JSON.stringify(output, null, 2)], {
+			type: "application/json",
+		});
+
+		const url = URL.createObjectURL(blob);
+
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = "output.json";
+		link.click();
+	}, [output]);
 
 	useEffect(() => {
 		if (!window.go_preview) {
@@ -93,9 +115,20 @@ export const Preview: FC = () => {
 					</div>
 				) : null}
 
-				<Tabs.List className={!isDebug ? "hidden" : undefined}>
-					<Tabs.Trigger value="preview" icon={PlayIcon} label="Preview" />
-					<Tabs.Trigger value="debug" icon={BugIcon} label="Debugger" />
+				<Tabs.List
+					className={cn(
+						"justify-between pr-3",
+						!isDebug ? "hidden" : undefined,
+					)}
+				>
+					<div className="flex">
+						<Tabs.Trigger value="preview" icon={PlayIcon} label="Preview" />
+						<Tabs.Trigger value="debug" icon={BugIcon} label="Debugger" />
+					</div>
+					<Button size="sm" variant="outline" className="self-center" onClick={onDownloadOutput}>
+						<DownloadIcon />
+						Download output
+					</Button>
 				</Tabs.List>
 
 				<Tabs.Content value="preview" asChild={true}>
