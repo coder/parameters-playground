@@ -1,4 +1,5 @@
 import { Button } from "@/components/Button";
+import * as Dialog from "@radix-ui/react-dialog";
 import {
 	ResizableHandle,
 	ResizablePanel,
@@ -21,6 +22,7 @@ import {
 	LoaderIcon,
 	PlayIcon,
 	ScrollTextIcon,
+	XIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { type FC, useEffect, useMemo, useState } from "react";
@@ -103,7 +105,7 @@ export const Preview: FC = () => {
 							($errors.show && $errors.diagnostics.length > 0)
 						}
 						className={cn(
-							"flex h-full w-full flex-col items-start gap-6 p-8",
+							"flex h-full w-full flex-col items-start gap-6 p-6",
 							($wasmState !== "loaded" ||
 								($errors.show && $errors.diagnostics.length > 0)) &&
 								"pointer-events-none",
@@ -360,21 +362,72 @@ const LogsEmptyState = () => {
 type LogProps = { log: ParserLog };
 const Log: FC<LogProps> = ({ log }) => {
 	return (
-		<button
-			className={cn(
-				"group grid h-10 min-h-10 w-full grid-cols-8 items-center border-b border-l-4 border-l-content-destructive hover:bg-surface-primary",
-				log.level.toLowerCase() === "info" && "border-l-content-link",
-				log.level.toLowerCase() === "warning" && "border-l-content-warning",
-			)}
-		>
-			<div className="col-span-2 flex h-full items-center border-r px-2">
-				<p className="truncate text-left font-mono text-content-primary text-xs">
-					{log.msg}
+		<Dialog.Root modal={true}>
+			<Dialog.Trigger
+				className={cn(
+					"group grid h-fit min-h-10 w-full grid-cols-8 items-center border-b border-l-4 border-l-content-destructive hover:bg-surface-primary",
+					log.level.toLowerCase() === "info" && "border-l-content-link",
+					log.level.toLowerCase() === "warning" && "border-l-content-warning",
+				)}
+			>
+				<div className="col-span-2 flex h-full items-start border-r p-2">
+					<p className="truncate text-left font-mono text-content-primary text-xs">
+						{log.msg}
+					</p>
+				</div>
+				<p className="col-span-6 break-all p-2 text-left font-mono text-content-primary text-xs">
+					{JSON.stringify(log)}
 				</p>
-			</div>
-			<p className="col-span-6 truncate px-2 text-left font-mono text-content-primary text-xs">
-				{JSON.stringify(log)}
-			</p>
-		</button>
+			</Dialog.Trigger>
+
+			<Dialog.Portal>
+				<Dialog.Overlay className="fixed top-0 left-0 h-full w-full bg-black/50" />
+				<Dialog.Content className="fixed top-0 right-0 flex h-full w-full max-w-md flex-col justify-start gap-3 border-l bg-surface-primary p-4">
+					<div>
+						<Dialog.Close asChild={true}>
+							<Button variant="outline" size="icon" className="float-right">
+								<XIcon />
+							</Button>
+						</Dialog.Close>
+					</div>
+					<div className="flex w-full flex-col overflow-clip rounded-lg border font-mono text-content-primary text-xs">
+						<div className="grid grid-cols-8 border-b bg-surface-secondary">
+							<div className="col-span-2 flex min-h-10 items-center border-r px-2 py-1">
+								<p className="text-left uppercase">field</p>
+							</div>
+							<div className="col-span-6 flex min-h-10 items-center px-2 py-1">
+								<p className="text-left uppercase">value</p>
+							</div>
+						</div>
+						{Object.entries(log).map(([key, value], index) => {
+							const displayValue = JSON.stringify(value);
+
+							return (
+								<div
+									key={index}
+									className="grid grid-cols-8 border-b last:border-b-0"
+								>
+									<div className="col-span-2 flex min-h-10 items-center border-r px-2 py-1">
+										<p className="text-left">{key}</p>
+									</div>
+									<div className="col-span-6 flex min-h-10 items-center px-2 py-1">
+										<p
+											className={cn(
+												"text-left",
+												value === "" && "text-content-secondary italic",
+											)}
+										>
+											{value === ""
+												? "<empty string>"
+												: displayValue.substring(1, displayValue.length - 1)}
+										</p>
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				</Dialog.Content>
+			</Dialog.Portal>
+		</Dialog.Root>
 	);
 };
