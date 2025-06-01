@@ -1,12 +1,16 @@
 import { Button } from "@/components/Button";
-import { ResizablePanel } from "@/components/Resizable";
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from "@/components/Resizable";
 import * as Tabs from "@/components/Tabs";
 import {
 	type Diagnostic,
 	type InternalDiagnostic,
 	outputToDiagnostics,
 } from "@/diagnostics";
-import type { PreviewOutput } from "@/gen/types";
+import type { ParserLog, PreviewOutput } from "@/gen/types";
 import { useDebouncedValue } from "@/hooks/debounce";
 import { useStore } from "@/store";
 import { cn } from "@/utils/cn";
@@ -16,6 +20,7 @@ import {
 	ExternalLinkIcon,
 	LoaderIcon,
 	PlayIcon,
+	ScrollTextIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { type FC, useEffect, useMemo, useState } from "react";
@@ -28,7 +33,7 @@ export const Preview: FC = () => {
 	const $setError = useStore((state) => state.setError);
 
 	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
-	const [_output, setOutput] = useState<PreviewOutput | null>(() => null);
+	const [output, setOutput] = useState<PreviewOutput | null>(() => null);
 
 	const [params] = useSearchParams();
 	const isDebug = useMemo(() => params.has("debug"), [params]);
@@ -129,6 +134,10 @@ export const Preview: FC = () => {
 							<PreviewEmptyState />
 						</div>
 					</div>
+				</Tabs.Content>
+
+				<Tabs.Content value="debug" asChild={true}>
+					<Debugger output={output} />
 				</Tabs.Content>
 
 				<ErrorPane />
@@ -295,5 +304,77 @@ const WasmError: FC = () => {
 				Add some copy here to explain that this will only take a few moments
 			</p>
 		</div>
+	);
+};
+
+type DebuggerProps = {
+	output: PreviewOutput | null;
+};
+const Debugger: FC<DebuggerProps> = ({ output }) => {
+	const parserLogs = output?.parser_logs ?? [];
+
+	return (
+		<ResizablePanelGroup
+			direction="vertical"
+			className="h-full w-full bg-surface-primary"
+		>
+			<ResizablePanel> foo</ResizablePanel>
+			<ResizableHandle className="bg-surface-quaternary" />
+			<ResizablePanel
+				className={cn(
+					"flex h-full w-full flex-col justify-start overflow-y-scroll bg-surface-secondary",
+					parserLogs.length === 0 && "items-center justify-center",
+				)}
+				defaultSize={30}
+			>
+				{parserLogs.length === 0 ? (
+					<LogsEmptyState />
+				) : (
+					parserLogs.map((log, index) => <Log log={log} key={index} />)
+				)}
+			</ResizablePanel>
+		</ResizablePanelGroup>
+	);
+};
+
+const LogsEmptyState = () => {
+	return (
+		<div className="flex flex-col items-center justify-center gap-2">
+			<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-highlight-sky">
+				<ScrollTextIcon
+					width={20}
+					height={20}
+					className="text-content-invert"
+				/>
+			</div>
+			<div className="text-center">
+				<p className="text-base text-content-primary">No logs yet</p>
+				<p className="max-w-56 text-content-secondary text-xs">
+					Make changes to the template and view the output logs here
+				</p>
+			</div>
+		</div>
+	);
+};
+
+type LogProps = { log: ParserLog };
+const Log: FC<LogProps> = ({ log }) => {
+	return (
+		<button
+			className={cn(
+				"group grid h-10 min-h-10 w-full grid-cols-8 items-center border-b border-l-4 border-l-content-destructive hover:bg-surface-primary",
+				log.level.toLowerCase() === "info" && "border-l-content-link",
+				log.level.toLowerCase() === "warning" && "border-l-content-warning",
+			)}
+		>
+			<div className="col-span-2 flex h-full items-center border-r px-2">
+				<p className="truncate text-left font-mono text-content-primary text-xs">
+					{log.msg}
+				</p>
+			</div>
+			<p className="col-span-6 truncate px-2 text-left font-mono text-content-primary text-xs">
+				{JSON.stringify(log)}
+			</p>
+		</button>
 	);
 };
