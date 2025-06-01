@@ -324,16 +324,18 @@ const Debugger: FC<DebuggerProps> = ({ output }) => {
 			<ResizableHandle className="bg-surface-quaternary" />
 			<ResizablePanel
 				className={cn(
-					"flex h-full w-full flex-col justify-start overflow-y-scroll bg-surface-secondary",
+					"flex h-full w-full flex-col justify-start bg-surface-secondary",
 					parserLogs.length === 0 && "items-center justify-center",
 				)}
 				defaultSize={30}
 			>
-				{parserLogs.length === 0 ? (
-					<LogsEmptyState />
-				) : (
-					parserLogs.map((log, index) => <Log log={log} key={index} />)
-				)}
+				<div className="mb-4 overflow-y-scroll">
+					{parserLogs.length === 0 ? (
+						<LogsEmptyState />
+					) : (
+						parserLogs.map((log, index) => <Log log={log} key={index} />)
+					)}
+				</div>
 			</ResizablePanel>
 		</ResizablePanelGroup>
 	);
@@ -406,7 +408,9 @@ const Log: FC<LogProps> = ({ log }) => {
 									className="fixed top-0 right-0 z-20 flex h-full w-full max-w-md flex-col justify-start gap-6 border-l bg-surface-primary p-4"
 								>
 									<div className="flex items-center justify-between">
-										<p className="font-semibold text-2xl text-content-primary">Log</p>
+										<p className="font-semibold text-2xl text-content-primary">
+											Log
+										</p>
 										<Dialog.Close asChild={true}>
 											<Button
 												variant="outline"
