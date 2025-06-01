@@ -1,11 +1,11 @@
-// @ts-expect-error TODO: create types for this
 import "@fontsource-variable/inter";
+import "@fontsource/dm-mono";
 import { TooltipProvider } from "@/components/Tooltip";
+import { ThemeProvider } from "@/contexts/theme.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App.tsx";
-import { ThemeProvider } from "@/contexts/theme.tsx";
 import { BrowserRouter } from "react-router";
+import { App } from "./App.tsx";
 
 const root = document.getElementById("root");
 
