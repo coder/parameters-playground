@@ -132,11 +132,11 @@ export const Editor: FC = () => {
 				{/* CODE EDITOR */}
 				<div
 					className={cn(
-						"absolute mt-12 flex h-full w-full justify-end p-3",
+						"pointer-events-none absolute mt-12 flex w-full justify-end p-3",
 						tab !== "code" && "hidden",
 					)}
 				>
-					<Button className="z-10" variant="subtle" size="sm" onClick={onCopy}>
+					<Button className="pointer-events-auto z-10" variant="subtle" size="sm" onClick={onCopy}>
 						{codeCopied ? <CheckIcon /> : <CopyIcon />} Copy
 					</Button>
 				</div>
