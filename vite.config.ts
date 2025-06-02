@@ -5,7 +5,7 @@ import path from "node:path";
 
 // https://vite.dev/config/
 export default defineConfig({
-	base: "/parameters-playground/",
+	base: "/",
 	server: {
 		// For dev purposes when using Coder Connect, and ngrok
 		allowedHosts: [".coder", ".ngrok"],
