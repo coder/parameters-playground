@@ -10,7 +10,7 @@ module.exports = {
 		extend: {
 			fontFamily: {
 				sans: `"Inter Variable", system-ui, sans-serif`,
-				mono: `"DM Mono", system-mono, monospace`,
+				mono: `"DM Mono", monospace`,
 			},
 			size: {
 				"icon-lg": "1.5rem",

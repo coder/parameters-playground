@@ -388,7 +388,7 @@ const Debugger: FC<DebuggerProps> = ({ output }) => {
 			className="h-full w-full bg-surface-primary"
 		>
 			<ResizablePanel className="flex">
-				<div className="h-full w-full overflow-scroll break-all p-4">
+				<div className="h-full w-full overflow-scroll break-all p-4 text-sm font-mono">
 					<ReactJsonView
 						src={output ?? {}}
 						collapsed={1}
