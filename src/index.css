@@ -129,3 +129,13 @@
   width: 40px;
   font-weight: 100;
 }
+
+/* Styles for the JSON viewer */
+
+.react-json-view {
+  background: hsl(var(--surface-primary)) !important;
+}
+
+.copy-to-clipboard-container span {
+  display: flex !important;
+}

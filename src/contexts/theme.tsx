@@ -2,6 +2,7 @@ import {
 	createContext,
 	useContext,
 	useEffect,
+	useMemo,
 	useState,
 	type FC,
 	type PropsWithChildren,
@@ -19,11 +20,13 @@ type Theme = v.InferInput<typeof ThemeSchema>;
 
 type ThemeContext = {
 	theme: Theme;
+	appliedTheme: "light" | "dark";
 	setTheme: (theme: Theme) => void;
 };
 
 const ThemeContext = createContext<ThemeContext>({
 	theme: "system",
+	appliedTheme: "dark",
 	setTheme: () => null,
 });
 
@@ -41,6 +44,18 @@ export const ThemeProvider: FC<PropsWithChildren> = ({ children }) => {
 		return parsedTheme.output;
 	});
 
+	const appliedTheme = useMemo(() => {
+		if (theme === "system") {
+			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+				return "dark";
+			}
+
+			return "light";
+		}
+
+		return theme;
+	}, [theme]);
+
 	useEffect(() => {
 		const force =
 			theme === "dark" ||
@@ -57,7 +72,7 @@ export const ThemeProvider: FC<PropsWithChildren> = ({ children }) => {
 	}, [theme]);
 
 	return (
-		<ThemeContext.Provider value={{ theme, setTheme }}>
+		<ThemeContext.Provider value={{ theme, setTheme, appliedTheme }}>
 			{children}
 		</ThemeContext.Provider>
 	);

@@ -29,6 +29,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import ReactJsonView from "@microlink/react-json-view";
+import { useTheme } from "@/contexts/theme";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -378,6 +379,7 @@ type DebuggerProps = {
 	output: PreviewOutput | null;
 };
 const Debugger: FC<DebuggerProps> = ({ output }) => {
+	const { appliedTheme } = useTheme();
 	const parserLogs = output?.parser_logs ?? [];
 
 	return (
@@ -386,8 +388,15 @@ const Debugger: FC<DebuggerProps> = ({ output }) => {
 			className="h-full w-full bg-surface-primary"
 		>
 			<ResizablePanel className="flex">
-				<div className="h-full w-full overflow-scroll p-4">
-					<ReactJsonView src={output ?? {}} collapsed={1} />
+				<div className="h-full w-full overflow-scroll break-all p-4">
+					<ReactJsonView
+						src={output ?? {}}
+						collapsed={1}
+						theme={appliedTheme === "dark" ? "brewer" : "rjv-default"}
+						style={{
+							background: "inherit",
+						}}
+					/>
 				</div>
 			</ResizablePanel>
 			<ResizableHandle className="bg-surface-quaternary" />
