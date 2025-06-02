@@ -1,5 +1,4 @@
 import { Button } from "@/components/Button";
-import * as Dialog from "@radix-ui/react-dialog";
 import {
 	ResizableHandle,
 	ResizablePanel,
@@ -15,6 +14,7 @@ import type { ParserLog, PreviewOutput } from "@/gen/types";
 import { useDebouncedValue } from "@/hooks/debounce";
 import { useStore } from "@/store";
 import { cn } from "@/utils/cn";
+import * as Dialog from "@radix-ui/react-dialog";
 import {
 	ActivityIcon,
 	BugIcon,
@@ -31,10 +31,10 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
-	useRef,
 	useState,
 } from "react";
 import { useSearchParams } from "react-router";
+import ReactJsonView from "@microlink/react-json-view";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -48,7 +48,6 @@ export const Preview: FC = () => {
 	const [params] = useSearchParams();
 	const isDebug = useMemo(() => params.has("debug"), [params]);
 
-
 	const onDownloadOutput = useCallback(() => {
 		const blob = new Blob([JSON.stringify(output, null, 2)], {
 			type: "application/json",
@@ -59,7 +58,16 @@ export const Preview: FC = () => {
 		const link = document.createElement("a");
 		link.href = url;
 		link.download = "output.json";
+		document.appendChild(link);
 		link.click();
+		document.removeChild(link);
+
+		// Give the click event enough time to fire and then revoke the URL.
+		// This method of doing it doesn't seem great but I'm not sure if there is a
+		// better way.
+		setTimeout(() => {
+			URL.revokeObjectURL(url);
+		}, 100);
 	}, [output]);
 
 	useEffect(() => {
@@ -125,7 +133,13 @@ export const Preview: FC = () => {
 						<Tabs.Trigger value="preview" icon={PlayIcon} label="Preview" />
 						<Tabs.Trigger value="debug" icon={BugIcon} label="Debugger" />
 					</div>
-					<Button size="sm" variant="outline" className="self-center" onClick={onDownloadOutput}>
+					<Button
+						size="sm"
+						variant="outline"
+						className="self-center"
+						onClick={onDownloadOutput}
+						disabled={isDebouncing}
+					>
 						<DownloadIcon />
 						Download output
 					</Button>
@@ -353,7 +367,9 @@ const Debugger: FC<DebuggerProps> = ({ output }) => {
 			direction="vertical"
 			className="h-full w-full bg-surface-primary"
 		>
-			<ResizablePanel> foo</ResizablePanel>
+			<ResizablePanel>
+				<ReactJsonView src={output ?? {}} />
+			</ResizablePanel>
 			<ResizableHandle className="bg-surface-quaternary" />
 			<ResizablePanel
 				className={cn(
