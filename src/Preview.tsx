@@ -26,13 +26,7 @@ import {
 	XIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import {
-	type FC,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from "react";
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import ReactJsonView from "@microlink/react-json-view";
 
@@ -47,6 +41,8 @@ export const Preview: FC = () => {
 
 	const [params] = useSearchParams();
 	const isDebug = useMemo(() => params.has("debug"), [params]);
+
+	const [tab, setTab] = useState(() => "preview");
 
 	const onDownloadOutput = useCallback(() => {
 		const blob = new Blob([JSON.stringify(output, null, 2)], {
@@ -115,7 +111,12 @@ export const Preview: FC = () => {
 	}, [debouncedCode, $setError]);
 
 	return (
-		<Tabs.Root defaultValue="preview" asChild={true}>
+		<Tabs.Root
+			defaultValue="preview"
+			asChild={true}
+			value={tab}
+			onValueChange={(tab) => setTab(() => tab)}
+		>
 			<ResizablePanel className="relative flex flex-col">
 				{$wasmState !== "loaded" ? (
 					<div className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center backdrop-blur-sm">
@@ -131,7 +132,20 @@ export const Preview: FC = () => {
 				>
 					<div className="flex">
 						<Tabs.Trigger value="preview" icon={PlayIcon} label="Preview" />
-						<Tabs.Trigger value="debug" icon={BugIcon} label="Debugger" />
+						<Tabs.Trigger
+							value="debug"
+							icon={
+								isDebouncing && tab === "debug"
+									? ({ className, ...rest }) => (
+											<LoaderIcon
+												{...rest}
+												className={cn("animate-spin", className)}
+											/>
+										)
+									: BugIcon
+							}
+							label="Debugger"
+						/>{" "}
 					</div>
 					<Button
 						size="sm"
@@ -171,7 +185,11 @@ export const Preview: FC = () => {
 											animate={{ opacity: 1, scale: 1 }}
 											exit={{ opacity: 0, scale: 0.75 }}
 										>
-											<LoaderIcon className="animate-spin text-content-primary" />
+											<LoaderIcon
+												width={16}
+												height={16}
+												className="animate-spin text-content-primary"
+											/>
 										</motion.div>
 									) : null}
 								</AnimatePresence>
@@ -367,8 +385,10 @@ const Debugger: FC<DebuggerProps> = ({ output }) => {
 			direction="vertical"
 			className="h-full w-full bg-surface-primary"
 		>
-			<ResizablePanel>
-				<ReactJsonView src={output ?? {}} />
+			<ResizablePanel className="flex">
+				<div className="h-full w-full overflow-scroll p-4">
+					<ReactJsonView src={output ?? {}} collapsed={1} />
+				</div>
 			</ResizablePanel>
 			<ResizableHandle className="bg-surface-quaternary" />
 			<ResizablePanel
@@ -378,13 +398,15 @@ const Debugger: FC<DebuggerProps> = ({ output }) => {
 				)}
 				defaultSize={30}
 			>
-				<div className="mb-4 overflow-y-scroll">
-					{parserLogs.length === 0 ? (
-						<LogsEmptyState />
-					) : (
-						parserLogs.map((log, index) => <Log log={log} key={index} />)
-					)}
-				</div>
+				{parserLogs.length === 0 ? (
+					<LogsEmptyState />
+				) : (
+					<div className="mb-4 overflow-y-scroll">
+						{parserLogs.map((log, index) => (
+							<Log log={log} key={index} />
+						))}
+					</div>
+				)}
 			</ResizablePanel>
 		</ResizablePanelGroup>
 	);
