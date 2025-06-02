@@ -1,10 +1,11 @@
-// @ts-expect-error TODO: create types for this
 import "@fontsource-variable/inter";
+import "@fontsource/dm-mono";
 import { TooltipProvider } from "@/components/Tooltip";
+import { ThemeProvider } from "@/contexts/theme.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router";
 import { App } from "./App.tsx";
-import { ThemeProvider } from "@/contexts/theme.tsx";
 
 const root = document.getElementById("root");
 
@@ -13,11 +14,13 @@ if (!root) {
 } else {
 	createRoot(root).render(
 		<StrictMode>
-			<ThemeProvider>
-				<TooltipProvider>
-					<App />
-				</TooltipProvider>
-			</ThemeProvider>
+			<BrowserRouter>
+				<ThemeProvider>
+					<TooltipProvider>
+						<App />
+					</TooltipProvider>
+				</ThemeProvider>
+			</BrowserRouter>
 		</StrictMode>,
 	);
 }
