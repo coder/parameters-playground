@@ -133,6 +133,7 @@
 /* Styles for the JSON viewer */
 
 .react-json-view {
+  font-family: "DM Mono", monospace !important;
   background: hsl(var(--surface-primary)) !important;
 }
 
