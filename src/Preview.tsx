@@ -55,9 +55,9 @@ export const Preview: FC = () => {
 		const link = document.createElement("a");
 		link.href = url;
 		link.download = "output.json";
-		document.appendChild(link);
+		document.body.appendChild(link);
 		link.click();
-		document.removeChild(link);
+		document.body.removeChild(link);
 
 		// Give the click event enough time to fire and then revoke the URL.
 		// This method of doing it doesn't seem great but I'm not sure if there is a
@@ -393,9 +393,6 @@ const Debugger: FC<DebuggerProps> = ({ output }) => {
 						src={output ?? {}}
 						collapsed={1}
 						theme={appliedTheme === "dark" ? "brewer" : "rjv-default"}
-						style={{
-							background: "inherit",
-						}}
 					/>
 				</div>
 			</ResizablePanel>
@@ -488,9 +485,9 @@ const Log: FC<LogProps> = ({ log }) => {
 									className="fixed top-0 right-0 z-20 flex h-full w-full max-w-md flex-col justify-start gap-6 border-l bg-surface-primary p-4"
 								>
 									<div className="flex items-center justify-between">
-										<p className="font-semibold text-2xl text-content-primary">
+										<Dialog.Title className="font-semibold text-2xl text-content-primary">
 											Log
-										</p>
+										</Dialog.Title>
 										<Dialog.Close asChild={true}>
 											<Button
 												variant="outline"
