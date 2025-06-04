@@ -60,7 +60,7 @@ app.get("/", (c) => {
 					</head>
 					<body>
 						<div id="root"></div>
-						{import.meta.env.PROD ? null : (
+						{import.meta.env.PROD ? "static/client.js" : (
 							<script type="module" src="/src/main.tsx"></script>
 						)}
 					</body>
