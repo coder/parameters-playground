@@ -9,9 +9,9 @@ import devServer from "@hono/vite-dev-server";
  *
  * **Build Details**
  *
- * We're deploying to Vercel which requires very a sepecifc project structure:
- *  .
- * ├── api/ <- All backend code must go here otherwise Vercel will complain
+ * We're deploying to Vercel which requires very a [build structure](https://vercel.com/docs/build-output-api):
+ *  .vercel
+ * ├── functions/ <- All backend code must go here otherwise Vercel will complain
  * │   └── index.js
  * └── static/
  *     └── client.js
@@ -56,7 +56,7 @@ export default defineConfig(({ mode }) => {
 			rollupOptions: {
 				input: "src/server.tsx",
 				output: {
-					entryFileNames: "api/index.js",
+					entryFileNames: ".vercel/functions/index.func/index.js",
 				},
 			},
 		},
