@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
 			...baseConfig,
 			build: {
 				rollupOptions: {
-					input: ["./app/client.ts"],
+					input: ["./src/main.tsx"],
 					output: {
 						entryFileNames: "static/client.js",
 						chunkFileNames: "static/assets/[name]-[hash].js",
@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => {
 			minify: true,
 			rollupOptions: {
 				output: {
-					entryFileNames: "_worker.js",
+					entryFileNames: "api/index.js",
 				},
 			},
 		},

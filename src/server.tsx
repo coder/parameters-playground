@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { renderToString } from "react-dom/server";
 import { serveStatic } from "hono/serve-static";
+import { handle } from "hono/vercel";
 import fs from "node:fs/promises";
 
 const app = new Hono();
@@ -69,4 +70,17 @@ app.get("/", (c) => {
 	);
 });
 
-export default app;
+const handler = (() => {
+	if (import.meta.env.PROD) {
+		return handle(app);
+	}
+
+	return app;
+})();
+
+export default handler
+export const GET = handler;
+export const POST = handler;
+export const PATCH = handler;
+export const PUT = handler;
+export const OPTIONS = handler;
