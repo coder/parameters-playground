@@ -10,7 +10,7 @@ const vercelConfigPlugin = () => ({
 	name: "wiret-vercel-config",
 	// Write config
 	writeBundle: async () => {
-		const distPath = path.resolve(__dirname, "dist", ".vercel", "output");
+		const distPath = path.resolve(__dirname, "dist");
 
 		// Create config.json
 		await fs.writeFile(
@@ -84,7 +84,7 @@ export default defineConfig(({ mode }) => {
 			rollupOptions: {
 				input: "src/server.tsx",
 				output: {
-					entryFileNames: ".vercel/output/functions/index.func/index.js",
+					entryFileNames: "functions/index.func/index.js",
 				},
 				plugins: [vercelConfigPlugin()],
 			},
