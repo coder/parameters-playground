@@ -12,8 +12,6 @@ import {
 } from "@/components/DropdownMenu";
 import { type FC, useEffect, useMemo } from "react";
 
-// Glue code required to be able to run wasm compiled Go code.
-import "@/utils/wasm_exec.js";
 import { useTheme } from "@/contexts/theme";
 import { MoonIcon, SunIcon, SunMoonIcon } from "lucide-react";
 import { Button } from "./components/Button";
