@@ -86,9 +86,9 @@ export default defineConfig(({ mode }) => {
 				output: {
 					entryFileNames: "functions/index.func/index.js",
 				},
-				copyPublicDir: false,
 				plugins: [vercelConfigPlugin()],
 			},
+			copyPublicDir: false,
 		},
 		plugins: [
 			vercelConfigPlugin(),
