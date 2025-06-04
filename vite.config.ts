@@ -3,7 +3,20 @@ import basicSsl from "@vitejs/plugin-basic-ssl";
 import path from "node:path";
 import devServer from "@hono/vite-dev-server";
 
-// https://vite.dev/config/
+/**
+ * Vite is handling both the building of our final assets and also running the
+ * dev server which gives us HMR even though we're serving the assets via Hono.
+ *
+ * **Build Details**
+ *
+ * We're deploying to Vercel which requires very a sepecifc project structure:
+ *  .
+ * ├── api/ <- All backend code must go here otherwise Vercel will complain
+ * │   └── index.js
+ * └── static/
+ *     └── client.js
+ *
+ */
 export default defineConfig(({ mode }) => {
 	const baseConfig = {
 		resolve: {
@@ -17,8 +30,9 @@ export default defineConfig(({ mode }) => {
 		return {
 			...baseConfig,
 			build: {
+				manifest: true,
 				rollupOptions: {
-					input: ["./src/main.tsx"],
+					input: "src/main.tsx",
 					output: {
 						entryFileNames: "static/client.js",
 						chunkFileNames: "static/assets/[name]-[hash].js",
@@ -40,6 +54,7 @@ export default defineConfig(({ mode }) => {
 		build: {
 			minify: true,
 			rollupOptions: {
+				input: "src/server.tsx",
 				output: {
 					entryFileNames: "api/index.js",
 				},
