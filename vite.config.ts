@@ -4,13 +4,29 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import devServer from "@hono/vite-dev-server";
 
-const viteConfigPlugin = () => ({
+// Vercel requires config files with the output so this simple plugin is used to
+// create it in the correct place.
+const vercelConfigPlugin = () => ({
 	name: "wiret-vercel-config",
+	// Write config
 	writeBundle: async () => {
-		const distPath = path.resolve(__dirname, "dist", ".vercel");
+		const distPath = path.resolve(__dirname, "dist", ".vercel", "output");
+
+		// Create config.json
 		await fs.writeFile(
-			path.join(distPath, "output", "config.json"),
+			path.join(distPath, "config.json"),
 			JSON.stringify({ version: 3 }),
+		);
+
+		// Write the .vc-config.json
+		await fs.writeFile(
+			path.join(distPath, "functions", "index.func", ".vc-config.json"),
+			JSON.stringify({
+				runtime: "nodejs20.x",
+				handler: "index.js",
+				launcherType: "Nodejs",
+				shouldAddHelpers: true,
+			}),
 		);
 	},
 });
@@ -70,12 +86,11 @@ export default defineConfig(({ mode }) => {
 				output: {
 					entryFileNames: ".vercel/output/functions/index.func/index.js",
 				},
+				plugins: [vercelConfigPlugin()],
 			},
 		},
 		plugins: [
-			// Vercel requires a config with the output version so this simple plugin
-			// is used to create it in the correct place.
-			viteConfigPlugin(),
+			vercelConfigPlugin(),
 			devServer({
 				entry: "./src/server.tsx",
 			}),
