@@ -1,7 +1,19 @@
 import { defineConfig } from "vite";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import path from "node:path";
+import fs from "node:fs/promises";
 import devServer from "@hono/vite-dev-server";
+
+const viteConfigPlugin = () => ({
+	name: "wiret-vercel-config",
+	writeBundle: async () => {
+		const distPath = path.resolve(__dirname, "dist", ".vercel");
+		await fs.writeFile(
+			path.join(distPath, "output", "config.json"),
+			JSON.stringify({ version: 3 }),
+		);
+	},
+});
 
 /**
  * Vite is handling both the building of our final assets and also running the
@@ -56,11 +68,14 @@ export default defineConfig(({ mode }) => {
 			rollupOptions: {
 				input: "src/server.tsx",
 				output: {
-					entryFileNames: ".vercel/functions/index.func/index.js",
+					entryFileNames: ".vercel/output/functions/index.func/index.js",
 				},
 			},
 		},
 		plugins: [
+			// Vercel requires a config with the output version so this simple plugin
+			// is used to create it in the correct place.
+			viteConfigPlugin(),
 			devServer({
 				entry: "./src/server.tsx",
 			}),
