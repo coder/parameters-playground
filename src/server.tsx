@@ -85,7 +85,7 @@ app.get("/foo", (c) => {
 
 const handler = handle(app);
 
-export default handler;
+// export default handler;
 export const GET = handler;
 export const POST = handler;
 export const PATCH = handler;
