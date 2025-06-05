@@ -76,9 +76,9 @@ export default defineConfig(({ mode }) => {
 				outDir: OUT_DIR,
 				manifest: true,
 				rollupOptions: {
-					input: "src/main.tsx",
+					input: "./index.html",
 					output: {
-						entryFileNames: "static/client.js",
+						entryFileNames: "output/static/index.html",
 						chunkFileNames: "static/assets/[name]-[hash].js",
 						assetFileNames: "static/assets/[name].[ext]",
 					},
