@@ -4,7 +4,7 @@ import { handle } from "hono/vercel";
 // import { serveStatic } from "hono/serve-static";
 // import fs from "node:fs/promises";
 
-const app = new Hono().basePath("/api");
+const app = new Hono();
 
 // app.use(
 // 	"*",
@@ -41,11 +41,11 @@ const app = new Hono().basePath("/api");
 // 	}),
 // );
 
-app.get("/", (c) => {
+app.get("/api", (c) => {
 	return c.json({ message: "Congrats! You've deployed Hono to Vercel" });
 });
 
-app.get("/foo", (c) => {
+app.get("/", (c) => {
 	return c.html(
 		[
 			"<!doctype html>",

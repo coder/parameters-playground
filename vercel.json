@@ -7,7 +7,7 @@
     },
     {
       "source": "/[^api]/(.*)",
-      "destination": "/*"
+      "destination": "/"
     }
   ]
 }
