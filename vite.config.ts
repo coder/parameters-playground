@@ -3,7 +3,8 @@ import { defineConfig } from "vite";
 import path from "node:path";
 import fs from "node:fs/promises";
 // import devServer from "@hono/vite-dev-server";
-import vercel from "vite-plugin-vercel";
+
+const OUT_DIR = ".vercel";
 
 // Vercel requires a config with the output version so this simple plugin
 // is used to create it in the correct place.
@@ -11,7 +12,7 @@ const vercelConfigPlugin = () => ({
 	name: "wiret-vercel-config",
 	// Write config
 	writeBundle: async () => {
-		const distPath = path.resolve(__dirname, "dist", ".vercel", "output");
+		const distPath = path.resolve(__dirname, OUT_DIR, "output");
 
 		// Create config.json
 		await fs.writeFile(
@@ -59,6 +60,7 @@ export default defineConfig(({ mode }) => {
 		return {
 			...baseConfig,
 			build: {
+				outDir: OUT_DIR,
 				manifest: true,
 				rollupOptions: {
 					input: "src/main.tsx",
@@ -81,34 +83,25 @@ export default defineConfig(({ mode }) => {
 			allowedHosts: [".coder", ".ngrok"],
 		},
 		build: {
+			copyPublicDir: false,
+			outDir: OUT_DIR,
 			minify: true,
 			rollupOptions: {
 				input: "src/server.tsx",
 				output: {
-					entryFileNames: ".vercel/output/functions/index.func/index.js",
+					entryFileNames: "output/functions/index.func/index.js",
 				},
 				plugins: [vercelConfigPlugin()],
 			},
 		},
 		plugins: [
-			// vercelConfigPlugin(),
+			vercelConfigPlugin(),
 			// devServer({
 			// 	entry: "./src/server.tsx",
 			// }),
 			// basicSsl({
 			// 	name: "dev",
 			// }),
-
-			vercel({
-				entries: [
-					{
-						input: "src/server.tsx",
-						destination: "index",
-						route: ".*",
-						edge: false,
-					},
-				],
-			}),
 		],
 	};
 });
