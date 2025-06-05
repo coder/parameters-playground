@@ -48,7 +48,11 @@ export const App = () => {
 			try {
 				const goWasm = new window.Go();
 				const result = await WebAssembly.instantiateStreaming(
-					fetch("build/preview.wasm"),
+					fetch(
+						import.meta.env.PROD
+							? "/assets/build/preview.wasm"
+							: "build/preview.wasm",
+					),
 					goWasm.importObject,
 				);
 
