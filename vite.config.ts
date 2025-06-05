@@ -107,7 +107,7 @@ export default defineConfig(({ mode }) => {
 			rollupOptions: {
 				// input: "src/server.tsx",
 				output: {
-					entryFileNames: "output/functions/index.func/index.js",
+					entryFileNames: "output/functions/index.func/index.mjs",
 				},
 				plugins: [vercelConfigPlugin()],
 			},
