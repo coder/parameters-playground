@@ -73,16 +73,16 @@ export default defineConfig(({ mode }) => {
 		return {
 			...baseConfig,
 			build: {
-				outDir: OUT_DIR,
+				outDir: path.resolve(OUT_DIR, "output", "static"),
 				manifest: true,
-				rollupOptions: {
-					input: "./index.html",
-					output: {
-						entryFileNames: "output/static/index.html",
-						chunkFileNames: "static/assets/[name]-[hash].js",
-						assetFileNames: "static/assets/[name].[ext]",
-					},
-				},
+				// rollupOptions: {
+				// 	input: "./index.html",
+				// 	output: {
+				// 		entryFileNames: "output/static/index.html",
+				// 		chunkFileNames: "static/assets/[name]-[hash].js",
+				// 		assetFileNames: "static/assets/[name].[ext]",
+				// 	},
+				// },
 				emptyOutDir: false,
 				copyPublicDir: false,
 			},
