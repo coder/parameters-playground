@@ -102,12 +102,12 @@ export default defineConfig(({ mode }) => {
 			lib: {
 				entry: "src/server.tsx",
 				name: "server",
-				formats: ["es"],
+				formats: ["umd"],
 			},
 			rollupOptions: {
 				// input: "src/server.tsx",
 				output: {
-					entryFileNames: "output/functions/index.func/index.mjs",
+					entryFileNames: "output/functions/index.func/index.js",
 				},
 				plugins: [vercelConfigPlugin()],
 			},
