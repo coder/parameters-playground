@@ -9,11 +9,10 @@ import devServer from "@hono/vite-dev-server";
 const OUT_DIR = ".vercel";
 
 /**
- *
  * Create the [config.json][1] and [vc-config.json][2] files required in the final output.
  *
  * [1]: <https://vercel.com/docs/build-output-api/configuration>
- * [2]: https://vercel.com/docs/build-output-api/primitives#serverless-function-configuration
+ * [2]: <https://vercel.com/docs/build-output-api/primitives#serverless-function-configuration>
  */
 const vercelConfigPlugin = () => ({
 	name: "write-vercel-config",
@@ -64,7 +63,6 @@ const vercelConfigPlugin = () => ({
  * the build script less brittle.
  *
  * [1]: <https://vercel.com/docs/build-output-api> 
- *
  */
 export default defineConfig(({ mode, command }) => {
 	const baseConfig = {
@@ -79,6 +77,7 @@ export default defineConfig(({ mode, command }) => {
 		build: {
 			outDir: path.resolve(OUT_DIR, "output", "static", "assets"),
 			manifest: true,
+			minify: true,
 			rollupOptions: {
 				input: ["./src/main.tsx"],
 				output: {
