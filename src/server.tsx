@@ -1,5 +1,5 @@
 // import { Hono } from "hono";
-// import { renderToString } from "react-dom/server";
+import { renderToString } from "react-dom/server";
 // import { serveStatic } from "hono/serve-static";
 // import { handle } from "hono/vercel";
 // import fs from "node:fs/promises";
@@ -88,14 +88,26 @@
 // export const PUT = handler;
 // export const OPTIONS = handler;
 
-import { Hono } from 'hono'
-import { handle } from 'hono/vercel'
+import { Hono } from "hono";
+import { handle } from "hono/vercel";
 
-const app = new Hono().basePath('/api')
+const app = new Hono().basePath("/api");
 
-app.get('/', (c) => {
-  return c.json({ message: "Congrats! You've deployed Hono to Vercel" })
-})
+app.get("/", (c) => {
+	return c.json({ message: "Congrats! You've deployed Hono to Vercel" });
+});
+
+app.get("/foo", (c) => {
+	return c.html(
+		renderToString(
+			<html lang="en">
+				<body>
+					<p>Hello, API!</p>
+				</body>
+			</html>,
+		),
+	);
+});
 
 const handler = handle(app);
 
