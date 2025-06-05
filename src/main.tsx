@@ -1,5 +1,3 @@
-import "@fontsource-variable/inter";
-import "@fontsource/dm-mono";
 import { TooltipProvider } from "@/components/Tooltip";
 import { ThemeProvider } from "@/contexts/theme.tsx";
 import { StrictMode } from "react";
