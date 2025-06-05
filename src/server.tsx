@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 // import { serveStatic } from "hono/serve-static";
+import { renderToString } from "react-dom/server";
 import { handle } from "hono/vercel";
 // import fs from "node:fs/promises";
 
@@ -48,7 +49,7 @@ app.get("/foo", (c) => {
 	return c.html(
 		[
 			"<!doctype html>",
-			`
+			renderToString(
 				<html lang="en">
 					<head>
 						<meta charSet="UTF-8" />
@@ -63,16 +64,17 @@ app.get("/foo", (c) => {
 					</head>
 					<body>
 						<div id="root"></div>
-						${import.meta.env.PROD ? "static/client.js" : (
+						{import.meta.env.PROD ? (
+							"static/client.js"
+						) : (
 							<script type="module" src="/src/main.tsx"></script>
 						)}
 					</body>
 				</html>,
-			`,
+			),
 		].join("\n"),
 	);
 });
-
 
 // const handler = (() => {
 // 	if (import.meta.env.PROD) {
