@@ -8,8 +8,13 @@ import devServer from "@hono/vite-dev-server";
 
 const OUT_DIR = ".vercel";
 
-// Vercel requires a config with the output version so this simple plugin
-// is used to create it in the correct place.
+/**
+ *
+ * Create the [config.json][1] and [vc-config.json][2] files required in the final output.
+ *
+ * [1]: <https://vercel.com/docs/build-output-api/configuration> "Configuration"
+ * [2]: https://vercel.com/docs/build-output-api/primitives#serverless-function-configuration "Serverless function configuration"
+ */
 const vercelConfigPlugin = () => ({
 	name: "write-vercel-config",
 	// Write config
@@ -22,7 +27,7 @@ const vercelConfigPlugin = () => ({
 			JSON.stringify({ version: 3 }),
 		);
 
-		// Write the .vc-config.json
+		// Create .vc-config.json
 		await fs.writeFile(
 			path.join(distPath, "functions", "index.func", ".vc-config.json"),
 			JSON.stringify({
@@ -37,16 +42,30 @@ const vercelConfigPlugin = () => ({
 
 /**
  * Vite is handling both the building of our final assets and also running the
- * dev server which gives us HMR even though we're serving the assets via Hono.
+ * dev server which gives us HMR for both SSR'd templates and client React code.
  *
  * **Build Details**
  *
- * We're deploying to Vercel which requires very a [build structure](https://vercel.com/docs/build-output-api):
- *  .vercel
- * ├── functions/ <- All backend code must go here otherwise Vercel will complain
- * │   └── index.js
- * └── static/
- *     └── client.js
+ * We're deploying to Vercel which requires very sepecific project outputs in
+ * order to deploy properly [build structure][1](https://vercel.com/docs/build-output-api):
+ *
+ * .vercel/
+ * └── output/
+ *     ├── config.json
+ *     ├── functions/
+ *     │   └── index.func/
+ *     │       ├── .vs-config.json
+ *     │       └── index.js <- Server code
+ *     └── static/
+ *         └── assets/
+ *             ├── client.js
+ *             └── <other>
+ *
+ * The current build setup is hard coded to expect files at their current
+ * paths within the code. This is something that could be improved to make
+ * the build script less brittle.
+ *
+ * [1]: <https://vercel.com/docs/build-output-api> "Build Output API"
  *
  */
 export default defineConfig(({ mode, command }) => {
