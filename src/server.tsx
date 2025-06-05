@@ -45,7 +45,7 @@ app.get("/api", (c) => {
 	return c.json({ message: "Congrats! You've deployed Hono to Vercel" });
 });
 
-app.get("/*", (c) => {
+app.get("*", (c) => {
 	return c.html(
 		[
 			"<!doctype html>",
