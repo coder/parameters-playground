@@ -1,8 +1,8 @@
-import { defineConfig } from "vite";
-// import basicSsl from "@vitejs/plugin-basic-ssl";
+import { defineConfig, mergeConfig } from "vite";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import path from "node:path";
 import fs from "node:fs/promises";
-// import devServer from "@hono/vite-dev-server";
+import devServer from "@hono/vite-dev-server";
 
 const OUT_DIR = ".vercel";
 
@@ -47,7 +47,7 @@ const vercelConfigPlugin = () => ({
  *     └── client.js
  *
  */
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
 	const baseConfig = {
 		resolve: {
 			alias: {
@@ -56,32 +56,24 @@ export default defineConfig(({ mode }) => {
 		},
 	};
 
-	if (mode === "client") {
-		return {
-			...baseConfig,
-			build: {
-				outDir: path.resolve(OUT_DIR, "output", "static", "assets"),
-				manifest: true,
-				rollupOptions: {
-					input: ["./src/main.tsx"],
-					output: {
-						entryFileNames: "client.js",
-						chunkFileNames: "[name]-[hash].js",
-						assetFileNames: "[name].[ext]",
-					},
+	const clientBuildConfig = {
+		build: {
+			outDir: path.resolve(OUT_DIR, "output", "static", "assets"),
+			manifest: true,
+			rollupOptions: {
+				input: ["./src/main.tsx"],
+				output: {
+					entryFileNames: "client.js",
+					chunkFileNames: "[name]-[hash].js",
+					assetFileNames: "[name].[ext]",
 				},
-				emptyOutDir: false,
-				copyPublicDir: true,
 			},
-		};
-	}
-
-	return {
-		...baseConfig,
-		server: {
-			// For dev purposes when using Coder Connect, and ngrok
-			allowedHosts: [".coder", ".ngrok"],
+			emptyOutDir: false,
+			copyPublicDir: true,
 		},
+	};
+
+	const serverBuildConfig = {
 		build: {
 			copyPublicDir: false,
 			outDir: OUT_DIR,
@@ -99,13 +91,30 @@ export default defineConfig(({ mode }) => {
 				plugins: [vercelConfigPlugin()],
 			},
 		},
+	};
+
+	const devConfig = {
+		server: {
+			// For dev purposes when using Coder Connect, and ngrok
+			allowedHosts: [".coder", ".ngrok"],
+		},
 		plugins: [
-			// devServer({
-			// 	entry: "./src/server.tsx",
-			// }),
-			// basicSsl({
-			// 	name: "dev",
-			// }),
+			devServer({
+				entry: "./src/server.tsx",
+				export: "app",
+			}),
+			basicSsl({
+				name: "dev",
+			}),
 		],
 	};
+
+	if (command === "build") {
+		if (mode === "client") {
+			return mergeConfig(baseConfig, clientBuildConfig);
+		}
+		return mergeConfig(baseConfig, serverBuildConfig);
+	}
+
+	return mergeConfig(baseConfig, devConfig);
 });

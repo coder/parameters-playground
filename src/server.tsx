@@ -4,7 +4,7 @@ import { handle } from "hono/vercel";
 // import { serveStatic } from "hono/serve-static";
 // import fs from "node:fs/promises";
 
-const app = new Hono();
+export const app = new Hono();
 
 // app.use(
 // 	"*",
@@ -83,15 +83,6 @@ app.get("*", (c) => {
 		].join("\n"),
 	);
 });
-
-// const handler = (() => {
-// 	if (import.meta.env.PROD) {
-// 		return handle(app);
-// 	}
-
-// 	return app;
-// })();
-//
 
 const handler = handle(app);
 
