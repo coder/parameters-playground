@@ -12,8 +12,8 @@ const OUT_DIR = ".vercel";
  *
  * Create the [config.json][1] and [vc-config.json][2] files required in the final output.
  *
- * [1]: <https://vercel.com/docs/build-output-api/configuration> "Configuration"
- * [2]: https://vercel.com/docs/build-output-api/primitives#serverless-function-configuration "Serverless function configuration"
+ * [1]: <https://vercel.com/docs/build-output-api/configuration>
+ * [2]: https://vercel.com/docs/build-output-api/primitives#serverless-function-configuration
  */
 const vercelConfigPlugin = () => ({
 	name: "write-vercel-config",
@@ -21,13 +21,11 @@ const vercelConfigPlugin = () => ({
 	writeBundle: async () => {
 		const distPath = path.resolve(__dirname, OUT_DIR, "output");
 
-		// Create config.json
 		await fs.writeFile(
 			path.join(distPath, "config.json"),
 			JSON.stringify({ version: 3 }),
 		);
 
-		// Create .vc-config.json
 		await fs.writeFile(
 			path.join(distPath, "functions", "index.func", ".vc-config.json"),
 			JSON.stringify({
@@ -47,7 +45,7 @@ const vercelConfigPlugin = () => ({
  * **Build Details**
  *
  * We're deploying to Vercel which requires very sepecific project outputs in
- * order to deploy properly [build structure][1](https://vercel.com/docs/build-output-api):
+ * order to deploy properly [build structure][1]:
  *
  * .vercel/
  * └── output/
@@ -65,7 +63,7 @@ const vercelConfigPlugin = () => ({
  * paths within the code. This is something that could be improved to make
  * the build script less brittle.
  *
- * [1]: <https://vercel.com/docs/build-output-api> "Build Output API"
+ * [1]: <https://vercel.com/docs/build-output-api> 
  *
  */
 export default defineConfig(({ mode, command }) => {
