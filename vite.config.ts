@@ -33,7 +33,6 @@ const vercelConfigPlugin = () => ({
 	},
 });
 
-
 /**
  * Vite is handling both the building of our final assets and also running the
  * dev server which gives us HMR even though we're serving the assets via Hono.
@@ -64,7 +63,7 @@ export default defineConfig(({ mode }) => {
 				outDir: path.resolve(OUT_DIR, "output", "static"),
 				manifest: true,
 				rollupOptions: {
-					input: ["./src/main.tsx", "./src/index.css"],
+					input: ["./src/main.tsx"],
 					output: {
 						entryFileNames: "assets/client.js",
 						chunkFileNames: "assets/[name]-[hash].js",
