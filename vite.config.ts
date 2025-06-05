@@ -33,18 +33,6 @@ const vercelConfigPlugin = () => ({
 	},
 });
 
-// const preserveEntryExports() {
-//   return {
-//     name: 'my-input-plugin',
-//     apply: 'build',
-//     options(opts) {
-//       // Obviously hard-coding the path here isn't ideal. You can (and should) read
-//       // your `index.html` instead and pull the script source out of it
-//       opts.input = [opts.input, path.join(process.cwd(), 'src', 'main.js')];
-//       opts.preserveEntrySignatures = 'allow-extension';
-//     },
-//   };
-// }
 
 /**
  * Vite is handling both the building of our final assets and also running the
