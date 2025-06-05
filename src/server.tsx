@@ -70,13 +70,16 @@
  	);
  });
 
- const handler = (() => {
- 	if (import.meta.env.PROD) {
- 		return handle(app);
- 	}
+ // const handler = (() => {
+ // 	if (import.meta.env.PROD) {
+ // 		return handle(app);
+ // 	}
 
- 	return app;
- })();
+ // 	return app;
+ // })();
+ //
+
+ const handler = handle(app);
 
  export default handler
  export const GET = handler;
