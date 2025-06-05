@@ -66,7 +66,7 @@ export default defineConfig(({ mode }) => {
 				rollupOptions: {
 					input: "./src/main.tsx",
 					output: {
-						entryFileNames: "client.js",
+						entryFileNames: "assets/client.js",
 						chunkFileNames: "assets/[name]-[hash].js",
 						assetFileNames: "assets/[name].[ext]",
 					},
