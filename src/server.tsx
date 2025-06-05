@@ -60,7 +60,7 @@ app.get("/foo", (c) => {
 						/>
 						<title>Paramaters Playground</title>
 						{import.meta.env.PROD ? (
-							<link rel="stylesheet" href="assets/main.css" />
+							<link rel="stylesheet" href="assets/index.css" />
 						) : (
 							<link rel="stylesheet" href="src/index.css" />
 						)}
