@@ -22,7 +22,7 @@ const vercelConfigPlugin = () => ({
 
 		// Write the .vc-config.json
 		await fs.writeFile(
-			path.join(distPath, "functions", "api", "index.func", ".vc-config.json"),
+			path.join(distPath, "functions", "index.func", ".vc-config.json"),
 			JSON.stringify({
 				runtime: "nodejs20.x",
 				handler: "index.js",
@@ -94,7 +94,7 @@ export default defineConfig(({ mode }) => {
 			rollupOptions: {
 				// input: "src/server.tsx",
 				output: {
-					entryFileNames: "output/functions/api/index.func/index.js",
+					entryFileNames: "output/functions/index.func/index.js",
 				},
 				plugins: [vercelConfigPlugin()],
 			},
