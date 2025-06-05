@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { renderToString } from "react-dom/server";
-import { serveStatic } from "hono/serve-static";
+// import { serveStatic } from "hono/serve-static";
 import { handle } from "hono/vercel";
-import fs from "node:fs/promises";
+// import fs from "node:fs/promises";
 
 const app = new Hono().basePath("/api");
 
