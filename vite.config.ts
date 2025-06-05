@@ -1,4 +1,6 @@
 import { defineConfig, mergeConfig } from "vite";
+
+import react from "@vitejs/plugin-react";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import path from "node:path";
 import fs from "node:fs/promises";
@@ -9,7 +11,7 @@ const OUT_DIR = ".vercel";
 // Vercel requires a config with the output version so this simple plugin
 // is used to create it in the correct place.
 const vercelConfigPlugin = () => ({
-	name: "wiret-vercel-config",
+	name: "write-vercel-config",
 	// Write config
 	writeBundle: async () => {
 		const distPath = path.resolve(__dirname, OUT_DIR, "output");
@@ -99,6 +101,7 @@ export default defineConfig(({ mode, command }) => {
 			allowedHosts: [".coder", ".ngrok"],
 		},
 		plugins: [
+			react(),
 			devServer({
 				entry: "./src/server.tsx",
 				export: "app",

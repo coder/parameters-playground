@@ -46,6 +46,16 @@ app.get("/api", (c) => {
 });
 
 app.get("*", (c) => {
+	const { url } = c.req;
+	const { origin } = new URL(url);
+	const injectClientScript = `
+    import RefreshRuntime from "${origin}/@react-refresh";
+    RefreshRuntime.injectIntoGlobalHook(window);
+    window.$RefreshReg$ = () => {};
+    window.$RefreshSig$ = () => (type) => type;
+    window.__vite_plugin_react_preamble_installed__ = true;
+    `;
+
 	return c.html(
 		[
 			"<!doctype html>",
@@ -64,6 +74,9 @@ app.get("*", (c) => {
 						) : (
 							<link rel="stylesheet" href="src/index.css" />
 						)}
+						{import.meta.env.DEV
+							? <script type="module">{injectClientScript}</script>
+							: null}
 						{import.meta.env.PROD ? (
 							<script type="module" src="/assets/wasm_exec.js"></script>
 						) : (
