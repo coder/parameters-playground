@@ -33,6 +33,19 @@ const vercelConfigPlugin = () => ({
 	},
 });
 
+// const preserveEntryExports() {
+//   return {
+//     name: 'my-input-plugin',
+//     apply: 'build',
+//     options(opts) {
+//       // Obviously hard-coding the path here isn't ideal. You can (and should) read
+//       // your `index.html` instead and pull the script source out of it
+//       opts.input = [opts.input, path.join(process.cwd(), 'src', 'main.js')];
+//       opts.preserveEntrySignatures = 'allow-extension';
+//     },
+//   };
+// }
+
 /**
  * Vite is handling both the building of our final assets and also running the
  * dev server which gives us HMR even though we're serving the assets via Hono.
@@ -86,8 +99,13 @@ export default defineConfig(({ mode }) => {
 			copyPublicDir: false,
 			outDir: OUT_DIR,
 			minify: true,
+			lib: {
+				entry: "src/server.tsx",
+				name: "server",
+				formats: ["es"],
+			},
 			rollupOptions: {
-				input: "src/server.tsx",
+				// input: "src/server.tsx",
 				output: {
 					entryFileNames: "output/functions/index.func/index.js",
 				},
@@ -95,7 +113,6 @@ export default defineConfig(({ mode }) => {
 			},
 		},
 		plugins: [
-			vercelConfigPlugin(),
 			// devServer({
 			// 	entry: "./src/server.tsx",
 			// }),
