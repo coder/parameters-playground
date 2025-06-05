@@ -64,8 +64,9 @@ app.get("/foo", (c) => {
 						) : (
 							<link rel="stylesheet" href="src/index.css" />
 						)}
-						{import.meta.env.PROD ? 							<script type="module" src="/wasm_exec.js"></script>
- : (
+						{import.meta.env.PROD ? (
+							<script type="module" src="/assets/wasm_exec.js"></script>
+						) : (
 							<script type="module" src="/wasm_exec.js"></script>
 						)}
 					</head>

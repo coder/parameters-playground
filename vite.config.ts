@@ -60,18 +60,18 @@ export default defineConfig(({ mode }) => {
 		return {
 			...baseConfig,
 			build: {
-				outDir: path.resolve(OUT_DIR, "output", "static"),
+				outDir: path.resolve(OUT_DIR, "output", "static", "assets"),
 				manifest: true,
 				rollupOptions: {
 					input: ["./src/main.tsx"],
 					output: {
-						entryFileNames: "assets/client.js",
-						chunkFileNames: "assets/[name]-[hash].js",
-						assetFileNames: "assets/[name].[ext]",
+						entryFileNames: "client.js",
+						chunkFileNames: "[name]-[hash].js",
+						assetFileNames: "[name].[ext]",
 					},
 				},
 				emptyOutDir: false,
-				copyPublicDir: false,
+				copyPublicDir: true,
 			},
 		};
 	}
