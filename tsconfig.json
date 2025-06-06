@@ -1,5 +1,6 @@
 {
   "files": [],
+  "erasableSyntaxOnly": true,
   "references": [
     {
       "path": "./tsconfig.app.json"

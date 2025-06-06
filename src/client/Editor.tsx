@@ -1,15 +1,19 @@
-import { Button } from "@/components/Button";
+import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuPortal,
 	DropdownMenuTrigger,
-} from "@/components/DropdownMenu";
-import { ResizablePanel } from "@/components/Resizable";
-import * as Tabs from "@/components/Tabs";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
-import { useStore } from "@/store";
+} from "@/client/components/DropdownMenu";
+import { ResizablePanel } from "@/client/components/Resizable";
+import * as Tabs from "@/client/components/Tabs";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/client/components/Tooltip";
+import { useStore } from "@/client/store";
 import {
 	BookIcon,
 	CheckIcon,
@@ -31,6 +35,8 @@ import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-hcl";
 import "prismjs/themes/prism.css";
 import { cn } from "@/utils/cn";
+import { rpc } from "@/utils/rpc";
+import { useParams } from "react-router";
 
 // Adds line numbers to the highlight.
 const hightlightWithLineNumbers = (input: string, language: unknown) =>
@@ -43,6 +49,7 @@ const hightlightWithLineNumbers = (input: string, language: unknown) =>
 		.join("\n");
 
 export const Editor: FC = () => {
+	const params = useParams();
 	const $code = useStore((state) => state.code);
 	const $setCode = useStore((state) => state.setCode);
 
@@ -57,6 +64,28 @@ export const Editor: FC = () => {
 		navigator.clipboard.writeText($code);
 		setCodeCopied(() => true);
 	};
+
+	useEffect(() => {
+		const loadCode = async () => {
+			const { id } = params;
+			if (!id) {
+				return;
+			}
+
+			try {
+				const res = await rpc.parameters[":id"].$get({ param: { id } });
+				if (res.ok) {
+					const { code } = await res.json();
+					$setCode(code);
+				}
+			} catch (e) {
+				console.error(`Error loading playground: ${e}`);
+				return;
+			}
+		};
+
+		loadCode();
+	}, [params, $setCode]);
 
 	useEffect(() => {
 		if (!codeCopied) {
@@ -136,7 +165,12 @@ export const Editor: FC = () => {
 						tab !== "code" && "hidden",
 					)}
 				>
-					<Button className="pointer-events-auto z-10" variant="subtle" size="sm" onClick={onCopy}>
+					<Button
+						className="pointer-events-auto z-10"
+						variant="subtle"
+						size="sm"
+						onClick={onCopy}
+					>
 						{codeCopied ? <CheckIcon /> : <CopyIcon />} Copy
 					</Button>
 				</div>
