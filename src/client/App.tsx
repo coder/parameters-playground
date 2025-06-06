@@ -22,7 +22,7 @@ import {
 	useState,
 } from "react";
 import { useTheme } from "@/client/contexts/theme";
-import { MoonIcon, SunIcon, SunMoonIcon } from "lucide-react";
+import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
 import { Button } from "@/client/components/Button";
 import {
 	Tooltip,
@@ -220,6 +220,7 @@ const ShareButton: FC = () => {
 		<Tooltip open={isCopied}>
 			<TooltipTrigger asChild={true}>
 				<Button size="sm" onClick={onShare}>
+					<ShareIcon />
 					Share
 				</Button>
 			</TooltipTrigger>
