@@ -2,21 +2,23 @@ import * as v from "valibot";
 import { vValidator } from "@hono/valibot-validator";
 import { nanoid } from "nanoid";
 import { Hono } from "hono";
+import { put, head } from "@vercel/blob";
 
-const sharedCode: Map<string, Uint8Array> = new Map();
+const BLOG_PATH = "parameters/share";
 
 const parameters = new Hono()
-	.get("/:id", (c) => {
+	.get("/:id", async (c) => {
 		const { id } = c.req.param();
-		const bytes = sharedCode.get(id);
+		try {
+			const { url } = await head(`${BLOG_PATH}/${id}.txt`);
+			const res = await fetch(url);
+			const code = new TextDecoder().decode(await res.arrayBuffer());
 
-		if (!bytes) {
-			throw new Error("Foo");
+			return c.json({ code });
+		} catch (e) {
+			console.error(`Failed to load playground with id ${id}: ${e}`);
+			return c.notFound();
 		}
-
-		const code = new TextDecoder().decode(bytes);
-
-		return c.json({ code });
 	})
 	.post(
 		"/",
@@ -26,7 +28,7 @@ const parameters = new Hono()
 				code: v.string(),
 			}),
 		),
-		(c) => {
+		async (c) => {
 			const { code } = c.req.valid("json");
 			const bytes = new TextEncoder().encode(code);
 
@@ -35,7 +37,10 @@ const parameters = new Hono()
 			}
 
 			const id = nanoid();
-			sharedCode.set(id, bytes);
+			await put(`${BLOG_PATH}/${id}.txt`, code, {
+				addRandomSuffix: false,
+				access: "public",
+			});
 
 			return c.json({ id });
 		},

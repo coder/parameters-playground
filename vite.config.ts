@@ -8,6 +8,42 @@ import { defineConfig, mergeConfig, type Plugin } from "vite";
 const OUT_DIR = ".vercel";
 
 /**
+ * Load .env files in dev.
+ * This is naive implementation but I wanted to avoid adding a dependency.
+ */
+const dotenv = (envFile?: string | string[]): Plugin => ({
+	name: "dotenv",
+	async buildStart() {
+		const files = () => {
+			if (!envFile) {
+				return [".env.local"];
+			}
+
+			if (typeof envFile === "string") {
+				return [envFile];
+			}
+
+			return envFile;
+		};
+
+		const contents = await Promise.all(
+			files().flatMap((path) => fs.readFile(path, "utf-8").catch(() => "")),
+		);
+		contents
+			.flatMap((line) => line.split("\n"))
+			.map((line) => line.trim())
+			.filter((line) => !line.startsWith("#") && line !== "")
+			.map((line) => line.split("="))
+			.map(([key, value]) => {
+				if (key.startsWith("VITE_")) {
+					return;
+				}
+				process.env[key] = value.replaceAll('"', "");
+			});
+	},
+});
+
+/**
  * Create the [config.json][1] and [vc-config.json][2] files required in the final output.
  *
  * [1]: <https://vercel.com/docs/build-output-api/configuration>
@@ -180,6 +216,7 @@ export default defineConfig(({ mode, command }) => {
 			allowedHosts: [".coder", ".ngrok"],
 		},
 		plugins: [
+			dotenv(),
 			react(),
 			devServer({
 				entry: "./src/server/index.tsx",
