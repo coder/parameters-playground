@@ -165,15 +165,13 @@ export default defineConfig(({ mode, command }) => {
 				name: "server",
 				formats: ["umd"],
 			},
-			plugins: [vercelConfigPlugin()],
 			rollupOptions: {
 				output: {
 					entryFileNames: "output/functions/index.func/index.js",
 				},
-				// plugins: [vercelEntryPlugin("src/server/index.tsx")],
 			},
 		},
-		plugins: [vercelEntryPlugin()],
+		plugins: [vercelEntryPlugin(), vercelConfigPlugin()],
 	};
 
 	const devConfig = {
