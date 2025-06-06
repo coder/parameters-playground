@@ -17,12 +17,12 @@ app.get("*", (c) => {
     window.$RefreshSig$ = () => (type) => type;
     window.__vite_plugin_react_preamble_installed__ = true;
     `;
-	const hmrScript = import.meta.env ? (
+	const hmrScript = import.meta.env.PROD ? (
 		<script type="module">{injectClientScript}</script>
 	) : null;
 
 	const cssPath = import.meta.env.PROD
-		? "/assets/main.css"
+		? "/assets/index.css"
 		: "src/client/index.css";
 	const clientScriptPath = import.meta.env.PROD
 		? "/assets/client.js"
