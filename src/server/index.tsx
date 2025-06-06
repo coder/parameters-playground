@@ -17,7 +17,7 @@ app.get("*", (c) => {
     window.$RefreshSig$ = () => (type) => type;
     window.__vite_plugin_react_preamble_installed__ = true;
     `;
-	const hmrScript = import.meta.env.PROD ? (
+	const hmrScript = import.meta.env.DEV ? (
 		<script type="module">{injectClientScript}</script>
 	) : null;
 
