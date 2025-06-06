@@ -1,15 +1,18 @@
 import { api } from "@/server/api";
 import { Hono } from "hono";
-import { handle } from "hono/vercel";
 import { renderToString } from "react-dom/server";
 
+// This must be exported for the dev server to work
 export const app = new Hono();
 
 app.route("/api", api);
+
+// Serves the main web application. This must come after the API route.
 app.get("*", (c) => {
+	// Along with the vite React plugin this enables HMR within react while
+	// running the dev server.
 	const { url } = c.req;
 	const { origin } = new URL(url);
-
 	const injectClientScript = `
     import RefreshRuntime from "${origin}/@react-refresh";
     RefreshRuntime.injectIntoGlobalHook(window);
@@ -21,6 +24,8 @@ app.get("*", (c) => {
 		<script type="module">{injectClientScript}</script>
 	) : null;
 
+	// Sets the correct path for static assets based on the environment.
+	// The production paths are hard coded based on the output of the build script.
 	const cssPath = import.meta.env.PROD
 		? "/assets/index.css"
 		: "src/client/index.css";
@@ -57,11 +62,3 @@ app.get("*", (c) => {
 		].join("\n"),
 	);
 });
-
-const handler = handle(app);
-
-export const GET = handler;
-export const POST = handler;
-export const PATCH = handler;
-export const PUT = handler;
-export const OPTIONS = handler;

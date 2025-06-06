@@ -1,10 +1,9 @@
-import { defineConfig, mergeConfig } from "vite";
-
-import react from "@vitejs/plugin-react";
-import basicSsl from "@vitejs/plugin-basic-ssl";
-import path from "node:path";
 import fs from "node:fs/promises";
+import path from "node:path";
 import devServer from "@hono/vite-dev-server";
+import basicSsl from "@vitejs/plugin-basic-ssl";
+import react from "@vitejs/plugin-react";
+import { defineConfig, mergeConfig, type Plugin } from "vite";
 
 const OUT_DIR = ".vercel";
 
@@ -38,6 +37,71 @@ const vercelConfigPlugin = () => ({
 });
 
 /**
+ * Generate the vercel specific code within the server entry file.
+ *
+ * ```ts
+ * import { handle } from "hono/vercel";
+ *
+ * ...
+ *
+ * const handler = handle(app);
+ * export const GET = handler;
+ * export const POST = handler;
+ * export const PATCH = handler;
+ * export const PUT = handler;
+ * export const OPTIONS = handler;
+ * ```
+ *
+ */
+const vercelEntryPlugin = (): Plugin => {
+	let entry: string;
+	let resolvedEntryPath: string;
+	let projectRoot: string;
+
+	return {
+		name: "vercel-entry",
+		configResolved(config) {
+			if (config.build.lib) {
+				const e = config.build.lib.entry;
+				if (typeof e === "string") {
+					entry = e;
+				} else {
+					throw new Error("Entry must be a string path");
+				}
+			}
+
+			projectRoot = config.root;
+			resolvedEntryPath = path.normalize(path.resolve(projectRoot, entry));
+		},
+		async load(id) {
+			const normalizedId = path.normalize(path.resolve(projectRoot, id));
+
+			if (normalizedId === resolvedEntryPath) {
+				try {
+					const content = await fs.readFile(resolvedEntryPath, "utf-8");
+					const transformedContent = [
+						'import { handle } from "hono/vercel";',
+						content,
+						"const handler = handle(app);",
+						"export const GET = handler;",
+						"export const POST = handler;",
+						"export const PATCH = handler;",
+						"export const PUT = handler;",
+						"export const OPTIONS = handler;",
+					].join("\n");
+
+					return transformedContent;
+				} catch (e) {
+					this.error(`Failed to process entry file ${entry}: ${e}`);
+				}
+			}
+
+			return null;
+		},
+	};
+};
+
+/**
  * Vite is handling both the building of our final assets and also running the
  * dev server which gives us HMR for both SSR'd templates and client React code.
  *
@@ -62,7 +126,7 @@ const vercelConfigPlugin = () => ({
  * paths within the code. This is something that could be improved to make
  * the build script less brittle.
  *
- * [1]: <https://vercel.com/docs/build-output-api> 
+ * [1]: <https://vercel.com/docs/build-output-api>
  */
 export default defineConfig(({ mode, command }) => {
 	const baseConfig = {
@@ -101,13 +165,15 @@ export default defineConfig(({ mode, command }) => {
 				name: "server",
 				formats: ["umd"],
 			},
+			plugins: [vercelConfigPlugin()],
 			rollupOptions: {
 				output: {
 					entryFileNames: "output/functions/index.func/index.js",
 				},
-				plugins: [vercelConfigPlugin()],
+				// plugins: [vercelEntryPlugin("src/server/index.tsx")],
 			},
 		},
+		plugins: [vercelEntryPlugin()],
 	};
 
 	const devConfig = {
