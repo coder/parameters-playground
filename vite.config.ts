@@ -79,7 +79,7 @@ export default defineConfig(({ mode, command }) => {
 			manifest: true,
 			minify: true,
 			rollupOptions: {
-				input: ["./src/main.tsx"],
+				input: ["./src/client/index.tsx"],
 				output: {
 					entryFileNames: "client.js",
 					chunkFileNames: "[name]-[hash].js",
@@ -97,12 +97,11 @@ export default defineConfig(({ mode, command }) => {
 			outDir: OUT_DIR,
 			minify: true,
 			lib: {
-				entry: "src/server.tsx",
+				entry: "src/server/index.tsx",
 				name: "server",
 				formats: ["umd"],
 			},
 			rollupOptions: {
-				// input: "src/server.tsx",
 				output: {
 					entryFileNames: "output/functions/index.func/index.js",
 				},
@@ -119,7 +118,7 @@ export default defineConfig(({ mode, command }) => {
 		plugins: [
 			react(),
 			devServer({
-				entry: "./src/server.tsx",
+				entry: "./src/server/index.tsx",
 				export: "app",
 			}),
 			basicSsl({

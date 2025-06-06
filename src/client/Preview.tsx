@@ -1,18 +1,18 @@
-import { Button } from "@/components/Button";
+import { Button } from "@/client/components/Button";
 import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
-} from "@/components/Resizable";
-import * as Tabs from "@/components/Tabs";
+} from "@/client/components/Resizable";
+import * as Tabs from "@/client/components/Tabs";
 import {
 	type Diagnostic,
 	type InternalDiagnostic,
 	outputToDiagnostics,
-} from "@/diagnostics";
+} from "@/client/diagnostics";
 import type { ParserLog, PreviewOutput } from "@/gen/types";
-import { useDebouncedValue } from "@/hooks/debounce";
-import { useStore } from "@/store";
+import { useDebouncedValue } from "@/client/hooks/debounce";
+import { useStore } from "@/client/store";
 import { cn } from "@/utils/cn";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
@@ -29,7 +29,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import ReactJsonView from "@microlink/react-json-view";
-import { useTheme } from "@/contexts/theme";
+import { useTheme } from "@/client/contexts/theme";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);

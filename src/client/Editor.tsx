@@ -1,15 +1,15 @@
-import { Button } from "@/components/Button";
+import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuPortal,
 	DropdownMenuTrigger,
-} from "@/components/DropdownMenu";
-import { ResizablePanel } from "@/components/Resizable";
-import * as Tabs from "@/components/Tabs";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
-import { useStore } from "@/store";
+} from "@/client/components/DropdownMenu";
+import { ResizablePanel } from "@/client/components/Resizable";
+import * as Tabs from "@/client/components/Tabs";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/client/components/Tooltip";
+import { useStore } from "@/client/store";
 import {
 	BookIcon,
 	CheckIcon,

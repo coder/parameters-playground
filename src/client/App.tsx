@@ -1,20 +1,35 @@
-import { Editor } from "@/Editor";
-import { Preview } from "@/Preview";
-import { Logo } from "@/components/Logo";
-import { ResizableHandle, ResizablePanelGroup } from "@/components/Resizable";
-import { useStore } from "@/store";
+import { Editor } from "@/client/Editor";
+import { Preview } from "@/client/Preview";
+import { Logo } from "@/client/components/Logo";
+import {
+	ResizableHandle,
+	ResizablePanelGroup,
+} from "@/client/components/Resizable";
+import { useStore } from "@/client/store";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuPortal,
 	DropdownMenuTrigger,
-} from "@/components/DropdownMenu";
-import { type FC, useEffect, useMemo } from "react";
-
-import { useTheme } from "@/contexts/theme";
+} from "@/client/components/DropdownMenu";
+import {
+	type FC,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import { useTheme } from "@/client/contexts/theme";
 import { MoonIcon, SunIcon, SunMoonIcon } from "lucide-react";
-import { Button } from "./components/Button";
+import { Button } from "@/client/components/Button";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/client/components/Tooltip";
+import { rpc } from "@/utils/rpc";
 
 type GoPreviewDef = (v: unknown) => Promise<string>;
 
@@ -73,11 +88,15 @@ export const App = () => {
 		<main className="flex h-dvh w-screen flex-col items-center bg-surface-primary">
 			{/* NAV BAR */}
 			<nav className="flex h-16 w-full justify-between border-b border-b-surface-quaternary px-6 py-2">
-				<div className="flex items-center gap-2">
-					<Logo className="text-content-primary" height={24} />
-					<p className="font-semibold text-content-primary text-xl">
-						Playground
-					</p>
+				<div className="flex items-center justify-center gap-4">
+					<div className="flex items-center gap-2">
+						<Logo className="text-content-primary" height={24} />
+						<p className="font-semibold text-content-primary text-xl">
+							Playground
+						</p>
+					</div>
+
+					<ShareButton />
 				</div>
 
 				<div className="flex items-center gap-3">
@@ -158,5 +177,53 @@ const ThemeSelector: FC = () => {
 				</DropdownMenuContent>
 			</DropdownMenuPortal>
 		</DropdownMenu>
+	);
+};
+
+const ShareButton: FC = () => {
+	const $code = useStore((state) => state.code);
+	const [isCopied, setIsCopied] = useState(() => false);
+	const timeoutId = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+	const onShare = useCallback(async () => {
+		try {
+			const { id } = await rpc.parameters
+				.$post({ json: { code: $code } })
+				.then((res) => res.json());
+
+			const { protocol, host } = window.location;
+			window.navigator.clipboard.writeText(
+				`${protocol}//${host}/parameters/${id}`,
+			);
+
+			setIsCopied(() => true);
+		} catch (e) {
+			console.error(e);
+		}
+	}, [$code]);
+
+	useEffect(() => {
+		if (!isCopied) {
+			return;
+		}
+
+		clearTimeout(timeoutId.current);
+		const id = setTimeout(() => {
+			setIsCopied(() => false);
+		}, 1000);
+		timeoutId.current = id;
+
+		return () => clearTimeout(timeoutId.current);
+	}, [isCopied]);
+
+	return (
+		<Tooltip open={isCopied}>
+			<TooltipTrigger asChild={true}>
+				<Button size="sm" onClick={onShare}>
+					Share
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent>Copied to clipboard</TooltipContent>
+		</Tooltip>
 	);
 };

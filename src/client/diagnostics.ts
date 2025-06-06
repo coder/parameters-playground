@@ -3,7 +3,7 @@ import type {
 	Parameter,
 	ParserLog,
 	PreviewOutput,
-} from "./gen/types";
+} from "@/gen/types";
 
 type FriendlyDiagnosticWithoutKind = Omit<FriendlyDiagnostic, "extra">;
 

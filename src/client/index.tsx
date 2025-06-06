@@ -1,10 +1,10 @@
-import { TooltipProvider } from "@/components/Tooltip";
-import { ThemeProvider } from "@/contexts/theme.tsx";
+import { TooltipProvider } from "@/client/components/Tooltip";
+import { ThemeProvider } from "@/client/contexts/theme.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import { App } from "./App.tsx";
-import "./index.css";
+import "@/client/index.css";
 
 const root = document.getElementById("root");
 

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Diagnostic } from "@/diagnostics";
+import type { Diagnostic } from "@/client/diagnostics";
 
 const defaultCode = `terraform {
   required_providers {
