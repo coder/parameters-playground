@@ -2,9 +2,22 @@ import { TooltipProvider } from "@/client/components/Tooltip";
 import { ThemeProvider } from "@/client/contexts/theme.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router";
+import { RouterProvider, createBrowserRouter, redirect } from "react-router";
 import { App } from "./App.tsx";
 import "@/client/index.css";
+
+const router = createBrowserRouter([
+	{
+		path: "/parameters/:id?",
+		Component: App,
+	},
+	{
+		path: "*",
+		loader: () => {
+			return redirect("/parameters");
+		},
+	},
+]);
 
 const root = document.getElementById("root");
 
@@ -13,13 +26,11 @@ if (!root) {
 } else {
 	createRoot(root).render(
 		<StrictMode>
-			<BrowserRouter>
-				<ThemeProvider>
-					<TooltipProvider>
-						<App />
-					</TooltipProvider>
-				</ThemeProvider>
-			</BrowserRouter>
+			<ThemeProvider>
+				<TooltipProvider>
+					<RouterProvider router={router} />
+				</TooltipProvider>
+			</ThemeProvider>
 		</StrictMode>,
 	);
 }

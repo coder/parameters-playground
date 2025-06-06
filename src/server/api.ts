@@ -1,8 +1,8 @@
-import * as v from "valibot";
 import { vValidator } from "@hono/valibot-validator";
-import { nanoid } from "nanoid";
+import { head, put } from "@vercel/blob";
 import { Hono } from "hono";
-import { put, head } from "@vercel/blob";
+import { nanoid } from "nanoid";
+import * as v from "valibot";
 
 const BLOG_PATH = "parameters/share";
 
@@ -17,7 +17,7 @@ const parameters = new Hono()
 			return c.json({ code });
 		} catch (e) {
 			console.error(`Failed to load playground with id ${id}: ${e}`);
-			return c.notFound();
+			return c.json({ code: "" }, 404);
 		}
 	})
 	.post(

@@ -66,7 +66,7 @@ export const App = () => {
 					fetch(
 						import.meta.env.PROD
 							? "/assets/build/preview.wasm"
-							: "build/preview.wasm",
+							: "/build/preview.wasm",
 					),
 					goWasm.importObject,
 				);

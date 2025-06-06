@@ -28,10 +28,10 @@ app.get("*", (c) => {
 	// The production paths are hard coded based on the output of the build script.
 	const cssPath = import.meta.env.PROD
 		? "/assets/index.css"
-		: "src/client/index.css";
+		: "/src/client/index.css";
 	const clientScriptPath = import.meta.env.PROD
 		? "/assets/client.js"
-		: "src/client/index.tsx";
+		: "/src/client/index.tsx";
 	const wasmExecScriptPath = import.meta.env.PROD
 		? "/assets/wasm_exec.js"
 		: "/wasm_exec.js";
