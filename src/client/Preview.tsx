@@ -14,11 +14,7 @@ import {
 } from "@/client/diagnostics";
 import { useDebouncedValue } from "@/client/hooks/debounce";
 import { useStore } from "@/client/store";
-import type {
-	Parameter,
-	ParserLog,
-	PreviewOutput,
-} from "@/gen/types";
+import type { Parameter, ParserLog, PreviewOutput } from "@/gen/types";
 import { cn } from "@/utils/cn";
 import ReactJsonView from "@microlink/react-json-view";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -578,24 +574,26 @@ const Form: FC<FormProps> = ({ parameters }) => {
 
 type FormElementProps = { parameter: Parameter };
 const FormElement: FC<FormElementProps> = ({ parameter }) => {
+	const $form = useStore((state) => state.form);
+	const $setForm = useStore((state) => state.setFormState);
+
+	const value = useMemo(
+		() => $form[parameter.name] ?? parameter.default_value.value,
+		[$form, parameter],
+	);
+
+	const onValueChange = (value: string) => {
+		$setForm(parameter.name, value);
+	};
+
 	return (
 		<DynamicParameter
 			parameter={parameter}
+			value={value}
 			autofill={false}
-			onChange={() => null}
+			onChange={onValueChange}
 		/>
 	);
-	// const $form = useStore((state) => state.form);
-	// const $setForm = useStore((state) => state.setFormState);
-
-	// const value = useMemo(
-	// 	() => $form[parameter.name] ?? parameter.default_value.value,
-	// 	[$form, parameter],
-	// );
-
-	// const onValueChange = (value: string) => {
-	// 	$setForm(parameter.name, value);
-	// };
 
 	// if (parameter.form_type === ParameterFormType.ParameterFormTypeInput) {
 	// 	return (

@@ -47,9 +47,9 @@ export const Markdown: FC<MarkdownProps> = (props) => {
 					const isExternal = href?.startsWith("http");
 
 					return (
-						<a href={href} target={isExternal ? "_blank" : undefined}>
+						<NavLink to={href ?? ""} target={isExternal ? "_blank" : undefined}>
 							{children}
-						</a>
+						</NavLink>
 					);
 				},
 
@@ -111,6 +111,30 @@ export const Markdown: FC<MarkdownProps> = (props) => {
 
 				th: ({ children }) => {
 					return <TableCell>{children}</TableCell>;
+				},
+
+				h1: ({ children }) => {
+					return <h1 className="mt-8 mb-4 font-bold text-lg">{children}</h1>;
+				},
+
+				h2: ({ children }) => {
+					return <h2  className="mt-8 mb-4">{children}</h2>;
+				},
+
+				h3: ({ children }) => {
+					return <h3 className="mt-8 mb-4">{children}</h3>;
+				},
+
+				h4: ({ children }) => {
+					return <h4 className="mt-8 mb-4">{children}</h4>;
+				},
+
+				h5: ({ children }) => {
+					return <h5 className="mt-8 mb-4">{children}</h5>;
+				},
+
+				h6: ({ children }) => {
+					return <h6 className="mt-8 mb-4">{children}</h6>;
 				},
 
 				/**
@@ -239,7 +263,7 @@ function parseChildrenAsAlertContent(
 		isValidElement(node),
 	);
 	// biome-ignore lint/suspicious/noExplicitAny: In coder/coder this typeis difined as any
-		let parentChildren = (mainParentNode?.props as any).children;
+	let parentChildren = (mainParentNode?.props as any).children;
 	if (typeof parentChildren === "string") {
 		// Children will only be an array if the parsed text contains other
 		// content that can be turned into HTML. If there aren't any, you
@@ -356,58 +380,3 @@ const MarkdownGfmAlert: FC<MarkdownGfmAlertProps> = ({
 		</div>
 	);
 };
-
-// const markdownStyles: Interpolation<Theme> = (theme: Theme) => ({
-// 	fontSize: 16,
-// 	lineHeight: "24px",
-
-// 	"& h1, & h2, & h3, & h4, & h5, & h6": {
-// 		marginTop: 32,
-// 		marginBottom: 16,
-// 		lineHeight: "1.25",
-// 	},
-
-// 	"& p": {
-// 		marginTop: 0,
-// 		marginBottom: 16,
-// 	},
-
-// 	"& p:only-child": {
-// 		marginTop: 0,
-// 		marginBottom: 0,
-// 	},
-
-// 	"& ul, & ol": {
-// 		display: "flex",
-// 		flexDirection: "column",
-// 		gap: 8,
-// 		marginBottom: 16,
-// 	},
-
-// 	"& li > ul, & li > ol": {
-// 		marginTop: 16,
-// 	},
-
-// 	"& li > p": {
-// 		marginBottom: 0,
-// 	},
-
-// 	"& .prismjs": {
-// 		background: theme.palette.background.paper,
-// 		borderRadius: 8,
-// 		padding: "16px 24px",
-// 		overflowX: "auto",
-
-// 		"& code": {
-// 			color: theme.palette.text.secondary,
-// 		},
-
-// 		"& .key, & .property, & .inserted, .keyword": {
-// 			color: colors.teal[300],
-// 		},
-
-// 		"& .deleted": {
-// 			color: theme.palette.error.light,
-// 		},
-// 	},
-// });
