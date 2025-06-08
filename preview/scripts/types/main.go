@@ -43,7 +43,7 @@ func main() {
 	}
 
 	ts, err := gen.ToTypescript()
-	ts.ApplyMutations(config.ExportTypes)
+	ts.ApplyMutations(config.ExportTypes, config.NullUnionSlices, config.SimplifyOmitEmpty)
 
 	if err != nil {
 		log.Fatalf("to typescript: %v", err)

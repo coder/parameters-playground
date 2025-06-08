@@ -19,7 +19,7 @@ export const List: FC<Tabs.TabsListProps> = ({
 	...rest
 }) => {
 	return (
-		<Tabs.List {...rest} className={cn("flex h-12 w-full border-b", className)}>
+		<Tabs.List {...rest} className={cn("flex h-12 max-h-12 w-full border-b", className)}>
 			{children}
 		</Tabs.List>
 	);

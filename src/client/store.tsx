@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { Diagnostic } from "@/client/diagnostics";
+import type { Parameter } from "@/gen/types";
 
 const defaultCode = `terraform {
   required_providers {
@@ -8,6 +9,8 @@ const defaultCode = `terraform {
     }
   }
 }`;
+
+type FormState = Record<string, string>;
 
 type WasmState = "loaded" | "loading" | "error";
 
@@ -22,17 +25,23 @@ const defaultErrorsState: ErrorsState = {
 
 type State = {
 	code: string;
+	parameters: Parameter[];
+	form: FormState;
 	wasmState: WasmState;
 	errors: ErrorsState;
 	setCode: (code: string) => void;
 	setError: (diagnostics: Diagnostic[]) => void;
 	toggleShowError: (open?: boolean) => void;
 	setWasmState: (wasmState: WasmState) => void;
+	setParameters: (parameters: Parameter[]) => void;
+	setFormState: (key: string, value: string) => void;
 };
 
 export const useStore = create<State>()((set) => ({
-	code: defaultCode,
+	code: window.CODE ?? defaultCode,
+	parameters: [],
 	wasmState: "loading",
+	form: {},
 	errors: defaultErrorsState,
 	setCode: (code) => set((_) => ({ code })),
 	setError: (data) =>
@@ -53,4 +62,12 @@ export const useStore = create<State>()((set) => ({
 			};
 		}),
 	setWasmState: (wasmState) => set((_) => ({ wasmState })),
+	setParameters: (parameters) => set((_) => ({ parameters })),
+	setFormState: (key, value) =>
+		set((state) => {
+			const form = { ...state.form };
+			form[key] = value;
+
+			return { form };
+		}),
 }));

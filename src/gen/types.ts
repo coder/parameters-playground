@@ -15,7 +15,7 @@ export interface DiagnosticExtra {
 export type DiagnosticSeverityString = string;
 
 // From types/diagnostics.go
-export type Diagnostics = (FriendlyDiagnostic | null)[];
+export type Diagnostics = (FriendlyDiagnostic)[];
 
 // From hcl/structure.go
 export interface File {
@@ -37,6 +37,14 @@ export interface FriendlyDiagnostic {
 export interface NullHCLString {
     value: string;
     valid: boolean;
+}
+
+// From apitypes/apitypes.go
+export enum OptionType {
+    OptionTypeBoolean = "bool",
+    OptionTypeListString = "list(string)",
+    OptionTypeNumber = "number",
+    OptionTypeString = "string"
 }
 
 // From preview/preview.go
@@ -64,15 +72,27 @@ export interface ParameterData {
     mutable: boolean;
     default_value: NullHCLString;
     icon: string;
-    options: (ParameterOption | null)[];
-    validations: (ParameterValidation | null)[];
+    options: (ParameterOption)[];
+    validations: (ParameterValidation)[];
     required: boolean;
     order: number;
     ephemeral: boolean;
 }
 
 // From provider/formtype.go
-export type ParameterFormType = string;
+export enum ParameterFormType {
+    ParameterFormTypeCheckbox = "checkbox",
+    ParameterFormTypeDefault = "",
+    ParameterFormTypeDropdown = "dropdown",
+    ParameterFormTypeError = "error",
+    ParameterFormTypeInput = "input",
+    ParameterFormTypeMultiSelect = "multi-select",
+    ParameterFormTypeRadio = "radio",
+    ParameterFormTypeSlider = "slider",
+    ParameterFormTypeSwitch = "switch",
+    ParameterFormTypeTagSelect = "tag-select",
+    ParameterFormTypeTextArea = "textarea"
+}
 
 // From types/parameter.go
 export interface ParameterOption {
@@ -84,9 +104,9 @@ export interface ParameterOption {
 
 // From types/parameter.go
 export interface ParameterStyling {
-    placeholder?: string | null;
-    disabled?: boolean | null;
-    label?: string | null;
+    placeholder?: string;
+    disabled?: boolean;
+    label?: string;
 }
 
 // From types/enum.go

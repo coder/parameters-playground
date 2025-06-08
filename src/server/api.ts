@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import { nanoid } from "nanoid";
 import * as v from "valibot";
 
-const BLOG_PATH = "parameters/share";
+export const BLOG_PATH = "parameters/share";
 
 const parameters = new Hono()
 	.get("/:id", async (c) => {
