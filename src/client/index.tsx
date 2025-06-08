@@ -3,11 +3,12 @@ import { ThemeProvider } from "@/client/contexts/theme.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter, redirect } from "react-router";
-import { App } from "./App.tsx";
+import { App, loader as appLoader } from "./App.tsx";
 import "@/client/index.css";
 
 const router = createBrowserRouter([
 	{
+		loader: appLoader,
 		path: "/parameters/:id?",
 		Component: App,
 	},
