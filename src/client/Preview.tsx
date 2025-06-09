@@ -1,19 +1,22 @@
 import { Button } from "@/client/components/Button";
+import { DynamicParameter } from "@/client/components/DynamicParameter";
 import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@/client/components/Resizable";
 import * as Tabs from "@/client/components/Tabs";
+import { useTheme } from "@/client/contexts/theme";
 import {
 	type Diagnostic,
 	type InternalDiagnostic,
 	outputToDiagnostics,
 } from "@/client/diagnostics";
-import type { ParserLog, PreviewOutput } from "@/gen/types";
 import { useDebouncedValue } from "@/client/hooks/debounce";
 import { useStore } from "@/client/store";
+import type { Parameter, ParserLog, PreviewOutput } from "@/gen/types";
 import { cn } from "@/utils/cn";
+import ReactJsonView from "@microlink/react-json-view";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
 	ActivityIcon,
@@ -28,14 +31,16 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import ReactJsonView from "@microlink/react-json-view";
-import { useTheme } from "@/client/contexts/theme";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
 	const $code = useStore((state) => state.code);
 	const $errors = useStore((state) => state.errors);
 	const $setError = useStore((state) => state.setError);
+	const $parameters = useStore((state) => state.parameters);
+	const $setParameters = useStore((state) => state.setParameters);
+	const $form = useStore((state) => state.form);
+	const $resetForm = useStore((state) => state.resetForm);
 
 	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
 	const [output, setOutput] = useState<PreviewOutput | null>(() => null);
@@ -68,22 +73,31 @@ export const Preview: FC = () => {
 	}, [output]);
 
 	useEffect(() => {
-		if (!window.go_preview) {
+		if ($wasmState === "loading" || !window.go_preview) {
 			return;
 		}
 
 		const getOutput = async () => {
 			try {
-				const rawOutput = await window.go_preview?.({
-					"main.tf": debouncedCode,
-				});
+				const rawOutput = await window.go_preview?.(
+					{
+						"main.tf": debouncedCode,
+					},
+					$form,
+				);
 
 				if (rawOutput === undefined) {
 					console.error("Something went wrong");
 				} else {
 					const output = JSON.parse(rawOutput) as PreviewOutput;
 					setOutput(() => output);
-					$setError(outputToDiagnostics(output));
+
+					const errors = outputToDiagnostics(output);
+					$setError(errors);
+
+					if (output.diags.length === 0) {
+						$setParameters(output.output?.Parameters ?? []);
+					}
 				}
 			} catch (e) {
 				console.error(e);
@@ -109,7 +123,7 @@ export const Preview: FC = () => {
 		};
 
 		getOutput();
-	}, [debouncedCode, $setError]);
+	}, [debouncedCode, $setError, $wasmState, $setParameters, $form]);
 
 	return (
 		<Tabs.Root
@@ -118,7 +132,7 @@ export const Preview: FC = () => {
 			value={tab}
 			onValueChange={(tab) => setTab(() => tab)}
 		>
-			<ResizablePanel className="relative flex flex-col">
+			<ResizablePanel className="relative flex h-full max-h-full flex-col">
 				{$wasmState !== "loaded" ? (
 					<div className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center backdrop-blur-sm">
 						{$wasmState === "loading" ? <WasmLoading /> : <WasmError />}
@@ -127,7 +141,7 @@ export const Preview: FC = () => {
 
 				<Tabs.List
 					className={cn(
-						"justify-between pr-3",
+						"flex justify-between pr-3",
 						!isDebug ? "hidden" : undefined,
 					)}
 				>
@@ -167,40 +181,50 @@ export const Preview: FC = () => {
 							($errors.show && $errors.diagnostics.length > 0)
 						}
 						className={cn(
-							"flex h-full w-full flex-col items-start gap-6 p-6",
+							"flex h-full w-full flex-col items-start gap-6 p-6 ",
 							($wasmState !== "loaded" ||
 								($errors.show && $errors.diagnostics.length > 0)) &&
 								"pointer-events-none",
+							isDebug && "max-h-[calc(100%-48px)]",
 						)}
 					>
-						<div className="flex w-full items-center justify-between">
-							<div className="flex items-center justify-center gap-4">
-								<p className="font-semibold text-3xl text-content-primary">
-									Parameters
-								</p>
+						{
+							<div className="flex w-full items-center justify-between">
+								<div className="flex items-center justify-center gap-4">
+									<p className="font-semibold text-3xl text-content-primary">
+										Parameters
+									</p>
 
-								<AnimatePresence>
-									{isDebouncing && $wasmState === "loaded" ? (
-										<motion.div
-											initial={{ opacity: 0, scale: 0.75 }}
-											animate={{ opacity: 1, scale: 1 }}
-											exit={{ opacity: 0, scale: 0.75 }}
-										>
-											<LoaderIcon
-												width={16}
-												height={16}
-												className="animate-spin text-content-primary"
-											/>
-										</motion.div>
-									) : null}
-								</AnimatePresence>
+									<AnimatePresence>
+										{isDebouncing && $wasmState === "loaded" ? (
+											<motion.div
+												initial={{ opacity: 0, scale: 0.75 }}
+												animate={{ opacity: 1, scale: 1 }}
+												exit={{ opacity: 0, scale: 0.75 }}
+											>
+												<LoaderIcon
+													width={16}
+													height={16}
+													className="animate-spin text-content-primary"
+												/>
+											</motion.div>
+										) : null}
+									</AnimatePresence>
+								</div>
+								<Button variant="destructive" onClick={$resetForm}>
+									Reset form
+								</Button>
 							</div>
-							<Button variant="destructive">Reset form</Button>
-						</div>
-
-						<div className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4">
-							<PreviewEmptyState />
-						</div>
+						}
+						{$parameters.length === 0 ? (
+							<div className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4">
+								<PreviewEmptyState />
+							</div>
+						) : (
+							<div className="flex h-full w-full flex-col items-center justify-start gap-5 overflow-x-clip overflow-y-scroll rounded-xl border p-6">
+								<Form parameters={$parameters} />
+							</div>
+						)}
 					</div>
 				</Tabs.Content>
 
@@ -388,7 +412,7 @@ const Debugger: FC<DebuggerProps> = ({ output }) => {
 			className="h-full w-full bg-surface-primary"
 		>
 			<ResizablePanel className="flex">
-				<div className="h-full w-full overflow-scroll break-all p-4 text-sm font-mono">
+				<div className="h-full w-full overflow-scroll break-all p-4 font-mono text-sm">
 					<ReactJsonView
 						src={output ?? {}}
 						collapsed={1}
@@ -544,5 +568,42 @@ const Log: FC<LogProps> = ({ log }) => {
 				</AnimatePresence>
 			</Dialog.Portal>
 		</Dialog.Root>
+	);
+};
+
+type FormProps = { parameters: Parameter[] };
+
+const Form: FC<FormProps> = ({ parameters }) => {
+	return parameters
+		.sort((a, b) => a.order - b.order)
+		.map((p, index) => <FormElement key={index} parameter={p} />);
+};
+
+type FormElementProps = { parameter: Parameter };
+const FormElement: FC<FormElementProps> = ({ parameter }) => {
+	const $form = useStore((state) => state.form);
+	const $setForm = useStore((state) => state.setFormState);
+
+	const value = useMemo(
+		() =>
+			$form[parameter.name] ??
+			(parameter.default_value.value === "??"
+				? ""
+				: parameter.default_value.value),
+		[$form, parameter],
+	);
+
+	const onValueChange = (value: string) => {
+		$setForm(parameter.name, value);
+	};
+
+	return (
+		<DynamicParameter
+			parameter={parameter}
+			value={value}
+			autofill={false}
+			onChange={onValueChange}
+			disabled={parameter.styling.disabled}
+		/>
 	);
 };

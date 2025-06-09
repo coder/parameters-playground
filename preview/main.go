@@ -63,10 +63,24 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 
 	handler := slog.NewJSONHandler(l, nil)
 	logger := slog.New(handler)
+
+	var parameters map[string]string
+	if len(p) >= 2 {
+		params, err := jsValueToStringMap(p[1])
+		if err != nil {
+			logger.Error("Unable to convert second prameter into map[string]string", "err", err)
+		}
+
+		parameters = params
+	} else {
+		logger.Error(fmt.Sprintf("Expected 2 arguments but got %v", len(p)))
+
+	}
+
 	pOutput, diags := preview.Preview(context.Background(), preview.Input{
 		PlanJSONPath:    "",
 		PlanJSON:        nil,
-		ParameterValues: nil,
+		ParameterValues: parameters,
 		Owner:           types.WorkspaceOwner{},
 		Logger:          logger,
 	}, tf)
@@ -144,4 +158,42 @@ func (l *Logger) Write(p []byte) (n int, err error) {
 	l.mu.Unlock()
 
 	return len(p), nil
+}
+
+func jsValueToStringMap(jsVal js.Value) (map[string]string, error) {
+	result := make(map[string]string)
+
+	// Validate input
+	if jsVal.IsUndefined() || jsVal.IsNull() {
+		return nil, fmt.Errorf("js.Value is undefined or null")
+	}
+
+	if jsVal.Type() != js.TypeObject {
+		return nil, fmt.Errorf("js.Value is not an object")
+	}
+
+	// Get object keys
+	keys := js.Global().Get("Object").Call("keys", jsVal)
+
+	for i := range keys.Length() {
+		key := keys.Index(i).String()
+		value := jsVal.Get(key)
+
+		// Handle different value types
+		switch value.Type() {
+		case js.TypeString:
+			result[key] = value.String()
+		case js.TypeNumber:
+			result[key] = fmt.Sprintf("%f", value.Float())
+		case js.TypeBoolean:
+			result[key] = fmt.Sprintf("%t", value.Bool())
+		case js.TypeNull, js.TypeUndefined:
+			result[key] = ""
+		default:
+			// For objects, arrays, etc., use String() method
+			result[key] = value.String()
+		}
+	}
+
+	return result, nil
 }

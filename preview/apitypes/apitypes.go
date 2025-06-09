@@ -7,6 +7,31 @@ import (
 	"github.com/coder/preview/types"
 )
 
+type ParameterFormType string
+
+const (
+	ParameterFormTypeDefault     ParameterFormType = ""
+	ParameterFormTypeRadio       ParameterFormType = "radio"
+	ParameterFormTypeSlider      ParameterFormType = "slider"
+	ParameterFormTypeInput       ParameterFormType = "input"
+	ParameterFormTypeDropdown    ParameterFormType = "dropdown"
+	ParameterFormTypeCheckbox    ParameterFormType = "checkbox"
+	ParameterFormTypeSwitch      ParameterFormType = "switch"
+	ParameterFormTypeMultiSelect ParameterFormType = "multi-select"
+	ParameterFormTypeTagSelect   ParameterFormType = "tag-select"
+	ParameterFormTypeTextArea    ParameterFormType = "textarea"
+	ParameterFormTypeError       ParameterFormType = "error"
+)
+
+type OptionType string
+
+const (
+	OptionTypeString     OptionType = "string"
+	OptionTypeNumber     OptionType = "number"
+	OptionTypeBoolean    OptionType = "bool"
+	OptionTypeListString OptionType = "list(string)"
+)
+
 type PreviewOutput struct {
 	Output *preview.Output   `json:"output"`
 	Diags  types.Diagnostics `json:"diags"`

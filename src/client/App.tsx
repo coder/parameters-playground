@@ -30,8 +30,12 @@ import {
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
 import { rpc } from "@/utils/rpc";
+import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 
-type GoPreviewDef = (v: unknown) => Promise<string>;
+type GoPreviewDef = (
+	v: Record<string, string>,
+	params: Record<string, string>,
+) => Promise<string>;
 
 // Extend the Window object to include the Go related code that is added from
 // wasm_exec.js and our loaded Go code.
@@ -40,6 +44,7 @@ declare global {
 		// Loaded from wasm
 		go_preview?: GoPreviewDef;
 		Go: { new (): Go };
+		CODE?: string;
 	}
 }
 
@@ -53,9 +58,37 @@ declare class Go {
 	run(instance: WebAssembly.Instance): Promise<void>;
 }
 
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+	const { id } = params;
+	if (!id) {
+		return;
+	}
+
+	try {
+		const res = await rpc.parameters[":id"].$get({ param: { id } });
+		if (res.ok) {
+			const { code } = await res.json();
+			return code;
+		}
+	} catch (e) {
+		console.error(`Error loading playground: ${e}`);
+		return;
+	}
+};
+
 export const App = () => {
 	const $wasmState = useStore((state) => state.wasmState);
 	const $setWasmState = useStore((state) => state.setWasmState);
+	const $setCode = useStore((store) => store.setCode);
+	const code = useLoaderData<typeof loader>();
+
+	useEffect(() => {
+		if (!code) {
+			return;
+		}
+
+		$setCode(code);
+	}, [code, $setCode]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
