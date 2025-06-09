@@ -23,7 +23,7 @@ export const Command = forwardRef<
 	/>
 ));
 
-const CommandDialog: FC<DialogProps> = ({ children, ...props }) => {
+export const CommandDialog: FC<DialogProps> = ({ children, ...props }) => {
 	return (
 		<Dialog {...props}>
 			<DialogContent className="overflow-hidden p-0">
@@ -116,14 +116,14 @@ export const CommandItem = forwardRef<
 	/>
 ));
 
-const CommandShortcut = ({
+export const CommandShortcut = ({
 	className,
 	...props
 }: React.HTMLAttributes<HTMLSpanElement>) => {
 	return (
 		<span
 			className={cn(
-				"ml-auto text-xs tracking-widest text-content-disabled",
+				"ml-auto text-content-disabled text-xs tracking-widest",
 				className,
 			)}
 			{...props}
