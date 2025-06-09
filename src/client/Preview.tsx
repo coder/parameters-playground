@@ -73,7 +73,7 @@ export const Preview: FC = () => {
 	}, [output]);
 
 	useEffect(() => {
-		if (!window.go_preview) {
+		if ($wasmState === "loading" || !window.go_preview) {
 			return;
 		}
 
