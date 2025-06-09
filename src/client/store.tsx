@@ -1,14 +1,7 @@
 import { create } from "zustand";
 import type { Diagnostic } from "@/client/diagnostics";
 import type { Parameter } from "@/gen/types";
-
-const defaultCode = `terraform {
-  required_providers {
-    coder = {
-      source = "coder/coder"
-    }
-  }
-}`;
+import { defaultCode } from "./snippets";
 
 type FormState = Record<string, string>;
 
