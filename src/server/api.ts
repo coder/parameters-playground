@@ -10,7 +10,7 @@ export const ShareDataSchema = v.object({ code: v.string() });
 type ShareData = v.InferInput<typeof ShareDataSchema>;
 
 const putShareData = async (data: ShareData): Promise<string> => {
-	const id = nanoid();
+	const id = nanoid(10);
 	await put(`${BLOG_PATH}/${id}.json`, JSON.stringify(data), {
 		addRandomSuffix: false,
 		access: "public",
