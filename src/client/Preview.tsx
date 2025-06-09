@@ -216,7 +216,7 @@ export const Preview: FC = () => {
 								</Button>
 							</div>
 						}
-						{!output ? (
+						{$parameters.length === 0 ? (
 							<div className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4">
 								<PreviewEmptyState />
 							</div>
@@ -585,7 +585,11 @@ const FormElement: FC<FormElementProps> = ({ parameter }) => {
 	const $setForm = useStore((state) => state.setFormState);
 
 	const value = useMemo(
-		() => $form[parameter.name] ?? parameter.default_value.value,
+		() =>
+			$form[parameter.name] ??
+			(parameter.default_value.value === "??"
+				? ""
+				: parameter.default_value.value),
 		[$form, parameter],
 	);
 
