@@ -1,6 +1,5 @@
 import type {
 	FriendlyDiagnostic,
-	Parameter,
 	ParserLog,
 	PreviewOutput,
 } from "@/gen/types";
@@ -26,9 +25,6 @@ export type Diagnostic =
 	| InternalDiagnostic;
 
 export const outputToDiagnostics = (output: PreviewOutput): Diagnostic[] => {
-	const parameterDiags = (output.output?.Parameters ?? []).flatMap(
-		parameterToDiagnostics,
-	);
 	const topLevelDiags: TopLevelDiagnostic[] = output.diags
 		.filter((d) => d !== null)
 		.map((d) => ({
@@ -37,17 +33,8 @@ export const outputToDiagnostics = (output: PreviewOutput): Diagnostic[] => {
 		}));
 	const diagsFromLogs = logsToDiagnostics(output.parser_logs ?? []);
 
-	return [...diagsFromLogs, ...topLevelDiags, ...parameterDiags];
+	return [...diagsFromLogs, ...topLevelDiags];
 };
-
-const parameterToDiagnostics = (parameter: Parameter): ParameterDiagnostic[] =>
-	parameter.diagnostics
-		.filter((d) => d !== null)
-		.map((d) => ({
-			kind: "parameter",
-			parameterName: parameter.name,
-			...d,
-		}));
 
 const logsToDiagnostics = (logs: ParserLog[]): TopLevelDiagnostic[] =>
 	logs
