@@ -460,7 +460,7 @@ export const MultiSelectCombobox = forwardRef<
 				{/* biome-ignore lint/a11y/useKeyWithClickEvents: onKeyDown is not needed here */}
 				<div
 					className={cn(
-						"min-h-10 rounded-md border border-border border-solid pr-3 text-sm focus-within:ring-2 focus-within:ring-content-link",
+						"h-10 min-h-10 rounded-md border border-border border-solid pr-3 text-sm focus-within:ring-2 focus-within:ring-content-link",
 						{
 							"py-1 pl-3": selected.length !== 0,
 							"cursor-text": !disabled && selected.length !== 0,
@@ -472,7 +472,7 @@ export const MultiSelectCombobox = forwardRef<
 						inputRef?.current?.focus();
 					}}
 				>
-					<div className="flex items-center justify-between">
+					<div className="flex items-center justify-between h-full">
 						<div className="relative flex flex-wrap gap-1">
 							{selected.map((option) => {
 								return (
@@ -540,7 +540,7 @@ export const MultiSelectCombobox = forwardRef<
 									"flex-1 border-none bg-transparent outline-none placeholder:text-content-secondary",
 									{
 										"w-full": hidePlaceholderWhenSelected,
-										"px-3 py-2.5": selected.length === 0,
+										"px-3": selected.length === 0,
 										"ml-1": selected.length !== 0,
 									},
 									inputProps?.className,
@@ -562,7 +562,7 @@ export const MultiSelectCombobox = forwardRef<
 									}
 								}}
 								className={cn(
-									"mt-1 cursor-pointer rounded-sm border-none bg-transparent text-content-secondary outline-none hover:text-content-primary focus:ring-2 focus:ring-content-link",
+									"cursor-pointer rounded-sm border-none bg-transparent text-content-secondary outline-none hover:text-content-primary focus:ring-2 focus:ring-content-link",
 									(hideClearAllButton ||
 										disabled ||
 										selected.length < 1 ||

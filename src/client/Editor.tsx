@@ -15,7 +15,6 @@ import {
 } from "@/client/components/Tooltip";
 import { useStore } from "@/client/store";
 import {
-	BookIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	CopyIcon,
@@ -25,8 +24,9 @@ import {
 	SquareMousePointerIcon,
 	TextCursorInputIcon,
 	ToggleLeftIcon,
+	ZapIcon,
 } from "lucide-react";
-import { type FC, useEffect, useRef, useState } from "react";
+import { type FC, useCallback, useEffect, useRef, useState } from "react";
 import CodeEditor from "react-simple-code-editor";
 
 // The following imports can't be re-ordered otherwise things break
@@ -35,6 +35,8 @@ import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-hcl";
 import "prismjs/themes/prism.css";
 import { cn } from "@/utils/cn";
+import type { ParameterFormType } from "@/gen/types";
+import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
 
 // Adds line numbers to the highlight.
 const hightlightWithLineNumbers = (input: string, language: unknown) =>
@@ -62,6 +64,20 @@ export const Editor: FC = () => {
 		setCodeCopied(() => true);
 	};
 
+	const onAddSnippet = useCallback(
+		(formType: ParameterFormType) => {
+			if (formType === "input") {
+				$setCode(`${$code.trimEnd()}\n\n${textInput}\n`);
+			} else if (formType === "radio") {
+				$setCode(`${$code.trimEnd()}\n\n${radio}\n`);
+			} else if (formType === "multi-select") {
+				$setCode(`${$code.trimEnd()}\n\n${multiSelect}\n`);
+			} else if (formType === "switch") {
+				$setCode(`${$code.trimEnd()}\n\n${switchInput}\n`);
+			}
+		},
+		[$code, $setCode],
+	);
 
 	useEffect(() => {
 		if (!codeCopied) {
@@ -105,27 +121,29 @@ export const Editor: FC = () => {
 						<DropdownMenu>
 							<DropdownMenuTrigger className="flex w-fit min-w-[140px] cursor-pointer items-center justify-between rounded-md border bg-surface-primary px-2 py-1.5 text-content-secondary transition-colors hover:text-content-primary data-[state=open]:text-content-primary">
 								<div className="flex items-center justify-center gap-2">
-									<BookIcon width={18} height={18} />
-									<p className="text-xs">Examples</p>
+									<ZapIcon width={18} height={18} />
+									<p className="text-xs">Snippets</p>
 								</div>
 								<ChevronDownIcon width={18} height={18} />
 							</DropdownMenuTrigger>
 
 							<DropdownMenuPortal>
 								<DropdownMenuContent align="start">
-									<DropdownMenuItem>
+									<DropdownMenuItem onClick={() => onAddSnippet("input")}>
 										<TextCursorInputIcon width={24} height={24} />
 										Text input
 									</DropdownMenuItem>
-									<DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() => onAddSnippet("multi-select")}
+									>
 										<SquareMousePointerIcon width={24} height={24} />
 										Multi-select
 									</DropdownMenuItem>
-									<DropdownMenuItem>
+									<DropdownMenuItem onClick={() => onAddSnippet("radio")}>
 										<RadioIcon width={24} height={24} />
 										Radio
 									</DropdownMenuItem>
-									<DropdownMenuItem>
+									<DropdownMenuItem onClick={() => onAddSnippet("switch")}>
 										<ToggleLeftIcon width={24} height={24} /> Switches
 									</DropdownMenuItem>
 								</DropdownMenuContent>

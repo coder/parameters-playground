@@ -46,6 +46,7 @@ export const Markdown: FC<MarkdownProps> = (props) => {
 				p: ({ children }) => {
 					return <p className="text-xs">{children}</p>;
 				},
+
 				a: ({ href, children }) => {
 					const isExternal = href?.startsWith("http");
 
@@ -55,6 +56,8 @@ export const Markdown: FC<MarkdownProps> = (props) => {
 						</NavLink>
 					);
 				},
+
+				hr: () => <hr className="my-3"/>,
 
 				pre: ({ node, children }) => {
 					if (!node || !node.children) {
@@ -92,6 +95,13 @@ export const Markdown: FC<MarkdownProps> = (props) => {
 					);
 				},
 
+				ul: ({ children }) => {
+					return <ul className="list-inside list-disc">{children}</ul>;
+				},
+				li: ({ children }) => {
+					return <li className="text-sm">{children}</li>;
+				},
+
 				table: ({ children }) => {
 					return <Table>{children}</Table>;
 				},
@@ -117,27 +127,27 @@ export const Markdown: FC<MarkdownProps> = (props) => {
 				},
 
 				h1: ({ children }) => {
-					return <h1 className="mt-8 mb-4 font-bold text-lg">{children}</h1>;
+					return <h1 className="my-3 font-bold text-xl">{children}</h1>;
 				},
 
 				h2: ({ children }) => {
-					return <h2 className="mt-8 mb-4">{children}</h2>;
+					return <h2 className="my-2 font-semibold">{children}</h2>;
 				},
 
 				h3: ({ children }) => {
-					return <h3 className="mt-8 mb-4">{children}</h3>;
+					return <h3 className="my-2 font-medium">{children}</h3>;
 				},
 
 				h4: ({ children }) => {
-					return <h4 className="mt-8 mb-4">{children}</h4>;
+					return <h4 className="">{children}</h4>;
 				},
 
 				h5: ({ children }) => {
-					return <h5 className="mt-8 mb-4">{children}</h5>;
+					return <h5 className="">{children}</h5>;
 				},
 
 				h6: ({ children }) => {
-					return <h6 className="mt-8 mb-4">{children}</h6>;
+					return <h6 className="">{children}</h6>;
 				},
 
 				/**

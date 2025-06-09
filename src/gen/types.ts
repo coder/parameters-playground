@@ -40,12 +40,7 @@ export interface NullHCLString {
 }
 
 // From apitypes/apitypes.go
-export enum OptionType {
-    OptionTypeBoolean = "bool",
-    OptionTypeListString = "list(string)",
-    OptionTypeNumber = "number",
-    OptionTypeString = "string"
-}
+export type OptionType = "bool" | "list(string)" | "number" | "string";
 
 // From preview/preview.go
 export interface Output {
@@ -80,19 +75,7 @@ export interface ParameterData {
 }
 
 // From provider/formtype.go
-export enum ParameterFormType {
-    ParameterFormTypeCheckbox = "checkbox",
-    ParameterFormTypeDefault = "",
-    ParameterFormTypeDropdown = "dropdown",
-    ParameterFormTypeError = "error",
-    ParameterFormTypeInput = "input",
-    ParameterFormTypeMultiSelect = "multi-select",
-    ParameterFormTypeRadio = "radio",
-    ParameterFormTypeSlider = "slider",
-    ParameterFormTypeSwitch = "switch",
-    ParameterFormTypeTagSelect = "tag-select",
-    ParameterFormTypeTextArea = "textarea"
-}
+export type ParameterFormType = "checkbox" | "" | "dropdown" | "error" | "input" | "multi-select" | "radio" | "slider" | "switch" | "tag-select" | "textarea";
 
 // From types/parameter.go
 export interface ParameterOption {

@@ -20,7 +20,7 @@ export const Switch = forwardRef<
 	>
 		<SwitchPrimitives.Thumb
 			className={cn(
-				"data-[state=unchecked]:-translate-x-1.5 pointer-events-none block h-4 w-4 rounded-full bg-surface-primary shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-2.5",
+				"pointer-events-none block h-4 w-4 rounded-full bg-surface-primary shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4",
 			)}
 		/>
 	</SwitchPrimitives.Root>
