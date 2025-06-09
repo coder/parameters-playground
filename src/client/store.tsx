@@ -35,6 +35,7 @@ type State = {
 	setWasmState: (wasmState: WasmState) => void;
 	setParameters: (parameters: Parameter[]) => void;
 	setFormState: (key: string, value: string) => void;
+	resetForm: () => void;
 };
 
 export const useStore = create<State>()((set) => ({
@@ -70,4 +71,5 @@ export const useStore = create<State>()((set) => ({
 
 			return { form };
 		}),
+	resetForm: () => set(() => ({ form: {} })),
 }));

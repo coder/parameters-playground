@@ -531,7 +531,7 @@ const ParameterField: FC<ParameterFieldProps> = ({
 						max={parameter.validations[0]?.validation_max ?? 100}
 						disabled={disabled}
 					/>
-					<span className="w-4 font-medium">
+					<span className="w-4 font-medium text-content-secondary">
 						{Number.isFinite(Number(value)) ? value : "0"}
 					</span>
 				</div>

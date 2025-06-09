@@ -43,6 +43,9 @@ export const Markdown: FC<MarkdownProps> = (props) => {
 			// className={className}
 			remarkPlugins={[gfm]}
 			components={{
+				p: ({ children }) => {
+					return <p className="text-xs">{children}</p>;
+				},
 				a: ({ href, children }) => {
 					const isExternal = href?.startsWith("http");
 
@@ -118,7 +121,7 @@ export const Markdown: FC<MarkdownProps> = (props) => {
 				},
 
 				h2: ({ children }) => {
-					return <h2  className="mt-8 mb-4">{children}</h2>;
+					return <h2 className="mt-8 mb-4">{children}</h2>;
 				},
 
 				h3: ({ children }) => {

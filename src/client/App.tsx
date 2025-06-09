@@ -32,7 +32,10 @@ import {
 import { rpc } from "@/utils/rpc";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 
-type GoPreviewDef = (v: unknown) => Promise<string>;
+type GoPreviewDef = (
+	v: Record<string, string>,
+	params: Record<string, string>,
+) => Promise<string>;
 
 // Extend the Window object to include the Go related code that is added from
 // wasm_exec.js and our loaded Go code.

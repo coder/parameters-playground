@@ -39,6 +39,8 @@ export const Preview: FC = () => {
 	const $setError = useStore((state) => state.setError);
 	const $parameters = useStore((state) => state.parameters);
 	const $setParameters = useStore((state) => state.setParameters);
+	const $form = useStore((state) => state.form);
+	const $resetForm = useStore((state) => state.resetForm);
 
 	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
 	const [output, setOutput] = useState<PreviewOutput | null>(() => null);
@@ -77,9 +79,12 @@ export const Preview: FC = () => {
 
 		const getOutput = async () => {
 			try {
-				const rawOutput = await window.go_preview?.({
-					"main.tf": debouncedCode,
-				});
+				const rawOutput = await window.go_preview?.(
+					{
+						"main.tf": debouncedCode,
+					},
+					$form,
+				);
 
 				if (rawOutput === undefined) {
 					console.error("Something went wrong");
@@ -90,7 +95,7 @@ export const Preview: FC = () => {
 					const errors = outputToDiagnostics(output);
 					$setError(errors);
 
-					if (errors.length === 0) {
+					if (output.diags.length === 0) {
 						$setParameters(output.output?.Parameters ?? []);
 					}
 				}
@@ -118,7 +123,7 @@ export const Preview: FC = () => {
 		};
 
 		getOutput();
-	}, [debouncedCode, $setError, $wasmState, $setParameters]);
+	}, [debouncedCode, $setError, $wasmState, $setParameters, $form]);
 
 	return (
 		<Tabs.Root
@@ -206,7 +211,9 @@ export const Preview: FC = () => {
 										) : null}
 									</AnimatePresence>
 								</div>
-								<Button variant="destructive">Reset form</Button>
+								<Button variant="destructive" onClick={$resetForm}>
+									Reset form
+								</Button>
 							</div>
 						}
 						{!output ? (
@@ -592,32 +599,7 @@ const FormElement: FC<FormElementProps> = ({ parameter }) => {
 			value={value}
 			autofill={false}
 			onChange={onValueChange}
+			disabled={parameter.styling.disabled}
 		/>
 	);
-
-	// if (parameter.form_type === ParameterFormType.ParameterFormTypeInput) {
-	// 	return (
-	// 		<Input
-	// 			onChange={(e) => onValueChange(e.target.value)}
-	// 			id={parameter.name}
-	// 			value={value}
-	// 		/>
-	// 	);
-	// }
-	// if (parameter.form_type === ParameterFormType.ParameterFormTypeRadio) {
-	// 	return (
-	// 		<RadioGroup value={value} onValueChange={onValueChange}>
-	// 			{parameter.options
-	// 				.filter((o) => o !== null)
-	// 				.map((o, index) => (
-	// 					<div className="flex items-center gap-2" key={index}>
-	// 						<RadioGroupItem value={o.value.value} title={"foo"} />
-	// 						<p className="text-content-primary text-sm">{o.name}</p>
-	// 					</div>
-	// 				))}
-	// 		</RadioGroup>
-	// 	);
-	// }
-
-	// return null;
 };
