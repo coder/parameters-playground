@@ -5,6 +5,14 @@ import { renderToString } from "react-dom/server";
 // This must be exported for the dev server to work
 export const app = new Hono();
 
+app.use("*", async (ctx, next) => {
+	const url = new URL(ctx.req.url);
+	if (url.hostname === "coder.app") {
+		return ctx.redirect("https://coder.com");
+	}
+
+	await next();
+});
 app.route("/api", api);
 
 // Serves the main web application. This must come after the API route.
