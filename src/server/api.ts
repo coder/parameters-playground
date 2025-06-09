@@ -53,7 +53,7 @@ const parameters = new Hono()
 			const bytes = new TextEncoder().encode(JSON.stringify(data));
 
 			// Check if the data is larger than 10kb
-			if (bytes.length < 1024 * 10) {
+			if (bytes.length > 1024 * 10) {
 				console.error("Data larger than 10kb");
 				return c.json({ id: "" }, 500);
 			}
