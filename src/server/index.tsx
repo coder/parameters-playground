@@ -35,6 +35,7 @@ app.get("*", (c) => {
 	const wasmExecScriptPath = import.meta.env.PROD
 		? "/assets/wasm_exec.js"
 		: "/wasm_exec.js";
+	const iconPath = import.meta.env.PROD ? "/assets/logo.svg" : "/logo.svg";
 
 	return c.html(
 		[
@@ -43,7 +44,7 @@ app.get("*", (c) => {
 				<html lang="en">
 					<head>
 						<meta charSet="UTF-8" />
-						<link rel="icon" type="image/svg+xml" href="/logo.svg" />
+						<link rel="icon" type="image/svg+xml" href={iconPath} />
 						<meta
 							name="viewport"
 							content="width=device-width, initial-scale=1.0"
