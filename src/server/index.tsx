@@ -7,7 +7,7 @@ export const app = new Hono();
 
 app.use("*", async (ctx, next) => {
 	const url = new URL(ctx.req.url);
-	if (url.hostname === "coder.app") {
+	if (url.hostname === "coder.app" || url.hostname === "www.coder.app") {
 		return ctx.redirect("https://coder.com");
 	}
 
