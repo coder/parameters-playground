@@ -1,6 +1,7 @@
-import { create } from "zustand";
 import type { Diagnostic } from "@/client/diagnostics";
-import type { Parameter } from "@/gen/types";
+import type { ParameterWithSource } from "@/gen/types";
+import type { editor } from "monaco-editor";
+import { create } from "zustand";
 import { defaultCode } from "./snippets";
 
 type FormState = Record<string, string>;
@@ -18,7 +19,8 @@ const defaultErrorsState: ErrorsState = {
 
 type State = {
 	code: string;
-	parameters: Parameter[];
+	editor: editor.IStandaloneCodeEditor | null;
+	parameters: ParameterWithSource[];
 	form: FormState;
 	wasmState: WasmState;
 	errors: ErrorsState;
@@ -26,13 +28,15 @@ type State = {
 	setError: (diagnostics: Diagnostic[]) => void;
 	toggleShowError: (open?: boolean) => void;
 	setWasmState: (wasmState: WasmState) => void;
-	setParameters: (parameters: Parameter[]) => void;
+	setParameters: (parameters: ParameterWithSource[]) => void;
 	setFormState: (key: string, value: string) => void;
+	setEditor: (editor: editor.IStandaloneCodeEditor) => void;
 	resetForm: () => void;
 };
 
 export const useStore = create<State>()((set) => ({
 	code: window.CODE ?? defaultCode,
+	editor: null,
 	parameters: [],
 	wasmState: "loading",
 	form: {},
@@ -65,4 +69,5 @@ export const useStore = create<State>()((set) => ({
 			return { form };
 		}),
 	resetForm: () => set(() => ({ form: {} })),
+	setEditor: (editor) => set(() => ({ editor })),
 }));

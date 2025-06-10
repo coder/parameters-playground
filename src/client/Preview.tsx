@@ -14,7 +14,7 @@ import {
 } from "@/client/diagnostics";
 import { useDebouncedValue } from "@/client/hooks/debounce";
 import { useStore } from "@/client/store";
-import type {Parameter, ParserLog, PreviewOutput} from "@/gen/types";
+import type { ParameterWithSource, ParserLog, PreviewOutput} from "@/gen/types";
 import { cn } from "@/utils/cn";
 import ReactJsonView from "@microlink/react-json-view";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -581,7 +581,7 @@ const Log: FC<LogProps> = ({ log }) => {
 	);
 };
 
-type FormProps = { parameters: Parameter[] };
+type FormProps = { parameters: ParameterWithSource[] };
 
 const Form: FC<FormProps> = ({ parameters }) => {
 	return parameters
@@ -589,7 +589,7 @@ const Form: FC<FormProps> = ({ parameters }) => {
 		.map((p, index) => <FormElement key={index} parameter={p} />);
 };
 
-type FormElementProps = { parameter: Parameter };
+type FormElementProps = { parameter: ParameterWithSource };
 const FormElement: FC<FormElementProps> = ({ parameter }) => {
 	const $form = useStore((state) => state.form);
 	const $setForm = useStore((state) => state.setFormState);

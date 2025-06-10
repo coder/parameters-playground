@@ -39,6 +39,7 @@ export const Editor: FC = () => {
 
 	const $code = useStore((state) => state.code);
 	const $setCode = useStore((state) => state.setCode);
+	const $setEditor = useStore((state) => state.setEditor);
 
 	const [codeCopied, setCodeCopied] = useState(() => false);
 	const copyTimeoutId = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -161,6 +162,7 @@ export const Editor: FC = () => {
 					<div className="h-full w-full bg-surface-secondary font-mono">
 						<MonacoEditor
 							value={$code}
+							onMount={(editor) => $setEditor(editor)}
 							onChange={(code) => {
 								if (code !== undefined) {
 									$setCode(code);
