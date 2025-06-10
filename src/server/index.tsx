@@ -57,7 +57,7 @@ app.get("*", (c) => {
 							name="viewport"
 							content="width=device-width, initial-scale=1.0"
 						/>
-						<title>Paramaters Playground</title>
+						<title>Parameters Playground</title>
 						<link rel="stylesheet" href={cssPath} />
 						{hmrScript}
 						<script type="module" src={wasmExecScriptPath}></script>
