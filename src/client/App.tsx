@@ -225,9 +225,9 @@ const ShareButton: FC = () => {
 				.then((res) => res.json());
 
 			const { protocol, host } = window.location;
-			window.navigator.clipboard.writeText(
-				`${protocol}//${host}/parameters/${id}`,
-			);
+			const shareUrl = `${protocol}//${host}/parameters/${id}`;
+			window.navigator.clipboard.writeText(shareUrl);
+			window.history.pushState({}, "", shareUrl);
 
 			setIsCopied(() => true);
 		} catch (e) {
