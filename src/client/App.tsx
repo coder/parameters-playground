@@ -31,9 +31,11 @@ import {
 } from "@/client/components/Tooltip";
 import { rpc } from "@/utils/rpc";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
+import type {WorkspaceOwner} from "@/gen/types.ts";
 
 type GoPreviewDef = (
 	v: Record<string, string>,
+	owner: WorkspaceOwner,
 	params: Record<string, string>,
 ) => Promise<string>;
 

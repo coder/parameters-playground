@@ -18,7 +18,6 @@ import (
 
 	"github.com/coder/preview"
 	"github.com/coder/preview/types"
-
 	"github.com/coder/parameters-playground/preview/apitypes"
 )
 
@@ -61,12 +60,17 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 		return err
 	}
 
+	owner, err := workspaceOwner(p[1])
+	if err != nil {
+		return err
+	}
+
 	handler := slog.NewJSONHandler(l, nil)
 	logger := slog.New(handler)
 
 	var parameters map[string]string
-	if len(p) >= 2 {
-		params, err := jsValueToStringMap(p[1])
+	if len(p) >= 3 {
+		params, err := jsValueToStringMap(p[2])
 		if err != nil {
 			logger.Error("Unable to convert second prameter into map[string]string", "err", err)
 		}
@@ -81,7 +85,7 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 		PlanJSONPath:    "",
 		PlanJSON:        nil,
 		ParameterValues: parameters,
-		Owner:           types.WorkspaceOwner{},
+		Owner:           owner,
 		Logger:          logger,
 	}, tf)
 
@@ -108,6 +112,16 @@ func fileTreeFS(value js.Value) (fs.FS, error) {
 	loadTree(mem, filetree)
 
 	return afero.NewIOFS(mem), nil
+}
+
+func workspaceOwner(value js.Value) (apitypes.WorkspaceOwner, error) {
+	data := js.Global().Get("JSON").Call("stringify", value).String()
+	var owner apitypes.WorkspaceOwner
+	if err := json.Unmarshal([]byte(data), &owner); err != nil {
+		return apitypes.WorkspaceOwner(types.WorkspaceOwner{}), err
+	}
+
+	return owner, nil
 }
 
 func loadTree(mem afero.Fs, fileTree map[string]any, path ...string) {

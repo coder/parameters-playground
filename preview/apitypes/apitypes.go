@@ -33,6 +33,8 @@ const (
 	OptionTypeListString OptionType = "list(string)"
 )
 
+type WorkspaceOwner = types.WorkspaceOwner
+
 type PreviewOutput struct {
 	Output *Output           `json:"output"`
 	Diags  types.Diagnostics `json:"diags"`

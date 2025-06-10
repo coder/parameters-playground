@@ -134,4 +134,22 @@ export interface Range {
     End: Pos;
 }
 
+// From apitypes/apitypes.go
+export interface WorkspaceOwner {
+    id: string;
+    name: string;
+    full_name: string;
+    email: string;
+    ssh_public_key: string;
+    groups: string[];
+    login_type: string;
+    rbac_roles: WorkspaceOwnerRBACRole[];
+}
+
+// From types/owner.go
+export interface WorkspaceOwnerRBACRole {
+    name: string;
+    org_id: string;
+}
+
 
