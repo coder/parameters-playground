@@ -106,7 +106,7 @@ export const Editor: FC = () => {
 						<div className="flex">
 							<Tabs.Trigger icon={FileJsonIcon} label="Code" value="code" />
 							<Tooltip>
-								<TooltipTrigger asChild={true}>
+								<TooltipTrigger asChild={true} className="hidden">
 									<Tabs.Trigger
 										icon={SettingsIcon}
 										label="Variables"
