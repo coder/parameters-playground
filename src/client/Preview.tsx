@@ -14,7 +14,7 @@ import {
 } from "@/client/diagnostics";
 import { useDebouncedValue } from "@/client/hooks/debounce";
 import { useStore } from "@/client/store";
-import type { Parameter, ParserLog, PreviewOutput } from "@/gen/types";
+import type {Parameter, ParserLog, PreviewOutput} from "@/gen/types";
 import { cn } from "@/utils/cn";
 import ReactJsonView from "@microlink/react-json-view";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -82,6 +82,16 @@ export const Preview: FC = () => {
 				const rawOutput = await window.go_preview?.(
 					{
 						"main.tf": debouncedCode,
+					},
+					{
+						id: "8d36e355-e775-4c49-9b8d-ac042ed50440",
+						name: "coder",
+						full_name: "Coder",
+						email: "coder@coder.com",
+						ssh_public_key: "",
+						groups: ["Everyone"],
+						login_type: "password",
+						rbac_roles: [{name:"member", org_id:""}, {name:"organization-member",org_id:"09942665-ba1b-4661-be9f-36bf9f738c83"}]
 					},
 					$form,
 				);
