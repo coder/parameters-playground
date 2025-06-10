@@ -96,7 +96,7 @@ export const Preview: FC = () => {
 					$setError(errors);
 
 					if (output.diags.length === 0) {
-						$setParameters(output.output?.Parameters ?? []);
+						$setParameters(output.output?.parameters ?? []);
 					}
 				}
 			} catch (e) {
