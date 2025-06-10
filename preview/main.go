@@ -86,7 +86,10 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 	}, tf)
 
 	data, _ := json.Marshal(apitypes.PreviewOutput{
-		Output:     pOutput,
+		Output: &apitypes.Output{
+			Parameters: apitypes.WithSource(pOutput.Parameters),
+			Files:      pOutput.Files,
+		},
 		Diags:      types.Diagnostics(diags),
 		ParserLogs: l.entries,
 	})

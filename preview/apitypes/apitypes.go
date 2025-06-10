@@ -3,7 +3,8 @@ package apitypes
 import (
 	"time"
 
-	"github.com/coder/preview"
+	"github.com/hashicorp/hcl/v2"
+
 	"github.com/coder/preview/types"
 )
 
@@ -33,12 +34,17 @@ const (
 )
 
 type PreviewOutput struct {
-	Output *preview.Output   `json:"output"`
+	Output *Output           `json:"output"`
 	Diags  types.Diagnostics `json:"diags"`
 	// ParserLogs are trivy logs that occur during parsing the
 	// Terraform files. This is useful for debugging issues with the
 	// invalid terraform syntax.
 	ParserLogs []ParserLog `json:"parser_logs,omitempty"`
+}
+
+type Output struct {
+	Parameters []ParameterWithSource `json:"parameters"`
+	Files      map[string]*hcl.File  `json:"files"`
 }
 
 type ParserLog struct {
@@ -53,3 +59,24 @@ type ParserLog struct {
 type NullHCLString = types.NullHCLString
 
 type FriendlyDiagnostic = types.FriendlyDiagnostic
+
+type ParameterWithSource struct {
+	types.Parameter
+	TypeRange hcl.Range `json:"type_range"`
+}
+
+func WithSource(p []types.Parameter) []ParameterWithSource {
+	result := make([]ParameterWithSource, 0, len(p))
+	for _, param := range p {
+		src := ParameterWithSource{
+			Parameter: param,
+		}
+
+		if param.Source != nil {
+			src.TypeRange = param.Source.HCLBlock().TypeRange
+		}
+
+		result = append(result, src)
+	}
+	return result
+}
