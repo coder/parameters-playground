@@ -167,8 +167,8 @@ export const Editor: FC = () => {
 								}
 							}}
 							theme={appliedTheme === "dark" ? "vs-dark" : "vs-light"}
-							className=""
 							defaultLanguage="hcl"
+							loading=""
 							options={{
 								minimap: {
 									enabled: false,
