@@ -27,28 +27,16 @@ import {
 	ZapIcon,
 } from "lucide-react";
 import { type FC, useCallback, useEffect, useRef, useState } from "react";
-import CodeEditor from "react-simple-code-editor";
+import { Editor as MonacoEditor } from "@monaco-editor/react";
 
-// The following imports can't be re-ordered otherwise things break
-// @ts-expect-error TODO: create types for this
-import { highlight, languages } from "prismjs/components/prism-core";
-import "prismjs/components/prism-hcl";
-import "prismjs/themes/prism.css";
 import { cn } from "@/utils/cn";
 import type { ParameterFormType } from "@/gen/types";
 import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
-
-// Adds line numbers to the highlight.
-const hightlightWithLineNumbers = (input: string, language: unknown) =>
-	highlight(input, language)
-		.split("\n")
-		.map(
-			(line: string, i: number) =>
-				`<span class='editorLineNumber'>${i + 1}</span>${line}`,
-		)
-		.join("\n");
+import { useTheme } from "@/client/contexts/theme";
 
 export const Editor: FC = () => {
+	const { appliedTheme } = useTheme();
+
 	const $code = useStore((state) => state.code);
 	const $setCode = useStore((state) => state.setCode);
 
@@ -160,7 +148,7 @@ export const Editor: FC = () => {
 					)}
 				>
 					<Button
-						className="pointer-events-auto z-10"
+						className="pointer-events-auto z-10 hidden"
 						variant="subtle"
 						size="sm"
 						onClick={onCopy}
@@ -170,15 +158,30 @@ export const Editor: FC = () => {
 				</div>
 
 				<Tabs.Content value="code" asChild={true}>
-					<div className="h-full w-full overflow-y-scroll bg-surface-secondary font-mono">
-						<CodeEditor
+					<div className="h-full w-full bg-surface-secondary font-mono">
+						<MonacoEditor
 							value={$code}
-							onValueChange={(code) => $setCode(code)}
-							highlight={(code) =>
-								hightlightWithLineNumbers(code, languages.hcl)
-							}
-							textareaId="codeArea"
-							className="editor pt-3"
+							onChange={(code) => {
+								if (code !== undefined) {
+									$setCode(code);
+								}
+							}}
+							theme={appliedTheme === "dark" ? "vs-dark" : "vs-light"}
+							defaultLanguage="hcl"
+							loading=""
+							options={{
+								minimap: {
+									enabled: false,
+								},
+								automaticLayout: true,
+								fontFamily: "DM Mono",
+								fontSize: 14,
+								wordWrap: "on",
+								padding: {
+									top: 16,
+									bottom: 16,
+								},
+							}}
 						/>
 					</div>
 				</Tabs.Content>
