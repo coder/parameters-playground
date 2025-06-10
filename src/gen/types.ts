@@ -101,6 +101,7 @@ export interface ParameterValidation {
 // From apitypes/apitypes.go
 export interface ParameterWithSource extends Parameter {
     type_range: Range;
+    def_range: Range;
 }
 
 // From apitypes/apitypes.go

@@ -28,7 +28,11 @@ import {
 } from "@/client/components/Tooltip";
 import { useDebouncedValue } from "@/client/hooks/debounce";
 import { useEffectEvent } from "@/client/hooks/hookPolyfills";
-import type { NullHCLString, Parameter, ParameterOption } from "@/gen/types";
+import type {
+	NullHCLString,
+	ParameterWithSource as Parameter,
+	ParameterOption,
+} from "@/gen/types";
 import {
 	CircleAlert,
 	Info,
@@ -38,6 +42,7 @@ import {
 } from "lucide-react";
 import { type FC, useEffect, useId, useRef, useState } from "react";
 import * as Yup from "yup";
+import { useStore } from "@/client/store";
 
 interface WorkspaceBuildParameter {
 	readonly name: string;
@@ -121,6 +126,19 @@ const ParameterLabel: FC<ParameterLabelProps> = ({
 	autofill,
 	id,
 }) => {
+	const $editor = useStore((state) => state.editor);
+
+	const onGoToDefinition = () => {
+		$editor?.revealLine(parameter.def_range.Start.Line);
+		$editor?.setSelection({
+			startLineNumber: parameter.def_range.Start.Line,
+			startColumn: parameter.def_range.Start.Column,
+			endColumn: parameter.def_range.End.Column,
+			endLineNumber: parameter.def_range.End.Line,
+		});
+		$editor?.focus()
+	};
+
 	const displayName = parameter.display_name
 		? parameter.display_name
 		: parameter.name;
@@ -130,26 +148,17 @@ const ParameterLabel: FC<ParameterLabelProps> = ({
 
 	return (
 		<div className="flex items-start gap-2">
-			{
-				// {parameter.icon && (
-				// 				<ExternalImage
-				// 					className="w-5 h-5 mt-0.5 object-contain"
-				// 					alt="Parameter icon"
-				// 					src={parameter.icon}
-				// 				/>
-				// 			)}
-			}
 			<div className="flex w-full flex-col gap-1">
 				<Label
 					htmlFor={id}
 					className="flex flex-wrap gap-2 font-medium text-content-primary text-sm"
 				>
-					<span className="flex">
+					<button className="flex hover:underline" onClick={onGoToDefinition}>
 						{displayName}
 						{parameter.required && (
 							<span className="text-content-destructive">*</span>
 						)}
-					</span>
+					</button>
 					{!parameter.mutable && (
 						<TooltipProvider delayDuration={100}>
 							<Tooltip>

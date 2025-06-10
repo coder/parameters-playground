@@ -65,6 +65,7 @@ type FriendlyDiagnostic = types.FriendlyDiagnostic
 type ParameterWithSource struct {
 	types.Parameter
 	TypeRange hcl.Range `json:"type_range"`
+	DefRange  hcl.Range `json:"def_range"`
 }
 
 func WithSource(p []types.Parameter) []ParameterWithSource {
@@ -76,6 +77,7 @@ func WithSource(p []types.Parameter) []ParameterWithSource {
 
 		if param.Source != nil {
 			src.TypeRange = param.Source.HCLBlock().TypeRange
+			src.DefRange = param.Source.HCLBlock().DefRange
 		}
 
 		result = append(result, src)
