@@ -204,7 +204,7 @@ export const Preview: FC = () => {
 							($errors.show && $errors.diagnostics.length > 0)
 						}
 						className={cn(
-							"flex h-full w-full flex-col items-start gap-6 p-6 ",
+							"flex h-full w-full flex-col items-start gap-4 p-5 ",
 							($wasmState !== "loaded" ||
 								($errors.show && $errors.diagnostics.length > 0)) &&
 								"pointer-events-none",
