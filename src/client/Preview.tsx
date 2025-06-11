@@ -44,6 +44,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { useSearchParams } from "react-router";
@@ -55,6 +56,18 @@ import {
 	SelectValue,
 } from "@/client/components/Select";
 import { mockUsers } from "@/owner";
+
+// Create a stable hash for parameters and owner to detect when form should be reset
+const createParametersHash = (parameters: ParameterWithSource[], owner: WorkspaceOwner, code: string): string => {
+	// Create a deterministic string from parameters structure, owner, and code
+	const parameterSignature = parameters
+		.map(p => `${p.name}:${p.type}:${p.order}:${p.required}`)
+		.sort()
+		.join('|');
+	const ownerSignature = `${owner.id}:${owner.name}:${JSON.stringify(owner.rbac_roles)}`;
+	const codeHash = code.length.toString(); // Simple hash based on code length
+	return `${parameterSignature}#${ownerSignature}#${codeHash}`;
+};
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -69,6 +82,18 @@ export const Preview: FC = () => {
 
 	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
 	const [output, setOutput] = useState<PreviewOutput | null>(() => null);
+
+	// Track the previous parameters hash to detect when form should be reset
+	const previousHashRef = useRef<string>('');
+	const currentHash = createParametersHash($parameters, $owner, debouncedCode);
+
+	// Reset form when parameters structure, owner, or code changes significantly
+	useEffect(() => {
+		if (previousHashRef.current !== '' && previousHashRef.current !== currentHash) {
+			$resetForm();
+		}
+		previousHashRef.current = currentHash;
+	}, [currentHash, $resetForm]);
 
 	const [params] = useSearchParams();
 	const isDebug = useMemo(() => params.has("debug"), [params]);
@@ -531,9 +556,9 @@ type FormProps = { parameters: ParameterWithSource[] };
 const Form: FC<FormProps> = ({ parameters }) => {
 	return parameters
 		.sort((a, b) => a.order - b.order)
-		// Since the form is sourced from constantly changing terraform, we are not sure
-		// if the parameters are the "same" as the previous render.
-		.map((p) => <FormElement key={window.crypto.randomUUID()} parameter={p} />);
+		// Use parameter name as stable key to preserve form state across re-renders
+		// The form reset logic above handles cases where parameters change significantly
+		.map((p) => <FormElement key={p.name} parameter={p} />);
 };
 
 type FormElementProps = { parameter: ParameterWithSource };
