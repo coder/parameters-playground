@@ -635,7 +635,7 @@ const TableDrawer: FC<TableDrawerProps> = ({
 											</Button>
 										</Dialog.Close>
 									</div>
-									<div className="flex w-full flex-col overflow-clip rounded-lg border font-mono text-content-primary text-xs">
+									<div className="flex w-full flex-col overflow-scroll rounded-lg border font-mono text-content-primary text-xs">
 										<div className="grid grid-cols-8 border-b bg-surface-secondary">
 											<div className="col-span-2 flex min-h-8 items-center border-r px-2 py-1">
 												<p className="text-left uppercase">{headers[0]}</p>
