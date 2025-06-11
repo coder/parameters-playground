@@ -31,10 +31,18 @@ import {
 	LoaderIcon,
 	PlayIcon,
 	ScrollTextIcon,
+	SearchCodeIcon,
 	XIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { type FC, useCallback, useEffect, useMemo, useState } from "react";
+import {
+	type FC,
+	type PropsWithChildren,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import { useSearchParams } from "react-router";
 import {
 	Select,
@@ -226,16 +234,7 @@ export const Preview: FC = () => {
 										) : null}
 									</AnimatePresence>
 								</div>
-								<div className="flex w-full items-center justify-end gap-3">
-									<UserSelect />
-									<Button
-										variant="destructive"
-										onClick={$resetForm}
-										className="w-fit"
-									>
-										Reset form
-									</Button>
-								</div>
+								<UserSelect />
 							</div>
 						}
 						{$parameters.length === 0 ? (
@@ -247,6 +246,12 @@ export const Preview: FC = () => {
 								<Form parameters={$parameters} />
 							</div>
 						)}
+						<div className="flex w-full justify-between gap-3">
+							<Button variant="outline" onClick={$resetForm} className="w-fit">
+								Reset form
+							</Button>
+							<ViewOutput />
+						</div>
 					</div>
 				</Tabs.Content>
 
@@ -486,15 +491,17 @@ const LogsEmptyState = () => {
 
 type LogProps = { log: ParserLog };
 const Log: FC<LogProps> = ({ log }) => {
-	const [showTable, setShowTable] = useState(() => false);
+	const data = Object.entries(log).reduce<Record<string, unknown>>(
+		(acc, [key, value]) => {
+			acc[key] = value;
+			return acc;
+		},
+		{},
+	);
 
 	return (
-		<Dialog.Root
-			modal={true}
-			open={showTable}
-			onOpenChange={(show) => setShowTable(() => show)}
-		>
-			<Dialog.Trigger
+		<TableDrawer data={data}>
+			<button
 				className={cn(
 					"group grid h-fit min-h-10 w-full grid-cols-8 items-center border-b border-l-4 border-l-content-destructive hover:bg-surface-primary",
 					log.level.toLowerCase() === "info" && "border-l-content-link",
@@ -509,87 +516,8 @@ const Log: FC<LogProps> = ({ log }) => {
 				<p className="col-span-6 break-all p-2 text-left font-mono text-content-primary text-xs">
 					{JSON.stringify(log)}
 				</p>
-			</Dialog.Trigger>
-
-			<Dialog.Portal forceMount={true}>
-				<AnimatePresence propagate={true}>
-					{showTable ? (
-						<>
-							<Dialog.Overlay asChild={true}>
-								<motion.div
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-									className="fixed top-0 left-0 z-10 h-full w-full bg-black/50"
-								/>
-							</Dialog.Overlay>
-							<Dialog.Content asChild={true}>
-								<motion.div
-									initial={{ opacity: 0, transform: "translateX(100px)" }}
-									animate={{ opacity: 1, transform: "translateX(0px)" }}
-									exit={{ opacity: 0, transform: "translateX(100px)" }}
-									className="fixed top-0 right-0 z-20 flex h-full w-full max-w-md flex-col justify-start gap-6 border-l bg-surface-primary p-4"
-								>
-									<div className="flex items-center justify-between">
-										<Dialog.Title className="font-semibold text-2xl text-content-primary">
-											Log
-										</Dialog.Title>
-										<Dialog.Close asChild={true}>
-											<Button
-												variant="outline"
-												size="icon"
-												className="float-right"
-											>
-												<XIcon />
-											</Button>
-										</Dialog.Close>
-									</div>
-									<div className="flex w-full flex-col overflow-clip rounded-lg border font-mono text-content-primary text-xs">
-										<div className="grid grid-cols-8 border-b bg-surface-secondary">
-											<div className="col-span-2 flex min-h-8 items-center border-r px-2 py-1">
-												<p className="text-left uppercase">field</p>
-											</div>
-											<div className="col-span-6 flex min-h-8 items-center px-2 py-1">
-												<p className="text-left uppercase">value</p>
-											</div>
-										</div>
-										{Object.entries(log).map(([key, value], index) => {
-											const displayValue = JSON.stringify(value);
-
-											return (
-												<div
-													key={index}
-													className="grid grid-cols-8 border-b last:border-b-0"
-												>
-													<div className="col-span-2 flex min-h-8 items-center border-r px-2 py-1">
-														<p className="text-left">{key}</p>
-													</div>
-													<div className="col-span-6 flex min-h-8 items-center px-2 py-1">
-														<p
-															className={cn(
-																"text-left",
-																value === "" && "text-content-secondary italic",
-															)}
-														>
-															{value === ""
-																? "<empty string>"
-																: displayValue.substring(
-																		1,
-																		displayValue.length - 1,
-																	)}
-														</p>
-													</div>
-												</div>
-											);
-										})}
-									</div>
-								</motion.div>
-							</Dialog.Content>
-						</>
-					) : null}
-				</AnimatePresence>
-			</Dialog.Portal>
-		</Dialog.Root>
+			</button>
+		</TableDrawer>
 	);
 };
 
@@ -651,5 +579,134 @@ const UserSelect: FC = () => {
 				<SelectItem value="eu-developer">EU Developer</SelectItem>
 			</SelectContent>
 		</Select>
+	);
+};
+
+type TableDrawerProps = {
+	data: Record<string, unknown>;
+	headers?: [string, string];
+} & PropsWithChildren;
+
+const TableDrawer: FC<TableDrawerProps> = ({
+	data,
+	headers = ["field", "value"],
+	children,
+}) => {
+	const [showTable, setShowTable] = useState(() => false);
+
+	return (
+		<Dialog.Root
+			modal={true}
+			open={showTable}
+			onOpenChange={(show) => setShowTable(() => show)}
+		>
+			<Dialog.Trigger asChild={true}>{children}</Dialog.Trigger>
+
+			<Dialog.Portal forceMount={true}>
+				<AnimatePresence propagate={true}>
+					{showTable ? (
+						<>
+							<Dialog.Overlay asChild={true}>
+								<motion.div
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									className="fixed top-0 left-0 z-10 h-full w-full bg-black/50"
+								/>
+							</Dialog.Overlay>
+							<Dialog.Content asChild={true}>
+								<motion.div
+									initial={{ opacity: 0, transform: "translateX(100px)" }}
+									animate={{ opacity: 1, transform: "translateX(0px)" }}
+									exit={{ opacity: 0, transform: "translateX(100px)" }}
+									className="fixed top-0 right-0 z-20 flex h-full w-full max-w-lg flex-col justify-start gap-6 border-l bg-surface-primary p-4"
+								>
+									<div className="flex items-center justify-between">
+										<Dialog.Title className="font-semibold text-2xl text-content-primary">
+											Parameter Values
+										</Dialog.Title>
+										<Dialog.Close asChild={true}>
+											<Button
+												variant="outline"
+												size="icon"
+												className="float-right"
+											>
+												<XIcon />
+											</Button>
+										</Dialog.Close>
+									</div>
+									<div className="flex w-full flex-col overflow-clip rounded-lg border font-mono text-content-primary text-xs">
+										<div className="grid grid-cols-8 border-b bg-surface-secondary">
+											<div className="col-span-2 flex min-h-8 items-center border-r px-2 py-1">
+												<p className="text-left uppercase">{headers[0]}</p>
+											</div>
+											<div className="col-span-6 flex min-h-8 items-center px-2 py-1">
+												<p className="text-left uppercase">{headers[1]}</p>
+											</div>
+										</div>
+										{Object.entries(data).map(([key, value], index) => {
+											const displayValue = JSON.stringify(value);
+
+											return (
+												<div
+													key={index}
+													className="grid grid-cols-8 border-b last:border-b-0"
+												>
+													<div className="col-span-2 flex min-h-8 items-center border-r px-2 py-1">
+														<p className="text-left">{key}</p>
+													</div>
+													<div className="col-span-6 flex min-h-8 items-center px-2 py-1">
+														<p
+															className={cn(
+																"text-left",
+																value === "" && "text-content-secondary italic",
+															)}
+														>
+															{value === ""
+																? "<empty string>"
+																: displayValue.substring(
+																		1,
+																		displayValue.length - 1,
+																	)}
+														</p>
+													</div>
+												</div>
+											);
+										})}
+									</div>
+								</motion.div>
+							</Dialog.Content>
+						</>
+					) : null}
+				</AnimatePresence>
+			</Dialog.Portal>
+		</Dialog.Root>
+	);
+};
+
+const ViewOutput: FC = () => {
+	const $parameters = useStore((state) => state.parameters);
+
+	const isInvalid = useMemo(
+		() => $parameters.length === 0 || $parameters.some((p) => !p.value.valid),
+		[$parameters],
+	);
+
+	const data = useMemo(
+		() =>
+			$parameters.reduce<Record<string, string>>((acc, p) => {
+				acc[p.name] = p.value.value;
+				return acc;
+			}, {}),
+		[$parameters],
+	);
+
+	return (
+		<TableDrawer data={data} headers={["Parameter", "Value"]}>
+			<Button variant="default" disabled={isInvalid}>
+				<SearchCodeIcon />
+				View output
+			</Button>
+		</TableDrawer>
 	);
 };
