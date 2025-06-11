@@ -78,6 +78,7 @@ export const DynamicParameter: FC<DynamicParameterProps> = ({
 		<div
 			className="flex w-full flex-col gap-2"
 			data-testid={`parameter-field-${parameter.name}`}
+			id={parameter.name}
 		>
 			<ParameterLabel
 				id={id}
