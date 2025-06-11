@@ -237,7 +237,12 @@ export const Preview: FC = () => {
 										) : null}
 									</AnimatePresence>
 								</div>
-								<UserSelect />
+								<UserSelect changeUser={() => {
+									// When you change the user, reset the form and the parameters. 
+									// This is a bit of a janky way to fully reset the form, but it works for now.
+									$resetForm();
+									$setParameters([]);
+								}}/>
 							</div>
 						}
 						{$parameters.length === 0 ? (
@@ -542,9 +547,8 @@ const FormElement: FC<FormElementProps> = ({ parameter }) => {
 	const value = useMemo(
 		() =>
 			$form[parameter.name] ??
-			(parameter.default_value.value === "??"
-				? ""
-				: parameter.default_value.value),
+			// undefined is ok, the parameter will select the default automatically
+			undefined,
 		[$form, parameter],
 	);
 
@@ -563,7 +567,11 @@ const FormElement: FC<FormElementProps> = ({ parameter }) => {
 	);
 };
 
-const UserSelect: FC = () => {
+interface UserSelectProps {
+	changeUser: () => void;
+}
+
+const UserSelect: FC<UserSelectProps> = ({changeUser}) => {
 	const $setWorkspaceOwner = useStore((state) => state.setWorkspaceOwner);
 
 	return (
@@ -572,6 +580,7 @@ const UserSelect: FC = () => {
 			onValueChange={(value) => {
 				const users: Record<string, WorkspaceOwner | undefined> = mockUsers;
 				$setWorkspaceOwner(users[value] ?? mockUsers.admin);
+				changeUser();
 			}}
 		>
 			<SelectTrigger className="w-fit min-w-40">
