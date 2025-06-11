@@ -58,15 +58,10 @@ import {
 import { mockUsers } from "@/owner";
 
 // Create a stable hash for parameters and owner to detect when form should be reset
-const createParametersHash = (parameters: ParameterWithSource[], owner: WorkspaceOwner, code: string): string => {
-	// Create a deterministic string from parameters structure, owner, and code
-	const parameterSignature = parameters
-		.map(p => `${p.name}:${p.type}:${p.order}:${p.required}`)
-		.sort()
-		.join('|');
+const createParametersHash = (owner: WorkspaceOwner, code: string): string => {
 	const ownerSignature = `${owner.id}:${owner.name}:${JSON.stringify(owner.rbac_roles)}`;
 	const codeHash = code.length.toString(); // Simple hash based on code length
-	return `${parameterSignature}#${ownerSignature}#${codeHash}`;
+	return `${ownerSignature}#${codeHash}`;
 };
 
 export const Preview: FC = () => {
@@ -85,7 +80,7 @@ export const Preview: FC = () => {
 
 	// Track the previous parameters hash to detect when form should be reset
 	const previousHashRef = useRef<string>('');
-	const currentHash = createParametersHash($parameters, $owner, debouncedCode);
+	const currentHash = createParametersHash($owner, debouncedCode);
 
 	// Reset form when parameters structure, owner, or code changes significantly
 	useEffect(() => {
@@ -271,7 +266,7 @@ export const Preview: FC = () => {
 							</div>
 						) : (
 							<div className="flex h-full w-full flex-col items-center justify-start gap-5 overflow-x-clip overflow-y-scroll rounded-xl border p-6">
-								<Form parameters={$parameters} />
+								<Form parameters={$parameters} hash={currentHash}/>
 							</div>
 						)}
 						<div className="flex w-full justify-between gap-3">
@@ -551,14 +546,14 @@ const Log: FC<LogProps> = ({ log }) => {
 	);
 };
 
-type FormProps = { parameters: ParameterWithSource[] };
+type FormProps = { parameters: ParameterWithSource[], hash: string };
 
-const Form: FC<FormProps> = ({ parameters }) => {
+const Form: FC<FormProps> = ({ parameters, hash }) => {
 	return parameters
 		.sort((a, b) => a.order - b.order)
 		// Use parameter name as stable key to preserve form state across re-renders
 		// The form reset logic above handles cases where parameters change significantly
-		.map((p) => <FormElement key={p.name} parameter={p} />);
+		.map((p) => <FormElement key={hash+p.name} parameter={p} />);
 };
 
 type FormElementProps = { parameter: ParameterWithSource };
