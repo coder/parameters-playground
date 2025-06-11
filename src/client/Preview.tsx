@@ -531,7 +531,9 @@ type FormProps = { parameters: ParameterWithSource[] };
 const Form: FC<FormProps> = ({ parameters }) => {
 	return parameters
 		.sort((a, b) => a.order - b.order)
-		.map((p, index) => <FormElement key={index} parameter={p} />);
+		// Since the form is sourced from constantly changing terraform, we are not sure
+		// if the parameters are the "same" as the previous render.
+		.map((p) => <FormElement key={window.crypto.randomUUID()} parameter={p} />);
 };
 
 type FormElementProps = { parameter: ParameterWithSource };
@@ -542,9 +544,7 @@ const FormElement: FC<FormElementProps> = ({ parameter }) => {
 	const value = useMemo(
 		() =>
 			$form[parameter.name] ??
-			(parameter.default_value.value === "??"
-				? ""
-				: parameter.default_value.value),
+			undefined,
 		[$form, parameter],
 	);
 
