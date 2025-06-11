@@ -1,5 +1,8 @@
 import { Button } from "@/client/components/Button";
-import { DynamicParameter } from "@/client/components/DynamicParameter";
+import {
+	DynamicParameter,
+	useValidationSchemaForDynamicParameters,
+} from "@/client/components/DynamicParameter";
 import {
 	ResizableHandle,
 	ResizablePanel,
@@ -491,6 +494,7 @@ const LogsEmptyState = () => {
 
 type LogProps = { log: ParserLog };
 const Log: FC<LogProps> = ({ log }) => {
+	const [open, setIsOpen] = useState(() => false);
 	const data = Object.entries(log).reduce<Record<string, unknown>>(
 		(acc, [key, value]) => {
 			acc[key] = value;
@@ -500,8 +504,9 @@ const Log: FC<LogProps> = ({ log }) => {
 	);
 
 	return (
-		<TableDrawer data={data}>
+		<TableDrawer data={data} open={open} onOpenChange={setIsOpen}>
 			<button
+				onClick={() => setIsOpen(() => true)}
 				className={cn(
 					"group grid h-fit min-h-10 w-full grid-cols-8 items-center border-b border-l-4 border-l-content-destructive hover:bg-surface-primary",
 					log.level.toLowerCase() === "info" && "border-l-content-link",
@@ -585,26 +590,24 @@ const UserSelect: FC = () => {
 type TableDrawerProps = {
 	data: Record<string, unknown>;
 	headers?: [string, string];
-} & PropsWithChildren;
+} & PropsWithChildren &
+	Dialog.DialogProps;
 
 const TableDrawer: FC<TableDrawerProps> = ({
 	data,
 	headers = ["field", "value"],
 	children,
+	open,
+	onOpenChange,
+	...rest
 }) => {
-	const [showTable, setShowTable] = useState(() => false);
-
 	return (
-		<Dialog.Root
-			modal={true}
-			open={showTable}
-			onOpenChange={(show) => setShowTable(() => show)}
-		>
-			<Dialog.Trigger asChild={true}>{children}</Dialog.Trigger>
+		<Dialog.Root {...rest} modal={true} open={open} onOpenChange={onOpenChange}>
+			{children}
 
 			<Dialog.Portal forceMount={true}>
 				<AnimatePresence propagate={true}>
-					{showTable ? (
+					{open ? (
 						<>
 							<Dialog.Overlay asChild={true}>
 								<motion.div
@@ -686,11 +689,34 @@ const TableDrawer: FC<TableDrawerProps> = ({
 
 const ViewOutput: FC = () => {
 	const $parameters = useStore((state) => state.parameters);
+	const [isOpen, setIsOpen] = useState(() => false);
 
-	const isInvalid = useMemo(
-		() => $parameters.length === 0 || $parameters.some((p) => !p.value.valid),
-		[$parameters],
-	);
+	const onView = async () => {
+		const invalidParameter = $parameters.find((p) => {
+			try {
+				if (!p.value.valid) {
+					return true;
+				}
+
+				const schema = useValidationSchemaForDynamicParameters([p]);
+				schema.validateSync([{ name: p.name, value: p.value.value }]);
+
+				return false;
+			} catch {
+				return true;
+			}
+		});
+
+		if (invalidParameter) {
+			const parameterFormElement = document.getElementById(
+				invalidParameter.name,
+			);
+			parameterFormElement?.scrollIntoView({ behavior: "smooth" });
+			return;
+		}
+
+		setIsOpen(() => true);
+	};
 
 	const data = useMemo(
 		() =>
@@ -702,8 +728,17 @@ const ViewOutput: FC = () => {
 	);
 
 	return (
-		<TableDrawer data={data} headers={["Parameter", "Value"]}>
-			<Button variant="default" disabled={isInvalid}>
+		<TableDrawer
+			data={data}
+			headers={["Parameter", "Value"]}
+			open={isOpen}
+			onOpenChange={(open) => setIsOpen(() => open)}
+		>
+			<Button
+				variant="default"
+				disabled={$parameters.length === 0}
+				onClick={onView}
+			>
 				<SearchCodeIcon />
 				View output
 			</Button>
