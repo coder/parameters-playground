@@ -1,4 +1,4 @@
-import type { WorkspaceOwner } from "./gen/types";
+import type { WorkspaceOwner } from "@/gen/types";
 
 const BaseMockUser: WorkspaceOwner = {
 	id: "8d36e355-e775-4c49-9b8d-ac042ed50440",
