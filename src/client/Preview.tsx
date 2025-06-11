@@ -72,6 +72,7 @@ export const Preview: FC = () => {
 
 	const [params] = useSearchParams();
 	const isDebug = useMemo(() => params.has("debug"), [params]);
+	const [uuid, setUUid] = useState(() => window.crypto.randomUUID());
 
 	const [tab, setTab] = useState(() => "preview");
 
@@ -96,6 +97,11 @@ export const Preview: FC = () => {
 			URL.revokeObjectURL(url);
 		}, 100);
 	}, [output]);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		setUUid(() => window.crypto.randomUUID())
+	}, [$owner]);
 
 	useEffect(() => {
 		if ($wasmState === "loading" || !window.go_preview) {
@@ -286,7 +292,7 @@ output "solved" {
 							</div>
 						) : (
 							<div className="flex h-full w-full flex-col items-center justify-start gap-5 overflow-x-clip overflow-y-scroll rounded-xl border p-6">
-								<Form parameters={$parameters} />
+								<Form parameters={$parameters} uuid={uuid} />
 							</div>
 						)}
 						<div className="flex w-full justify-between gap-3">
@@ -566,14 +572,14 @@ const Log: FC<LogProps> = ({ log }) => {
 	);
 };
 
-type FormProps = { parameters: ParameterWithSource[] };
+type FormProps = { parameters: ParameterWithSource[], uuid: string; };
 
-const Form: FC<FormProps> = ({ parameters }) => {
+const Form: FC<FormProps> = ({ parameters, uuid }) => {
 	return parameters
 		.sort((a, b) => a.order - b.order)
 		// Since the form is sourced from constantly changing terraform, we are not sure
 		// if the parameters are the "same" as the previous render.
-		.map((p) => <FormElement key={window.crypto.randomUUID()} parameter={p} />);
+		.map((p) => <FormElement key={uuid} parameter={p} />);
 };
 
 type FormElementProps = { parameter: ParameterWithSource };
