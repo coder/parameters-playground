@@ -14,7 +14,12 @@ import {
 } from "@/client/diagnostics";
 import { useDebouncedValue } from "@/client/hooks/debounce";
 import { useStore } from "@/client/store";
-import type { ParameterWithSource, ParserLog, PreviewOutput} from "@/gen/types";
+import type {
+	ParameterWithSource,
+	ParserLog,
+	PreviewOutput,
+	WorkspaceOwner,
+} from "@/gen/types";
 import { cn } from "@/utils/cn";
 import ReactJsonView from "@microlink/react-json-view";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -31,6 +36,14 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/client/components/Select";
+import { mockUsers } from "@/owner";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -40,6 +53,7 @@ export const Preview: FC = () => {
 	const $parameters = useStore((state) => state.parameters);
 	const $setParameters = useStore((state) => state.setParameters);
 	const $form = useStore((state) => state.form);
+	const $owner = useStore((state) => state.owner);
 	const $resetForm = useStore((state) => state.resetForm);
 
 	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
@@ -83,16 +97,7 @@ export const Preview: FC = () => {
 					{
 						"main.tf": debouncedCode,
 					},
-					{
-						id: "8d36e355-e775-4c49-9b8d-ac042ed50440",
-						name: "coder",
-						full_name: "Coder",
-						email: "coder@coder.com",
-						ssh_public_key: "",
-						groups: ["Everyone"],
-						login_type: "password",
-						rbac_roles: [{name:"member", org_id:""}, {name:"organization-member",org_id:"09942665-ba1b-4661-be9f-36bf9f738c83"}]
-					},
+					$owner,
 					$form,
 				);
 
@@ -133,7 +138,7 @@ export const Preview: FC = () => {
 		};
 
 		getOutput();
-	}, [debouncedCode, $setError, $wasmState, $setParameters, $form]);
+	}, [debouncedCode, $setError, $wasmState, $setParameters, $form, $owner]);
 
 	return (
 		<Tabs.Root
@@ -221,9 +226,16 @@ export const Preview: FC = () => {
 										) : null}
 									</AnimatePresence>
 								</div>
-								<Button variant="destructive" onClick={$resetForm}>
-									Reset form
-								</Button>
+								<div className="flex w-full items-center justify-end gap-3">
+									<UserSelect />
+									<Button
+										variant="destructive"
+										onClick={$resetForm}
+										className="w-fit"
+									>
+										Reset form
+									</Button>
+								</div>
 							</div>
 						}
 						{$parameters.length === 0 ? (
@@ -615,5 +627,29 @@ const FormElement: FC<FormElementProps> = ({ parameter }) => {
 			onChange={onValueChange}
 			disabled={parameter.styling.disabled}
 		/>
+	);
+};
+
+const UserSelect: FC = () => {
+	const $setWorkspaceOwner = useStore((state) => state.setWorkspaceOwner);
+
+	return (
+		<Select
+			defaultValue="admin"
+			onValueChange={(value) => {
+				const users: Record<string, WorkspaceOwner | undefined> = mockUsers;
+				$setWorkspaceOwner(users[value] ?? mockUsers.admin);
+			}}
+		>
+			<SelectTrigger className="w-fit min-w-40">
+				<SelectValue />
+			</SelectTrigger>
+			<SelectContent>
+				<SelectItem value="admin">Administrator</SelectItem>
+				<SelectItem value="developer">Developer</SelectItem>
+				<SelectItem value="contractor">Contractor</SelectItem>
+				<SelectItem value="eu-developer">EU Developer</SelectItem>
+			</SelectContent>
+		</Select>
 	);
 };

@@ -1,8 +1,9 @@
 import type { Diagnostic } from "@/client/diagnostics";
-import type { ParameterWithSource } from "@/gen/types";
+import type { ParameterWithSource, WorkspaceOwner } from "@/gen/types";
 import type { editor } from "monaco-editor";
 import { create } from "zustand";
 import { defaultCode } from "./snippets";
+import { mockUsers } from "@/owner";
 
 type FormState = Record<string, string>;
 
@@ -23,6 +24,7 @@ type State = {
 	parameters: ParameterWithSource[];
 	form: FormState;
 	wasmState: WasmState;
+	owner: WorkspaceOwner;
 	errors: ErrorsState;
 	setCode: (code: string) => void;
 	setError: (diagnostics: Diagnostic[]) => void;
@@ -31,6 +33,7 @@ type State = {
 	setParameters: (parameters: ParameterWithSource[]) => void;
 	setFormState: (key: string, value: string) => void;
 	setEditor: (editor: editor.IStandaloneCodeEditor) => void;
+	setWorkspaceOwner: (owner: WorkspaceOwner) => void;
 	resetForm: () => void;
 };
 
@@ -39,6 +42,7 @@ export const useStore = create<State>()((set) => ({
 	editor: null,
 	parameters: [],
 	wasmState: "loading",
+	owner: mockUsers.admin,
 	form: {},
 	errors: defaultErrorsState,
 	setCode: (code) => set((_) => ({ code })),
@@ -70,4 +74,5 @@ export const useStore = create<State>()((set) => ({
 		}),
 	resetForm: () => set(() => ({ form: {} })),
 	setEditor: (editor) => set(() => ({ editor })),
+	setWorkspaceOwner: (owner) => set(() => ({ owner })),
 }));
