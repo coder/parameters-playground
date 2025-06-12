@@ -5,7 +5,7 @@ import { create } from "zustand";
 import { defaultCode } from "./snippets";
 import { mockUsers } from "@/owner";
 
-type FormState = Record<string, string>;
+export type FormState = Record<string, string>;
 
 type WasmState = "loaded" | "loading" | "error";
 
@@ -19,6 +19,7 @@ const defaultErrorsState: ErrorsState = {
 };
 
 type State = {
+	_force: number;
 	code: string;
 	editor: editor.IStandaloneCodeEditor | null;
 	parameters: ParameterWithSource[];
@@ -38,6 +39,7 @@ type State = {
 };
 
 export const useStore = create<State>()((set) => ({
+	_force: 0,
 	code: window.CODE ?? defaultCode,
 	editor: null,
 	parameters: [],
@@ -72,7 +74,18 @@ export const useStore = create<State>()((set) => ({
 
 			return { form };
 		}),
-	resetForm: () => set(() => ({ form: {} })),
+	resetForm: () =>
+		set((state) => ({
+			form: {},
+			_force: state._force + 1,
+		})),
 	setEditor: (editor) => set(() => ({ editor })),
-	setWorkspaceOwner: (owner) => set(() => ({ owner })),
+	setWorkspaceOwner: (owner) =>
+		set((state) => ({
+			...state,
+			owner,
+			_force: state._force + 1,
+			form: {},
+			parameters: [...state.parameters],
+		})),
 }));

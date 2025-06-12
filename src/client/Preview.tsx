@@ -55,6 +55,7 @@ import {
 	SelectValue,
 } from "@/client/components/Select";
 import { mockUsers } from "@/owner";
+import { checkerModule } from "./snippets";
 
 export const Preview: FC = () => {
 	const $wasmState = useStore((state) => state.wasmState);
@@ -107,6 +108,7 @@ export const Preview: FC = () => {
 				const rawOutput = await window.go_preview?.(
 					{
 						"main.tf": debouncedCode,
+						"checker/main.tf": checkerModule,
 					},
 					$owner,
 					$form,
@@ -529,11 +531,18 @@ const Log: FC<LogProps> = ({ log }) => {
 type FormProps = { parameters: ParameterWithSource[] };
 
 const Form: FC<FormProps> = ({ parameters }) => {
-	return parameters
-		.sort((a, b) => a.order - b.order)
-		// Since the form is sourced from constantly changing terraform, we are not sure
-		// if the parameters are the "same" as the previous render.
-		.map((p) => <FormElement key={window.crypto.randomUUID()} parameter={p} />);
+	const $force = useStore((state) => state._force);
+
+	const getParameterHash = (p: ParameterWithSource) =>
+		`${$force}:${p.name}:${p.form_type}`;
+
+	return (
+		parameters
+			.sort((a, b) => a.order - b.order)
+			// Since the form is sourced from constantly changing terraform, we are not sure
+			// if the parameters are the "same" as the previous render.
+			.map((p) => <FormElement key={getParameterHash(p)} parameter={p} />)
+	);
 };
 
 type FormElementProps = { parameter: ParameterWithSource };
@@ -541,12 +550,9 @@ const FormElement: FC<FormElementProps> = ({ parameter }) => {
 	const $form = useStore((state) => state.form);
 	const $setForm = useStore((state) => state.setFormState);
 
-	const value = useMemo(
-		() =>
-			$form[parameter.name] ??
-			undefined,
-		[$form, parameter],
-	);
+	const value = useMemo(() => {
+		return $form[parameter.name];
+	}, [$form, parameter.name]);
 
 	const onValueChange = (value: string) => {
 		$setForm(parameter.name, value);
