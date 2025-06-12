@@ -17,7 +17,7 @@ const BaseMockUser: WorkspaceOwner = {
 	],
 };
 
-export type User = "admin" | "developer" | "contractor" | "eu-developer";
+export type User = "admin" | "developer" | "contractor" | "eu-developer" | "sales";
 
 export const mockUsers: Record<User, WorkspaceOwner> = {
 	admin: {
@@ -47,5 +47,12 @@ export const mockUsers: Record<User, WorkspaceOwner> = {
 		full_name: "EU Developer",
 		email: "eu.dev@coder.com",
 		groups: ["developer", "eu-helsinki"],
+	},
+	"sales": {
+		...BaseMockUser,
+		name: "sales",
+		full_name: "Sales",
+		email: "sales@coder.com",
+		groups: ["sales"],
 	},
 };
