@@ -551,8 +551,12 @@ const FormElement: FC<FormElementProps> = ({ parameter }) => {
 	const $setForm = useStore((state) => state.setFormState);
 
 	const value = useMemo(() => {
-		return $form[parameter.name];
-	}, [$form, parameter.name]);
+		const defaultValue =
+			parameter.default_value.value !== "??" 
+				? parameter.default_value.value
+				: undefined;
+		return $form[parameter.name] ?? defaultValue;
+	}, [$form, parameter.name, parameter.default_value]);
 
 	const onValueChange = (value: string) => {
 		$setForm(parameter.name, value);
