@@ -31,35 +31,11 @@ import {
 } from "@/client/components/Tooltip";
 import { rpc } from "@/utils/rpc";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
-import type {WorkspaceOwner} from "@/gen/types.ts";
+import { initWasm, type WasmLoadState } from "@/utils/wasm";
 
-type GoPreviewDef = (
-	v: Record<string, string>,
-	owner: WorkspaceOwner,
-	params: Record<string, string>,
-) => Promise<string>;
-
-// Extend the Window object to include the Go related code that is added from
-// wasm_exec.js and our loaded Go code.
-declare global {
-	interface Window {
-		// Loaded from wasm
-		go_preview?: GoPreviewDef;
-		Go: { new (): Go };
-		CODE?: string;
-	}
-}
-
-declare class Go {
-	argv: string[];
-	env: { [envKey: string]: string };
-	exit: (code: number) => void;
-	importObject: WebAssembly.Imports;
-	exited: boolean;
-	mem: DataView;
-	run(instance: WebAssembly.Instance): Promise<void>;
-}
-
+/**
+ * Load the shared code if present.
+ */
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { id } = params;
 	if (!id) {
@@ -79,8 +55,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const App = () => {
-	const $wasmState = useStore((state) => state.wasmState);
-	const $setWasmState = useStore((state) => state.setWasmState);
+	const [wasmLoadState, setWasmLoadingState] = useState<WasmLoadState>(() => {
+		if (window.go_preview) {
+			return "loaded";
+		}
+		return "loading";
+	});
 	const $setCode = useStore((store) => store.setCode);
 	const code = useLoaderData<typeof loader>();
 
@@ -92,30 +72,15 @@ export const App = () => {
 		$setCode(code);
 	}, [code, $setCode]);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		const initWasm = async () => {
-			try {
-				const goWasm = new window.Go();
-				const result = await WebAssembly.instantiateStreaming(
-					fetch(
-						import.meta.env.PROD
-							? "/assets/build/preview.wasm"
-							: "/build/preview.wasm",
-					),
-					goWasm.importObject,
-				);
-
-				goWasm.run(result.instance);
-				$setWasmState("loaded");
-			} catch (e) {
-				$setWasmState("error");
-				console.error(e);
-			}
-		};
-
-		if ($wasmState !== "loaded") {
-			initWasm();
+		if (!window.go_preview) {
+			initWasm().then((loadState) => {
+				setWasmLoadingState(loadState);
+			});
+		} else {
+			// We assume that if `window.go_preview` has already created then the wasm
+			// has already been initiated.
+			setWasmLoadingState("loaded");
 		}
 	}, []);
 
@@ -163,14 +128,14 @@ export const App = () => {
 				</div>
 			</nav>
 
-			<ResizablePanelGroup aria-hidden={!$wasmState} direction={"horizontal"}>
+			<ResizablePanelGroup direction={"horizontal"}>
 				{/* EDITOR */}
 				<Editor />
 
 				<ResizableHandle className="bg-surface-quaternary" />
 
 				{/* PREVIEW */}
-				<Preview />
+				<Preview wasmLoadState={wasmLoadState} />
 			</ResizablePanelGroup>
 		</main>
 	);

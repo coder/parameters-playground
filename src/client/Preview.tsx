@@ -56,9 +56,13 @@ import {
 } from "@/client/components/Select";
 import { mockUsers } from "@/owner";
 import { checkerModule } from "./snippets";
+import type { WasmLoadState } from "@/utils/wasm";
 
-export const Preview: FC = () => {
-	const $wasmState = useStore((state) => state.wasmState);
+type PreviewProps = {
+	wasmLoadState: WasmLoadState;
+}
+
+export const Preview: FC<PreviewProps> = ({ wasmLoadState }) => {
 	const $code = useStore((state) => state.code);
 	const $errors = useStore((state) => state.errors);
 	const $setError = useStore((state) => state.setError);
@@ -99,7 +103,7 @@ export const Preview: FC = () => {
 	}, [output]);
 
 	useEffect(() => {
-		if ($wasmState === "loading" || !window.go_preview) {
+		if (wasmLoadState === "loading" || !window.go_preview) {
 			return;
 		}
 
@@ -151,7 +155,7 @@ export const Preview: FC = () => {
 		};
 
 		getOutput();
-	}, [debouncedCode, $setError, $wasmState, $setParameters, $form, $owner]);
+	}, [debouncedCode, $setError, wasmLoadState, $setParameters, $form, $owner]);
 
 	return (
 		<Tabs.Root
@@ -161,9 +165,9 @@ export const Preview: FC = () => {
 			onValueChange={(tab) => setTab(() => tab)}
 		>
 			<ResizablePanel className="relative flex h-full max-h-full flex-col">
-				{$wasmState !== "loaded" ? (
+				{wasmLoadState !== "loaded" ? (
 					<div className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center backdrop-blur-sm">
-						{$wasmState === "loading" ? <WasmLoading /> : <WasmError />}
+						{wasmLoadState === "loading" ? <WasmLoading /> : <WasmError />}
 					</div>
 				) : null}
 
@@ -205,12 +209,12 @@ export const Preview: FC = () => {
 				<Tabs.Content value="preview" asChild={true}>
 					<div
 						aria-hidden={
-							$wasmState !== "loaded" ||
+							wasmLoadState !== "loaded" ||
 							($errors.show && $errors.diagnostics.length > 0)
 						}
 						className={cn(
 							"flex h-full w-full flex-col items-start gap-4 p-5 ",
-							($wasmState !== "loaded" ||
+							(wasmLoadState !== "loaded" ||
 								($errors.show && $errors.diagnostics.length > 0)) &&
 								"pointer-events-none",
 							isDebug && "max-h-[calc(100%-48px)]",
@@ -224,7 +228,7 @@ export const Preview: FC = () => {
 									</p>
 
 									<AnimatePresence>
-										{isDebouncing && $wasmState === "loaded" ? (
+										{isDebouncing && wasmLoadState === "loaded" ? (
 											<motion.div
 												initial={{ opacity: 0, scale: 0.75 }}
 												animate={{ opacity: 1, scale: 1 }}

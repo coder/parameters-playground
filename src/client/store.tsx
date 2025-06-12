@@ -7,8 +7,6 @@ import { mockUsers } from "@/owner";
 
 export type FormState = Record<string, string>;
 
-type WasmState = "loaded" | "loading" | "error";
-
 type ErrorsState = {
 	diagnostics: Diagnostic[];
 	show: boolean;
@@ -24,13 +22,11 @@ type State = {
 	editor: editor.IStandaloneCodeEditor | null;
 	parameters: ParameterWithSource[];
 	form: FormState;
-	wasmState: WasmState;
 	owner: WorkspaceOwner;
 	errors: ErrorsState;
 	setCode: (code: string) => void;
 	setError: (diagnostics: Diagnostic[]) => void;
 	toggleShowError: (open?: boolean) => void;
-	setWasmState: (wasmState: WasmState) => void;
 	setParameters: (parameters: ParameterWithSource[]) => void;
 	setFormState: (key: string, value: string) => void;
 	setEditor: (editor: editor.IStandaloneCodeEditor) => void;
@@ -65,7 +61,6 @@ export const useStore = create<State>()((set) => ({
 				},
 			};
 		}),
-	setWasmState: (wasmState) => set((_) => ({ wasmState })),
 	setParameters: (parameters) => set((_) => ({ parameters })),
 	setFormState: (key, value) =>
 		set((state) => {
