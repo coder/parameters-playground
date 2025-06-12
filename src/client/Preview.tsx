@@ -667,7 +667,7 @@ const TableDrawer: FC<TableDrawerProps> = ({
 													<div className="col-span-6 flex min-h-8 items-center px-2 py-1">
 														<p
 															className={cn(
-																"text-left",
+																"break-all text-left",
 																value === "" && "text-content-secondary italic",
 															)}
 														>
