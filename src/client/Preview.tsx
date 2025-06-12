@@ -588,6 +588,7 @@ const UserSelect: FC = () => {
 				<SelectItem value="developer">Developer</SelectItem>
 				<SelectItem value="contractor">Contractor</SelectItem>
 				<SelectItem value="eu-developer">EU Developer</SelectItem>
+				<SelectItem value="sales">Sales</SelectItem>
 			</SelectContent>
 		</Select>
 	);
