@@ -1,11 +1,6 @@
 import { Editor } from "@/client/Editor";
 import { Preview } from "@/client/Preview";
-import { Logo } from "@/client/components/Logo";
-import {
-	ResizableHandle,
-	ResizablePanelGroup,
-} from "@/client/components/Resizable";
-import { useStore } from "@/client/store";
+import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,53 +8,39 @@ import {
 	DropdownMenuPortal,
 	DropdownMenuTrigger,
 } from "@/client/components/DropdownMenu";
+import { Logo } from "@/client/components/Logo";
 import {
-	type FC,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
-import { useTheme } from "@/client/contexts/theme";
-import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
-import { Button } from "@/client/components/Button";
+	ResizableHandle,
+	ResizablePanelGroup,
+} from "@/client/components/Resizable";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
+import { useTheme } from "@/client/contexts/theme";
+import { defaultCode } from "@/client/snippets";
+import type {
+	ParameterWithSource,
+	PreviewOutput,
+	WorkspaceOwner,
+} from "@/gen/types";
 import { rpc } from "@/utils/rpc";
-import { useLoaderData, type LoaderFunctionArgs } from "react-router";
-import type {WorkspaceOwner} from "@/gen/types.ts";
+import {
+	type WasmLoadState,
+	getDynamicParametersOutput,
+	initWasm,
+} from "@/utils/wasm";
+import isEqual from "lodash/isEqual";
+import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
+import { type FC, useEffect, useMemo, useRef, useState } from "react";
+import { type LoaderFunctionArgs, useLoaderData } from "react-router";
+import { useDebouncedValue } from "./hooks/debounce";
+import { mockUsers } from "@/owner";
 
-type GoPreviewDef = (
-	v: Record<string, string>,
-	owner: WorkspaceOwner,
-	params: Record<string, string>,
-) => Promise<string>;
-
-// Extend the Window object to include the Go related code that is added from
-// wasm_exec.js and our loaded Go code.
-declare global {
-	interface Window {
-		// Loaded from wasm
-		go_preview?: GoPreviewDef;
-		Go: { new (): Go };
-		CODE?: string;
-	}
-}
-
-declare class Go {
-	argv: string[];
-	env: { [envKey: string]: string };
-	exit: (code: number) => void;
-	importObject: WebAssembly.Imports;
-	exited: boolean;
-	mem: DataView;
-	run(instance: WebAssembly.Instance): Promise<void>;
-}
-
+/**
+ * Load the shared code if present.
+ */
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { id } = params;
 	if (!id) {
@@ -79,45 +60,116 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const App = () => {
-	const $wasmState = useStore((state) => state.wasmState);
-	const $setWasmState = useStore((state) => state.setWasmState);
-	const $setCode = useStore((store) => store.setCode);
-	const code = useLoaderData<typeof loader>();
+	const [wasmLoadState, setWasmLoadingState] = useState<WasmLoadState>(() => {
+		if (window.go_preview) {
+			return "loaded";
+		}
+		return "loading";
+	});
+	const loadedCode = useLoaderData<typeof loader>();
+	const [code, setCode] = useState(loadedCode ?? defaultCode);
+	const [debouncedCode, isDebouncing] = useDebouncedValue(code, 1000);
+	const [parameterValues, setParameterValues] = useState<
+		Record<string, string>
+	>({});
+	const [output, setOutput] = useState<PreviewOutput | null>(null);
+	const [parameters, setParameters] = useState<ParameterWithSource[]>([]);
+	const [owner, setOwner] = useState<WorkspaceOwner>(mockUsers.admin);
+
+	const onDownloadOutput = () => {
+		const blob = new Blob([JSON.stringify(output, null, 2)], {
+			type: "application/json",
+		});
+
+		const url = URL.createObjectURL(blob);
+
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = "output.json";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		// Give the click event enough time to fire and then revoke the URL.
+		// This method of doing it doesn't seem great but I'm not sure if there is a
+		// better way.
+		setTimeout(() => {
+			URL.revokeObjectURL(url);
+		}, 100);
+	};
+
+	const onReset = () => {
+		setParameterValues({});
+		setParameters((curr) =>
+			curr.map((p) => {
+				p.uuid = window.crypto.randomUUID();
+				return p;
+			}),
+		);
+	};
 
 	useEffect(() => {
-		if (!code) {
+		if (!window.go_preview) {
+			initWasm().then((loadState) => {
+				setWasmLoadingState(loadState);
+			});
+		} else {
+			// We assume that if `window.go_preview` has already created then the wasm
+			// has already been initiated.
+			setWasmLoadingState("loaded");
+		}
+	}, []);
+
+	useEffect(() => {
+		setParameters((curr) => {
+			const newParameters = output?.output?.parameters ?? [];
+
+			return newParameters.map((p) => {
+				// Check if the parameter is already in the array and if it is then keep it.
+				// This allows us to optimize React by not re-rendering parameters that haven't changed.
+				//
+				// We unset value because the value may not be in sync with what we have locally,
+				// and we unset uuid because it's given a new random UUID every time.
+				const existing = curr.find((currP) => {
+					const currentParameterOmitValue = {
+						...currP,
+						value: undefined,
+						uuid: undefined,
+					};
+					const existingParameterOmitValue = {
+						...p,
+						value: undefined,
+						uuid: undefined,
+					};
+
+					return isEqual(currentParameterOmitValue, existingParameterOmitValue);
+				});
+
+				if (existing) {
+					existing.value = p.value;
+					return existing;
+				}
+				return p;
+			});
+		});
+	}, [output]);
+
+	useEffect(() => {
+		if (wasmLoadState !== "loaded") {
 			return;
 		}
 
-		$setCode(code);
-	}, [code, $setCode]);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
-		const initWasm = async () => {
-			try {
-				const goWasm = new window.Go();
-				const result = await WebAssembly.instantiateStreaming(
-					fetch(
-						import.meta.env.PROD
-							? "/assets/build/preview.wasm"
-							: "/build/preview.wasm",
-					),
-					goWasm.importObject,
-				);
-
-				goWasm.run(result.instance);
-				$setWasmState("loaded");
-			} catch (e) {
-				$setWasmState("error");
+		getDynamicParametersOutput(debouncedCode, parameterValues, owner)
+			.catch((e) => {
 				console.error(e);
-			}
-		};
+				setWasmLoadingState("error");
 
-		if ($wasmState !== "loaded") {
-			initWasm();
-		}
-	}, []);
+				return null;
+			})
+			.then((output) => {
+				setOutput(output);
+			});
+	}, [debouncedCode, parameterValues, wasmLoadState, owner]);
 
 	return (
 		<main className="flex h-dvh w-screen flex-col items-center bg-surface-primary">
@@ -131,7 +183,7 @@ export const App = () => {
 						</p>
 					</div>
 
-					<ShareButton />
+					<ShareButton code={code} />
 				</div>
 
 				<div className="flex items-center gap-3">
@@ -163,14 +215,27 @@ export const App = () => {
 				</div>
 			</nav>
 
-			<ResizablePanelGroup aria-hidden={!$wasmState} direction={"horizontal"}>
+			<ResizablePanelGroup direction={"horizontal"}>
 				{/* EDITOR */}
-				<Editor />
+				<Editor code={code} setCode={setCode} />
 
 				<ResizableHandle className="bg-surface-quaternary" />
 
 				{/* PREVIEW */}
-				<Preview />
+				<Preview
+					wasmLoadState={wasmLoadState}
+					isDebouncing={isDebouncing}
+					onDownloadOutput={onDownloadOutput}
+					output={output}
+					parameterValues={parameterValues}
+					setParameterValues={setParameterValues}
+					parameters={parameters}
+					onReset={onReset}
+					setOwner={(owner) => {
+						onReset();
+						setOwner(owner);
+					}}
+				/>
 			</ResizablePanelGroup>
 		</main>
 	);
@@ -215,15 +280,17 @@ const ThemeSelector: FC = () => {
 	);
 };
 
-const ShareButton: FC = () => {
-	const $code = useStore((state) => state.code);
+type ShareButtonProps = {
+	code: string;
+};
+const ShareButton: FC<ShareButtonProps> = ({ code }) => {
 	const [isCopied, setIsCopied] = useState(() => false);
 	const timeoutId = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-	const onShare = useCallback(async () => {
+	const onShare = async () => {
 		try {
 			const { id } = await rpc.parameters
-				.$post({ json: { code: $code } })
+				.$post({ json: { code } })
 				.then((res) => res.json());
 
 			const { protocol, host } = window.location;
@@ -235,7 +302,7 @@ const ShareButton: FC = () => {
 		} catch (e) {
 			console.error(e);
 		}
-	}, [$code]);
+	};
 
 	useEffect(() => {
 		if (!isCopied) {

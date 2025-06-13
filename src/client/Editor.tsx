@@ -13,7 +13,11 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
-import { useStore } from "@/client/store";
+import { useTheme } from "@/client/contexts/theme";
+import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
+import type { ParameterFormType } from "@/gen/types";
+import { cn } from "@/utils/cn";
+import { Editor as MonacoEditor } from "@monaco-editor/react";
 import {
 	CheckIcon,
 	ChevronDownIcon,
@@ -26,20 +30,17 @@ import {
 	ToggleLeftIcon,
 	ZapIcon,
 } from "lucide-react";
-import { type FC, useCallback, useEffect, useRef, useState } from "react";
-import { Editor as MonacoEditor } from "@monaco-editor/react";
+import { type FC, useEffect, useRef, useState } from "react";
+import { useEditor } from "@/client/contexts/editor";
 
-import { cn } from "@/utils/cn";
-import type { ParameterFormType } from "@/gen/types";
-import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
-import { useTheme } from "@/client/contexts/theme";
+type EditorProps = {
+	code: string;
+	setCode: React.Dispatch<React.SetStateAction<string>>;
+};
 
-export const Editor: FC = () => {
+export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 	const { appliedTheme } = useTheme();
-
-	const $code = useStore((state) => state.code);
-	const $setCode = useStore((state) => state.setCode);
-	const $setEditor = useStore((state) => state.setEditor);
+	const editorRef = useEditor();
 
 	const [codeCopied, setCodeCopied] = useState(() => false);
 	const copyTimeoutId = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -49,24 +50,21 @@ export const Editor: FC = () => {
 	const [tab, setTab] = useState(() => "code");
 
 	const onCopy = () => {
-		navigator.clipboard.writeText($code);
+		navigator.clipboard.writeText(code);
 		setCodeCopied(() => true);
 	};
 
-	const onAddSnippet = useCallback(
-		(formType: ParameterFormType) => {
-			if (formType === "input") {
-				$setCode(`${$code.trimEnd()}\n\n${textInput}\n`);
-			} else if (formType === "radio") {
-				$setCode(`${$code.trimEnd()}\n\n${radio}\n`);
-			} else if (formType === "multi-select") {
-				$setCode(`${$code.trimEnd()}\n\n${multiSelect}\n`);
-			} else if (formType === "switch") {
-				$setCode(`${$code.trimEnd()}\n\n${switchInput}\n`);
-			}
-		},
-		[$code, $setCode],
-	);
+	const onAddSnippet = (formType: ParameterFormType) => {
+		if (formType === "input") {
+			setCode(`${code.trimEnd()}\n\n${textInput}\n`);
+		} else if (formType === "radio") {
+			setCode(`${code.trimEnd()}\n\n${radio}\n`);
+		} else if (formType === "multi-select") {
+			setCode(`${code.trimEnd()}\n\n${multiSelect}\n`);
+		} else if (formType === "switch") {
+			setCode(`${code.trimEnd()}\n\n${switchInput}\n`);
+		}
+	};
 
 	useEffect(() => {
 		if (!codeCopied) {
@@ -161,11 +159,13 @@ export const Editor: FC = () => {
 				<Tabs.Content value="code" asChild={true}>
 					<div className="h-full w-full bg-surface-secondary font-mono">
 						<MonacoEditor
-							value={$code}
-							onMount={(editor) => $setEditor(editor)}
+							value={code}
+							onMount={(editor) => {
+								editorRef.current = editor;
+							}}
 							onChange={(code) => {
 								if (code !== undefined) {
-									$setCode(code);
+									setCode(code);
 								}
 							}}
 							theme={appliedTheme === "dark" ? "vs-dark" : "vs-light"}

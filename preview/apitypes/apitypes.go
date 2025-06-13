@@ -3,6 +3,7 @@ package apitypes
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/hcl/v2"
 
 	"github.com/coder/preview/types"
@@ -64,6 +65,7 @@ type FriendlyDiagnostic = types.FriendlyDiagnostic
 
 type ParameterWithSource struct {
 	types.Parameter
+	Uuid      uuid.UUID `json:"uuid"`
 	TypeRange hcl.Range `json:"type_range"`
 	DefRange  hcl.Range `json:"def_range"`
 }
@@ -79,6 +81,7 @@ func WithSource(p []types.Parameter) []ParameterWithSource {
 			src.TypeRange = param.Source.HCLBlock().TypeRange
 			src.DefRange = param.Source.HCLBlock().DefRange
 		}
+		src.Uuid = uuid.New()
 
 		result = append(result, src)
 	}

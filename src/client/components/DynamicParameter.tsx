@@ -42,7 +42,7 @@ import {
 } from "lucide-react";
 import { type FC, useEffect, useId, useRef, useState } from "react";
 import * as Yup from "yup";
-import { useStore } from "@/client/store";
+import { useEditor } from "@/client/contexts/editor";
 
 interface WorkspaceBuildParameter {
 	readonly name: string;
@@ -127,17 +127,17 @@ const ParameterLabel: FC<ParameterLabelProps> = ({
 	autofill,
 	id,
 }) => {
-	const $editor = useStore((state) => state.editor);
+	const ediorRef = useEditor();
 
 	const onGoToDefinition = () => {
-		$editor?.revealLine(parameter.def_range.Start.Line);
-		$editor?.setSelection({
+		ediorRef.current?.revealLine(parameter.def_range.Start.Line);
+		ediorRef.current?.setSelection({
 			startLineNumber: parameter.def_range.Start.Line,
 			startColumn: parameter.def_range.Start.Column,
 			endColumn: parameter.def_range.End.Column,
 			endLineNumber: parameter.def_range.End.Line,
 		});
-		$editor?.focus()
+		ediorRef.current?.focus();
 	};
 
 	const displayName = parameter.display_name

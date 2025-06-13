@@ -100,6 +100,7 @@ export interface ParameterValidation {
 
 // From apitypes/apitypes.go
 export interface ParameterWithSource extends Parameter {
+    uuid: string;
     type_range: Range;
     def_range: Range;
 }

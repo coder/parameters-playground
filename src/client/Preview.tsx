@@ -8,22 +8,25 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@/client/components/Resizable";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/client/components/Select";
 import * as Tabs from "@/client/components/Tabs";
 import { useTheme } from "@/client/contexts/theme";
-import {
-	type Diagnostic,
-	type InternalDiagnostic,
-	outputToDiagnostics,
-} from "@/client/diagnostics";
-import { useDebouncedValue } from "@/client/hooks/debounce";
-import { useStore } from "@/client/store";
+import { outputToDiagnostics, type Diagnostic } from "@/client/diagnostics";
 import type {
 	ParameterWithSource,
 	ParserLog,
 	PreviewOutput,
 	WorkspaceOwner,
 } from "@/gen/types";
+import { mockUsers } from "@/owner";
 import { cn } from "@/utils/cn";
+import type { WasmLoadState } from "@/utils/wasm";
 import ReactJsonView from "@microlink/react-json-view";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
@@ -38,45 +41,42 @@ import {
 	XIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import {
-	type FC,
-	type PropsWithChildren,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from "react";
+import React from "react";
+import { type FC, type PropsWithChildren, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/client/components/Select";
-import { mockUsers } from "@/owner";
-import { checkerModule } from "./snippets";
 
-export const Preview: FC = () => {
-	const $wasmState = useStore((state) => state.wasmState);
-	const $code = useStore((state) => state.code);
-	const $errors = useStore((state) => state.errors);
-	const $setError = useStore((state) => state.setError);
-	const $parameters = useStore((state) => state.parameters);
-	const $setParameters = useStore((state) => state.setParameters);
-	const $form = useStore((state) => state.form);
-	const $owner = useStore((state) => state.owner);
-	const $resetForm = useStore((state) => state.resetForm);
+type PreviewProps = {
+	wasmLoadState: WasmLoadState;
+	isDebouncing: boolean;
+	onDownloadOutput: () => void;
+	output: PreviewOutput | null;
+	parameterValues: Record<string, string>;
+	setParameterValues: React.Dispatch<
+		React.SetStateAction<Record<string, string>>
+	>;
+	parameters: ParameterWithSource[];
+	onReset: () => void;
+	setOwner: (owner: WorkspaceOwner) => void;
+};
 
-	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
-	const [output, setOutput] = useState<PreviewOutput | null>(() => null);
-
+export const Preview: FC<PreviewProps> = ({
+	wasmLoadState,
+	isDebouncing,
+	output,
+	parameterValues,
+	setParameterValues,
+	parameters,
+	onReset,
+	setOwner,
+}) => {
 	const [params] = useSearchParams();
-	const isDebug = useMemo(() => params.has("debug"), [params]);
-
+	const isDebug = params.has("debug");
 	const [tab, setTab] = useState(() => "preview");
+	const [showErrors, setShowErrors] = useState(true);
 
-	const onDownloadOutput = useCallback(() => {
+	const errors = output ? outputToDiagnostics(output) : [];
+
+	const onDownloadOutput = () => {
 		const blob = new Blob([JSON.stringify(output, null, 2)], {
 			type: "application/json",
 		});
@@ -96,62 +96,62 @@ export const Preview: FC = () => {
 		setTimeout(() => {
 			URL.revokeObjectURL(url);
 		}, 100);
-	}, [output]);
+	};
 
-	useEffect(() => {
-		if ($wasmState === "loading" || !window.go_preview) {
-			return;
-		}
+	// useEffect(() => {
+	// 	if (wasmLoadState === "loading" || !window.go_preview) {
+	// 		return;
+	// 	}
 
-		const getOutput = async () => {
-			try {
-				const rawOutput = await window.go_preview?.(
-					{
-						"main.tf": debouncedCode,
-						"checker/main.tf": checkerModule,
-					},
-					$owner,
-					$form,
-				);
+	// 	// const getOutput = async () => {
+	// 	// 	try {
+	// 	// 		const rawOutput = await window.go_preview?.(
+	// 	// 			{
+	// 	// 				"main.tf": code,
+	// 	// 				"checker/main.tf": checkerModule,
+	// 	// 			},
+	// 	// 			$owner,
+	// 	// 			$form,
+	// 	// 		);
 
-				if (rawOutput === undefined) {
-					console.error("Something went wrong");
-				} else {
-					const output = JSON.parse(rawOutput) as PreviewOutput;
-					setOutput(() => output);
+	// 	// 		if (rawOutput === undefined) {
+	// 	// 			console.error("Something went wrong");
+	// 	// 		} else {
+	// 	// 			const output = JSON.parse(rawOutput) as PreviewOutput;
+	// 	// 			setOutput(() => output);
 
-					const errors = outputToDiagnostics(output);
-					$setError(errors);
+	// 	// 			const errors = outputToDiagnostics(output);
+	// 	// 			$setError(errors);
 
-					if (output.diags.length === 0) {
-						$setParameters(output.output?.parameters ?? []);
-					}
-				}
-			} catch (e) {
-				console.error(e);
-				if (e instanceof Error) {
-					const diagnostic: InternalDiagnostic = {
-						severity: "error",
-						summary: e.name,
-						detail: e.message,
-						kind: "internal",
-					};
-					$setError([diagnostic]);
-				} else {
-					const diagnostic: InternalDiagnostic = {
-						severity: "error",
-						summary: "Error",
-						detail: "Something went wrong",
-						kind: "internal",
-					};
+	// 	// 			if (output.diags.length === 0) {
+	// 	// 				$setParameters(output.output?.parameters ?? []);
+	// 	// 			}
+	// 	// 		}
+	// 	// 	} catch (e) {
+	// 	// 		console.error(e);
+	// 	// 		if (e instanceof Error) {
+	// 	// 			const diagnostic: InternalDiagnostic = {
+	// 	// 				severity: "error",
+	// 	// 				summary: e.name,
+	// 	// 				detail: e.message,
+	// 	// 				kind: "internal",
+	// 	// 			};
+	// 	// 			$setError([diagnostic]);
+	// 	// 		} else {
+	// 	// 			const diagnostic: InternalDiagnostic = {
+	// 	// 				severity: "error",
+	// 	// 				summary: "Error",
+	// 	// 				detail: "Something went wrong",
+	// 	// 				kind: "internal",
+	// 	// 			};
 
-					$setError([diagnostic]);
-				}
-			}
-		};
+	// 	// 			$setError([diagnostic]);
+	// 	// 		}
+	// 	// 	}
+	// 	// };
 
-		getOutput();
-	}, [debouncedCode, $setError, $wasmState, $setParameters, $form, $owner]);
+	// 	// getOutput();
+	// }, [code, $setError, wasmLoadState, $setParameters, $form, $owner]);
 
 	return (
 		<Tabs.Root
@@ -161,9 +161,9 @@ export const Preview: FC = () => {
 			onValueChange={(tab) => setTab(() => tab)}
 		>
 			<ResizablePanel className="relative flex h-full max-h-full flex-col">
-				{$wasmState !== "loaded" ? (
+				{wasmLoadState !== "loaded" ? (
 					<div className="absolute top-0 left-0 z-10 flex h-full w-full items-center justify-center backdrop-blur-sm">
-						{$wasmState === "loading" ? <WasmLoading /> : <WasmError />}
+						{wasmLoadState === "loading" ? <WasmLoading /> : <WasmError />}
 					</div>
 				) : null}
 
@@ -205,13 +205,12 @@ export const Preview: FC = () => {
 				<Tabs.Content value="preview" asChild={true}>
 					<div
 						aria-hidden={
-							$wasmState !== "loaded" ||
-							($errors.show && $errors.diagnostics.length > 0)
+							wasmLoadState !== "loaded" || (showErrors && errors.length > 0)
 						}
 						className={cn(
 							"flex h-full w-full flex-col items-start gap-4 p-5 ",
-							($wasmState !== "loaded" ||
-								($errors.show && $errors.diagnostics.length > 0)) &&
+							(wasmLoadState !== "loaded" ||
+								(showErrors && errors.length > 0)) &&
 								"pointer-events-none",
 							isDebug && "max-h-[calc(100%-48px)]",
 						)}
@@ -224,7 +223,7 @@ export const Preview: FC = () => {
 									</p>
 
 									<AnimatePresence>
-										{isDebouncing && $wasmState === "loaded" ? (
+										{isDebouncing && wasmLoadState === "loaded" ? (
 											<motion.div
 												initial={{ opacity: 0, scale: 0.75 }}
 												animate={{ opacity: 1, scale: 1 }}
@@ -239,23 +238,27 @@ export const Preview: FC = () => {
 										) : null}
 									</AnimatePresence>
 								</div>
-								<UserSelect />
+								<UserSelect setOwner={setOwner} />
 							</div>
 						}
-						{$parameters.length === 0 ? (
+						{parameters.length === 0 ? (
 							<div className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4">
 								<PreviewEmptyState />
 							</div>
 						) : (
 							<div className="flex h-full w-full flex-col items-center justify-start gap-5 overflow-x-clip overflow-y-scroll rounded-xl border p-6">
-								<Form parameters={$parameters} />
+								<Form
+									parameters={parameters}
+									parameterValues={parameterValues}
+									setParameterValues={setParameterValues}
+								/>
 							</div>
 						)}
 						<div className="flex w-full justify-between gap-3">
-							<Button variant="outline" onClick={$resetForm} className="w-fit">
+							<Button variant="outline" onClick={onReset} className="w-fit">
 								Reset form
 							</Button>
-							<ViewOutput />
+							<ViewOutput parameters={parameters} />
 						</div>
 					</div>
 				</Tabs.Content>
@@ -264,7 +267,11 @@ export const Preview: FC = () => {
 					<Debugger output={output} />
 				</Tabs.Content>
 
-				<ErrorPane />
+				<ErrorPane
+					errors={errors}
+					setShowErrors={setShowErrors}
+					showErrors={showErrors}
+				/>
 			</ResizablePanel>
 		</Tabs.Root>
 	);
@@ -300,16 +307,22 @@ const PreviewEmptyState = () => {
 	);
 };
 
-const ErrorPane = () => {
-	const $errors = useStore((state) => state.errors);
-	const $toggleShowError = useStore((state) => state.toggleShowError);
-
-	const hasErrors = useMemo(() => $errors.diagnostics.length > 0, [$errors]);
+type ErrorPaneProps = {
+	errors: Diagnostic[];
+	showErrors: boolean;
+	setShowErrors: React.Dispatch<React.SetStateAction<boolean>>;
+};
+const ErrorPane: FC<ErrorPaneProps> = ({
+	errors,
+	setShowErrors,
+	showErrors,
+}) => {
+	const hasErrors = errors.length > 0;
 
 	return (
 		<>
 			<AnimatePresence propagate={true}>
-				{$errors.show && hasErrors ? (
+				{showErrors && hasErrors ? (
 					// lint/a11y/useKeyWithClickEvents: key events don't seem to
 					// work for divs, and I'm otherwise not sure how to make this element
 					// more accesible. But I think it's fine since the functionality is able to
@@ -321,7 +334,7 @@ const ErrorPane = () => {
 						aria-hidden={true}
 						className="absolute top-0 left-0 h-full w-full cursor-pointer bg-black/10 dark:bg-black/50"
 						onClick={() => {
-							$toggleShowError(false);
+							setShowErrors(false);
 						}}
 					>
 						{/* OVERLAY */}
@@ -339,21 +352,21 @@ const ErrorPane = () => {
 						exit={{ opacity: 0 }}
 						className={cn(
 							"absolute bottom-0 left-0 flex max-h-[60%] w-full flex-col justify-start",
-							$errors.show && "h-auto",
+							showErrors && "h-auto",
 						)}
 					>
 						<motion.button
 							className="flex h-4 min-h-4 w-full items-center justify-center rounded-t-xl bg-border-destructive"
-							onClick={() => $toggleShowError()}
+							onClick={() => setShowErrors((curr) => !curr)}
 							aria-label={
-								$errors.show ? "Hide error dialog" : "Show error dialog"
+								showErrors ? "Hide error dialog" : "Show error dialog"
 							}
 						>
 							<div className="h-0.5 w-2/3 max-w-32 rounded-full bg-white/40"></div>
 						</motion.button>
 
 						<AnimatePresence propagate={true}>
-							{$errors.show ? (
+							{showErrors ? (
 								<motion.div
 									initial={{ height: 0 }}
 									animate={{
@@ -363,7 +376,7 @@ const ErrorPane = () => {
 									className="flex flex-col gap-6 overflow-y-scroll bg-surface-secondary"
 								>
 									<div className="flex w-full flex-col gap-3 p-6">
-										{$errors.diagnostics.map((diagnostic, index) => (
+										{errors.map((diagnostic, index) => (
 											<ErrorBlock diagnostic={diagnostic} key={index} />
 										))}
 									</div>
@@ -528,60 +541,80 @@ const Log: FC<LogProps> = ({ log }) => {
 	);
 };
 
-type FormProps = { parameters: ParameterWithSource[] };
+type FormProps = {
+	parameters: ParameterWithSource[];
+	parameterValues: Record<string, string>;
+	setParameterValues: React.Dispatch<
+		React.SetStateAction<Record<string, string>>
+	>;
+};
 
-const Form: FC<FormProps> = ({ parameters }) => {
-	const $force = useStore((state) => state._force);
-
-	const getParameterHash = (p: ParameterWithSource) =>
-		`${$force}:${p.name}:${p.form_type}`;
-
+const Form: FC<FormProps> = ({
+	parameters,
+	parameterValues,
+	setParameterValues,
+}) => {
 	return (
 		parameters
 			.sort((a, b) => a.order - b.order)
 			// Since the form is sourced from constantly changing terraform, we are not sure
 			// if the parameters are the "same" as the previous render.
-			.map((p) => <FormElement key={getParameterHash(p)} parameter={p} />)
+			.map((p) => {
+				return (
+					<FormElement
+						key={p.uuid}
+						parameter={p}
+						value={parameterValues[p.name]}
+						setParameterValues={setParameterValues}
+					/>
+				);
+			})
 	);
 };
 
-type FormElementProps = { parameter: ParameterWithSource };
-const FormElement: FC<FormElementProps> = ({ parameter }) => {
-	const $form = useStore((state) => state.form);
-	const $setForm = useStore((state) => state.setFormState);
-
-	const value = useMemo(() => {
+type FormElementProps = {
+	parameter: ParameterWithSource;
+	value: string | undefined;
+	setParameterValues: React.Dispatch<
+		React.SetStateAction<Record<string, string>>
+	>;
+};
+const FormElement: FC<FormElementProps> = React.memo(
+	({ parameter, value, setParameterValues }) => {
 		const defaultValue =
-			parameter.default_value.value !== "??" 
+			parameter.default_value.value !== "??"
 				? parameter.default_value.value
 				: undefined;
-		return $form[parameter.name] ?? defaultValue;
-	}, [$form, parameter.name, parameter.default_value]);
 
-	const onValueChange = (value: string) => {
-		$setForm(parameter.name, value);
-	};
+		const onValueChange = (value: string) => {
+			setParameterValues((curr) => {
+				return { ...curr, [parameter.name]: value };
+			});
+		};
 
-	return (
-		<DynamicParameter
-			parameter={parameter}
-			value={value}
-			autofill={false}
-			onChange={onValueChange}
-			disabled={parameter.styling.disabled}
-		/>
-	);
+		return (
+			<DynamicParameter
+				parameter={parameter}
+				value={value ?? defaultValue}
+				autofill={false}
+				onChange={onValueChange}
+				disabled={parameter.styling.disabled}
+			/>
+		);
+	},
+);
+FormElement.displayName = "FormElement";
+
+type UserSelectProps = {
+	setOwner: (owner: WorkspaceOwner) => void;
 };
-
-const UserSelect: FC = () => {
-	const $setWorkspaceOwner = useStore((state) => state.setWorkspaceOwner);
-
+const UserSelect: FC<UserSelectProps> = ({ setOwner }) => {
 	return (
 		<Select
 			defaultValue="admin"
 			onValueChange={(value) => {
 				const users: Record<string, WorkspaceOwner | undefined> = mockUsers;
-				$setWorkspaceOwner(users[value] ?? mockUsers.admin);
+				setOwner(users[value] ?? mockUsers.admin);
 			}}
 		>
 			<SelectTrigger className="w-fit min-w-40">
@@ -698,12 +731,15 @@ const TableDrawer: FC<TableDrawerProps> = ({
 	);
 };
 
-const ViewOutput: FC = () => {
-	const $parameters = useStore((state) => state.parameters);
+type ViewOutputProps = {
+	parameters: ParameterWithSource[];
+	// parameterValues: Record<string, string>;
+};
+const ViewOutput: FC<ViewOutputProps> = ({ parameters }) => {
 	const [isOpen, setIsOpen] = useState(() => false);
 
 	const onView = async () => {
-		const invalidParameter = $parameters.find((p) => {
+		const invalidParameter = parameters.find((p) => {
 			try {
 				if (!p.value.valid) {
 					return true;
@@ -731,11 +767,11 @@ const ViewOutput: FC = () => {
 
 	const data = useMemo(
 		() =>
-			$parameters.reduce<Record<string, string>>((acc, p) => {
+			parameters.reduce<Record<string, string>>((acc, p) => {
 				acc[p.name] = p.value.value;
 				return acc;
 			}, {}),
-		[$parameters],
+		[parameters],
 	);
 
 	return (
@@ -747,7 +783,7 @@ const ViewOutput: FC = () => {
 		>
 			<Button
 				variant="default"
-				disabled={$parameters.length === 0}
+				disabled={parameters.length === 0}
 				onClick={onView}
 			>
 				<SearchCodeIcon />

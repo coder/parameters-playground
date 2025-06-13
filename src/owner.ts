@@ -1,6 +1,6 @@
 import type { WorkspaceOwner } from "@/gen/types";
 
-const BaseMockUser: WorkspaceOwner = {
+export const baseMockUser: WorkspaceOwner = {
 	id: "8d36e355-e775-4c49-9b8d-ac042ed50440",
 	name: "coder",
 	full_name: "Coder",
@@ -21,35 +21,35 @@ export type User = "admin" | "developer" | "contractor" | "eu-developer" | "sale
 
 export const mockUsers: Record<User, WorkspaceOwner> = {
 	admin: {
-		...BaseMockUser,
+		...baseMockUser,
 		name: "admin",
 		full_name: "Admin",
 		email: "admin@coder.com",
 		groups: ["admin"],
 	},
 	developer: {
-		...BaseMockUser,
+		...baseMockUser,
 		name: "developer",
 		full_name: "Developer",
 		email: "dev@coder.com",
 		groups: ["developer"],
 	},
 	contractor: {
-		...BaseMockUser,
+		...baseMockUser,
 		name: "contractor",
 		full_name: "Contractor",
 		email: "contractor@coder.com",
 		groups: ["contractor"],
 	},
 	"eu-developer": {
-		...BaseMockUser,
+		...baseMockUser,
 		name: "eu-developer",
 		full_name: "EU Developer",
 		email: "eu.dev@coder.com",
 		groups: ["developer", "eu-helsinki"],
 	},
 	"sales": {
-		...BaseMockUser,
+		...baseMockUser,
 		name: "sales",
 		full_name: "Sales",
 		email: "sales@coder.com",
