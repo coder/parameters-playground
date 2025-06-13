@@ -17,8 +17,7 @@ import {
 } from "@/client/components/Select";
 import * as Tabs from "@/client/components/Tabs";
 import { useTheme } from "@/client/contexts/theme";
-import type { Diagnostic } from "@/client/diagnostics";
-import { useStore } from "@/client/store";
+import { outputToDiagnostics, type Diagnostic } from "@/client/diagnostics";
 import type {
 	ParameterWithSource,
 	ParserLog,
@@ -70,10 +69,12 @@ export const Preview: FC<PreviewProps> = ({
 	onReset,
 	setOwner,
 }) => {
-	const $errors = useStore((state) => state.errors);
 	const [params] = useSearchParams();
 	const isDebug = params.has("debug");
 	const [tab, setTab] = useState(() => "preview");
+	const [showErrors, setShowErrors] = useState(true);
+
+	const errors = output ? outputToDiagnostics(output) : [];
 
 	const onDownloadOutput = () => {
 		const blob = new Blob([JSON.stringify(output, null, 2)], {
@@ -204,13 +205,12 @@ export const Preview: FC<PreviewProps> = ({
 				<Tabs.Content value="preview" asChild={true}>
 					<div
 						aria-hidden={
-							wasmLoadState !== "loaded" ||
-							($errors.show && $errors.diagnostics.length > 0)
+							wasmLoadState !== "loaded" || (showErrors && errors.length > 0)
 						}
 						className={cn(
 							"flex h-full w-full flex-col items-start gap-4 p-5 ",
 							(wasmLoadState !== "loaded" ||
-								($errors.show && $errors.diagnostics.length > 0)) &&
+								(showErrors && errors.length > 0)) &&
 								"pointer-events-none",
 							isDebug && "max-h-[calc(100%-48px)]",
 						)}
@@ -267,7 +267,11 @@ export const Preview: FC<PreviewProps> = ({
 					<Debugger output={output} />
 				</Tabs.Content>
 
-				<ErrorPane />
+				<ErrorPane
+					errors={errors}
+					setShowErrors={setShowErrors}
+					showErrors={showErrors}
+				/>
 			</ResizablePanel>
 		</Tabs.Root>
 	);
@@ -303,16 +307,22 @@ const PreviewEmptyState = () => {
 	);
 };
 
-const ErrorPane = () => {
-	const $errors = useStore((state) => state.errors);
-	const $toggleShowError = useStore((state) => state.toggleShowError);
-
-	const hasErrors = useMemo(() => $errors.diagnostics.length > 0, [$errors]);
+type ErrorPaneProps = {
+	errors: Diagnostic[];
+	showErrors: boolean;
+	setShowErrors: React.Dispatch<React.SetStateAction<boolean>>;
+};
+const ErrorPane: FC<ErrorPaneProps> = ({
+	errors,
+	setShowErrors,
+	showErrors,
+}) => {
+	const hasErrors = errors.length > 0;
 
 	return (
 		<>
 			<AnimatePresence propagate={true}>
-				{$errors.show && hasErrors ? (
+				{showErrors && hasErrors ? (
 					// lint/a11y/useKeyWithClickEvents: key events don't seem to
 					// work for divs, and I'm otherwise not sure how to make this element
 					// more accesible. But I think it's fine since the functionality is able to
@@ -324,7 +334,7 @@ const ErrorPane = () => {
 						aria-hidden={true}
 						className="absolute top-0 left-0 h-full w-full cursor-pointer bg-black/10 dark:bg-black/50"
 						onClick={() => {
-							$toggleShowError(false);
+							setShowErrors(false);
 						}}
 					>
 						{/* OVERLAY */}
@@ -342,21 +352,21 @@ const ErrorPane = () => {
 						exit={{ opacity: 0 }}
 						className={cn(
 							"absolute bottom-0 left-0 flex max-h-[60%] w-full flex-col justify-start",
-							$errors.show && "h-auto",
+							showErrors && "h-auto",
 						)}
 					>
 						<motion.button
 							className="flex h-4 min-h-4 w-full items-center justify-center rounded-t-xl bg-border-destructive"
-							onClick={() => $toggleShowError()}
+							onClick={() => setShowErrors((curr) => !curr)}
 							aria-label={
-								$errors.show ? "Hide error dialog" : "Show error dialog"
+								showErrors ? "Hide error dialog" : "Show error dialog"
 							}
 						>
 							<div className="h-0.5 w-2/3 max-w-32 rounded-full bg-white/40"></div>
 						</motion.button>
 
 						<AnimatePresence propagate={true}>
-							{$errors.show ? (
+							{showErrors ? (
 								<motion.div
 									initial={{ height: 0 }}
 									animate={{
@@ -366,7 +376,7 @@ const ErrorPane = () => {
 									className="flex flex-col gap-6 overflow-y-scroll bg-surface-secondary"
 								>
 									<div className="flex w-full flex-col gap-3 p-6">
-										{$errors.diagnostics.map((diagnostic, index) => (
+										{errors.map((diagnostic, index) => (
 											<ErrorBlock diagnostic={diagnostic} key={index} />
 										))}
 									</div>

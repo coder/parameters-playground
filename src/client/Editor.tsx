@@ -15,7 +15,6 @@ import {
 } from "@/client/components/Tooltip";
 import { useTheme } from "@/client/contexts/theme";
 import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
-import { useStore } from "@/client/store";
 import type { ParameterFormType } from "@/gen/types";
 import { cn } from "@/utils/cn";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
@@ -40,8 +39,6 @@ type EditorProps = {
 
 export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 	const { appliedTheme } = useTheme();
-
-	const $setEditor = useStore((state) => state.setEditor);
 
 	const [codeCopied, setCodeCopied] = useState(() => false);
 	const copyTimeoutId = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -161,7 +158,9 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 					<div className="h-full w-full bg-surface-secondary font-mono">
 						<MonacoEditor
 							value={code}
-							onMount={(editor) => $setEditor(editor)}
+							onMount={(editor) => {
+								// $setEditor(editor);
+							}}
 							onChange={(code) => {
 								if (code !== undefined) {
 									setCode(code);
