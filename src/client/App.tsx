@@ -29,8 +29,9 @@ import {
 	type WasmLoadState,
 } from "@/utils/wasm";
 import { defaultCode } from "@/client/snippets";
-import type { PreviewOutput } from "@/gen/types";
+import type { ParameterWithSource, PreviewOutput } from "@/gen/types";
 import { useDebouncedValue } from "./hooks/debounce";
+import isEqual from "lodash/isEqual";
 
 /**
  * Load the shared code if present.
@@ -67,6 +68,7 @@ export const App = () => {
 		Record<string, string>
 	>({});
 	const [output, setOutput] = useState<PreviewOutput | null>(null);
+	const [parameters, setParameters] = useState<ParameterWithSource[]>([]);
 
 	const onDownloadOutput = () => {
 		const blob = new Blob([JSON.stringify(output, null, 2)], {
@@ -101,6 +103,23 @@ export const App = () => {
 			setWasmLoadingState("loaded");
 		}
 	}, []);
+
+	useEffect(() => {
+		setParameters((curr) => {
+			const newParameters = output?.output?.parameters ?? [];
+
+			return newParameters.map((p) => {
+				const existing = curr.find((currP) => {
+					const currentParameterOmitValue = { ...currP, value: undefined };
+					const existingParameterOmitValue = { ...p, value: undefined };
+
+					return isEqual(currentParameterOmitValue, existingParameterOmitValue);
+				});
+
+				return existing ?? p;
+			});
+		});
+	}, [output]);
 
 	useEffect(() => {
 		getDynamicParametersOutput(debouncedCode, parameterValues)
@@ -171,6 +190,9 @@ export const App = () => {
 					isDebouncing={isDebouncing}
 					onDownloadOutput={onDownloadOutput}
 					output={output}
+					parameterValues={parameterValues}
+					setParameterValues={setParameterValues}
+					parameters={parameters}
 				/>
 			</ResizablePanelGroup>
 		</main>

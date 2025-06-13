@@ -5,8 +5,6 @@ import { create } from "zustand";
 import { defaultCode } from "./snippets";
 import { mockUsers } from "@/owner";
 
-export type FormState = Record<string, string>;
-
 type ErrorsState = {
 	diagnostics: Diagnostic[];
 	show: boolean;
@@ -19,15 +17,12 @@ const defaultErrorsState: ErrorsState = {
 type State = {
 	_force: number;
 	editor: editor.IStandaloneCodeEditor | null;
-	form: FormState;
 	owner: WorkspaceOwner;
 	errors: ErrorsState;
 	setError: (diagnostics: Diagnostic[]) => void;
 	toggleShowError: (open?: boolean) => void;
-	setFormState: (key: string, value: string) => void;
 	setEditor: (editor: editor.IStandaloneCodeEditor) => void;
 	setWorkspaceOwner: (owner: WorkspaceOwner) => void;
-	resetForm: () => void;
 };
 
 export const useStore = create<State>()((set) => ({
@@ -35,7 +30,6 @@ export const useStore = create<State>()((set) => ({
 	code: window.CODE ?? defaultCode,
 	editor: null,
 	owner: mockUsers.admin,
-	form: {},
 	errors: defaultErrorsState,
 	setError: (data) =>
 		set((state) => {
@@ -54,18 +48,6 @@ export const useStore = create<State>()((set) => ({
 				},
 			};
 		}),
-	setFormState: (key, value) =>
-		set((state) => {
-			const form = { ...state.form };
-			form[key] = value;
-
-			return { form };
-		}),
-	resetForm: () =>
-		set((state) => ({
-			form: {},
-			_force: state._force + 1,
-		})),
 	setEditor: (editor) => set(() => ({ editor })),
 	setWorkspaceOwner: (owner) =>
 		set((state) => ({

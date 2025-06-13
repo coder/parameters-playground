@@ -42,6 +42,7 @@ import {
 	XIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import React from "react";
 import { type FC, type PropsWithChildren, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 
@@ -50,21 +51,25 @@ type PreviewProps = {
 	isDebouncing: boolean;
 	onDownloadOutput: () => void;
 	output: PreviewOutput | null;
+	parameterValues: Record<string, string>;
+	setParameterValues: React.Dispatch<
+		React.SetStateAction<Record<string, string>>
+	>;
+	parameters: ParameterWithSource[];
 };
 
 export const Preview: FC<PreviewProps> = ({
 	wasmLoadState,
 	isDebouncing,
 	output,
+	parameterValues,
+	setParameterValues,
+	parameters,
 }) => {
 	const $errors = useStore((state) => state.errors);
-	const $resetForm = useStore((state) => state.resetForm);
 	const [params] = useSearchParams();
-	const isDebug = useMemo(() => params.has("debug"), [params]);
+	const isDebug = params.has("debug");
 	const [tab, setTab] = useState(() => "preview");
-
-	const parameters = output?.output?.parameters ?? [];
-	console.info(parameters);
 
 	const onDownloadOutput = () => {
 		const blob = new Blob([JSON.stringify(output, null, 2)], {
@@ -238,11 +243,19 @@ export const Preview: FC<PreviewProps> = ({
 							</div>
 						) : (
 							<div className="flex h-full w-full flex-col items-center justify-start gap-5 overflow-x-clip overflow-y-scroll rounded-xl border p-6">
-								<Form parameters={parameters} />
+								<Form
+									parameters={parameters}
+									parameterValues={parameterValues}
+									setParameterValues={setParameterValues}
+								/>
 							</div>
 						)}
 						<div className="flex w-full justify-between gap-3">
-							<Button variant="outline" onClick={$resetForm} className="w-fit">
+							<Button
+								variant="outline"
+								onClick={() => setParameterValues({})}
+								className="w-fit"
+							>
 								Reset form
 							</Button>
 							<ViewOutput parameters={parameters} />
@@ -518,50 +531,71 @@ const Log: FC<LogProps> = ({ log }) => {
 	);
 };
 
-type FormProps = { parameters: ParameterWithSource[] };
+type FormProps = {
+	parameters: ParameterWithSource[];
+	parameterValues: Record<string, string>;
+	setParameterValues: React.Dispatch<
+		React.SetStateAction<Record<string, string>>
+	>;
+};
 
-const Form: FC<FormProps> = ({ parameters }) => {
-	const $force = useStore((state) => state._force);
-
-	const getParameterHash = (p: ParameterWithSource) =>
-		`${$force}:${p.name}:${p.form_type}`;
-
+const Form: FC<FormProps> = ({
+	parameters,
+	parameterValues,
+	setParameterValues,
+}) => {
 	return (
 		parameters
 			.sort((a, b) => a.order - b.order)
 			// Since the form is sourced from constantly changing terraform, we are not sure
 			// if the parameters are the "same" as the previous render.
-			.map((p) => <FormElement key={getParameterHash(p)} parameter={p} />)
+			.map((p) => {
+				return (
+					<FormElement
+						key={p.name}
+						parameter={p}
+						value={parameterValues[p.name]}
+						setParameterValues={setParameterValues}
+					/>
+				);
+			})
 	);
 };
 
-type FormElementProps = { parameter: ParameterWithSource };
-const FormElement: FC<FormElementProps> = ({ parameter }) => {
-	const $form = useStore((state) => state.form);
-	const $setForm = useStore((state) => state.setFormState);
-
-	const value = useMemo(() => {
-		const defaultValue =
-			parameter.default_value.value !== "??"
-				? parameter.default_value.value
-				: undefined;
-		return $form[parameter.name] ?? defaultValue;
-	}, [$form, parameter.name, parameter.default_value]);
+type FormElementProps = {
+	parameter: ParameterWithSource;
+	value: string | undefined;
+	setParameterValues: React.Dispatch<
+		React.SetStateAction<Record<string, string>>
+	>;
+};
+const FormElement: FC<FormElementProps> = React.memo(({
+	parameter,
+	value,
+	setParameterValues,
+}) => {
+	const defaultValue =
+		parameter.default_value.value !== "??"
+			? parameter.default_value.value
+			: undefined;
 
 	const onValueChange = (value: string) => {
-		$setForm(parameter.name, value);
+		setParameterValues((curr) => {
+			return { ...curr, [parameter.name]: value };
+		});
 	};
 
 	return (
 		<DynamicParameter
 			parameter={parameter}
-			value={value}
+			value={value ?? defaultValue}
 			autofill={false}
 			onChange={onValueChange}
 			disabled={parameter.styling.disabled}
 		/>
 	);
-};
+});
+FormElement.displayName = "FormElement";
 
 const UserSelect: FC = () => {
 	const $setWorkspaceOwner = useStore((state) => state.setWorkspaceOwner);
