@@ -15,7 +15,6 @@ const defaultErrorsState: ErrorsState = {
 };
 
 type State = {
-	_force: number;
 	editor: editor.IStandaloneCodeEditor | null;
 	owner: WorkspaceOwner;
 	errors: ErrorsState;
@@ -53,7 +52,6 @@ export const useStore = create<State>()((set) => ({
 		set((state) => ({
 			...state,
 			owner,
-			_force: state._force + 1,
 			form: {},
 		})),
 }));
