@@ -58,13 +58,13 @@ export const Preview: FC<PreviewProps> = ({
 	output,
 }) => {
 	const $errors = useStore((state) => state.errors);
-	const $parameters = useStore((state) => state.parameters);
 	const $resetForm = useStore((state) => state.resetForm);
-
 	const [params] = useSearchParams();
 	const isDebug = useMemo(() => params.has("debug"), [params]);
-
 	const [tab, setTab] = useState(() => "preview");
+
+	const parameters = output?.output?.parameters ?? [];
+	console.info(parameters);
 
 	const onDownloadOutput = () => {
 		const blob = new Blob([JSON.stringify(output, null, 2)], {
@@ -232,20 +232,20 @@ export const Preview: FC<PreviewProps> = ({
 								<UserSelect />
 							</div>
 						}
-						{$parameters.length === 0 ? (
+						{parameters.length === 0 ? (
 							<div className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4">
 								<PreviewEmptyState />
 							</div>
 						) : (
 							<div className="flex h-full w-full flex-col items-center justify-start gap-5 overflow-x-clip overflow-y-scroll rounded-xl border p-6">
-								<Form parameters={$parameters} />
+								<Form parameters={parameters} />
 							</div>
 						)}
 						<div className="flex w-full justify-between gap-3">
 							<Button variant="outline" onClick={$resetForm} className="w-fit">
 								Reset form
 							</Button>
-							<ViewOutput />
+							<ViewOutput parameters={parameters} />
 						</div>
 					</div>
 				</Tabs.Content>
@@ -688,12 +688,14 @@ const TableDrawer: FC<TableDrawerProps> = ({
 	);
 };
 
-const ViewOutput: FC = () => {
-	const $parameters = useStore((state) => state.parameters);
+type ViewOutputProps = {
+	parameters: ParameterWithSource[];
+};
+const ViewOutput: FC<ViewOutputProps> = ({ parameters }) => {
 	const [isOpen, setIsOpen] = useState(() => false);
 
 	const onView = async () => {
-		const invalidParameter = $parameters.find((p) => {
+		const invalidParameter = parameters.find((p) => {
 			try {
 				if (!p.value.valid) {
 					return true;
@@ -721,11 +723,11 @@ const ViewOutput: FC = () => {
 
 	const data = useMemo(
 		() =>
-			$parameters.reduce<Record<string, string>>((acc, p) => {
+			parameters.reduce<Record<string, string>>((acc, p) => {
 				acc[p.name] = p.value.value;
 				return acc;
 			}, {}),
-		[$parameters],
+		[parameters],
 	);
 
 	return (
@@ -737,7 +739,7 @@ const ViewOutput: FC = () => {
 		>
 			<Button
 				variant="default"
-				disabled={$parameters.length === 0}
+				disabled={parameters.length === 0}
 				onClick={onView}
 			>
 				<SearchCodeIcon />
