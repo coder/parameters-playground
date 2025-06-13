@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter, redirect } from "react-router";
 import { App, loader as appLoader } from "./App.tsx";
 import "@/client/index.css";
+import { EditorProvider } from "./contexts/editor.tsx";
 
 const router = createBrowserRouter([
 	{
@@ -27,11 +28,13 @@ if (!root) {
 } else {
 	createRoot(root).render(
 		<StrictMode>
-			<ThemeProvider>
-				<TooltipProvider>
-					<RouterProvider router={router} />
-				</TooltipProvider>
-			</ThemeProvider>
+			<EditorProvider>
+				<ThemeProvider>
+					<TooltipProvider>
+						<RouterProvider router={router} />
+					</TooltipProvider>
+				</ThemeProvider>
+			</EditorProvider>
 		</StrictMode>,
 	);
 }

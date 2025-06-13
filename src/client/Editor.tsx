@@ -31,6 +31,7 @@ import {
 	ZapIcon,
 } from "lucide-react";
 import { type FC, useEffect, useRef, useState } from "react";
+import { useEditor } from "@/client/contexts/editor";
 
 type EditorProps = {
 	code: string;
@@ -39,6 +40,7 @@ type EditorProps = {
 
 export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 	const { appliedTheme } = useTheme();
+	const editorRef = useEditor();
 
 	const [codeCopied, setCodeCopied] = useState(() => false);
 	const copyTimeoutId = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -159,7 +161,7 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 						<MonacoEditor
 							value={code}
 							onMount={(editor) => {
-								// $setEditor(editor);
+								editorRef.current = editor;
 							}}
 							onChange={(code) => {
 								if (code !== undefined) {
