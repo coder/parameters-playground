@@ -16,9 +16,9 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/spf13/afero"
 
+	"github.com/coder/parameters-playground/preview/apitypes"
 	"github.com/coder/preview"
 	"github.com/coder/preview/types"
-	"github.com/coder/parameters-playground/preview/apitypes"
 )
 
 func main() {
@@ -60,17 +60,12 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 		return err
 	}
 
-	owner, err := workspaceOwner(p[1])
-	if err != nil {
-		return err
-	}
-
 	handler := slog.NewJSONHandler(l, nil)
 	logger := slog.New(handler)
 
 	var parameters map[string]string
-	if len(p) >= 3 {
-		params, err := jsValueToStringMap(p[2])
+	if len(p) >= 2 {
+		params, err := jsValueToStringMap(p[1])
 		if err != nil {
 			logger.Error("Unable to convert second prameter into map[string]string", "err", err)
 		}
@@ -78,7 +73,16 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 		parameters = params
 	} else {
 		logger.Error(fmt.Sprintf("Expected 2 arguments but got %v", len(p)))
+	}
 
+	owner := apitypes.WorkspaceOwner{}
+	if len(p) >= 3 {
+		o, err := workspaceOwner(p[2])
+		if err != nil {
+			logger.Error("Unable to convert third parameter into WorkspaceOwner", "err", err)
+		}
+
+		owner = o
 	}
 
 	pOutput, diags := preview.Preview(context.Background(), preview.Input{

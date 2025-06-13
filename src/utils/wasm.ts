@@ -1,4 +1,6 @@
-import type { WorkspaceOwner } from "@/gen/types";
+import { checkerModule } from "@/client/snippets";
+import type { PreviewOutput, WorkspaceOwner } from "@/gen/types";
+import { baseMockUser } from "@/owner";
 
 export type WasmLoadState = "loaded" | "loading" | "error";
 
@@ -7,8 +9,8 @@ type GoPreviewDef = (
 	 * A virtual filetree
 	 */
 	files: Record<string, string>,
-	owner: WorkspaceOwner,
 	params: Record<string, string>,
+	owner: WorkspaceOwner,
 ) => Promise<string>;
 
 // Extend the Window object to include the Go related code that is added from
@@ -51,4 +53,51 @@ export const initWasm = async (): Promise<WasmLoadState> => {
 		console.error(e);
 		return "error";
 	}
+};
+
+export const getDynamicParametersOutput = async (
+	code: string,
+	parameterValues: Record<string, string>,
+	owner?: WorkspaceOwner,
+): Promise<PreviewOutput | null> => {
+	if (!window.go_preview) {
+		return null;
+	}
+
+	const rawOutput = await window.go_preview(
+		{
+			"main.tf": code,
+			// Hard coded module for demo
+			"checker/main.tf": checkerModule,
+		},
+		parameterValues,
+		owner ?? baseMockUser,
+	);
+
+	if (rawOutput === undefined) {
+		console.error("Something went wrong");
+		return null;
+	}
+
+	const output = JSON.parse(rawOutput) as PreviewOutput;
+
+	return output;
+	// if (e instanceof Error) {
+	// 	const diagnostic: InternalDiagnostic = {
+	// 		severity: "error",
+	// 		summary: e.name,
+	// 		detail: e.message,
+	// 		kind: "internal",
+	// 	};
+	// 	$setError([diagnostic]);
+	// } else {
+	// 	const diagnostic: InternalDiagnostic = {
+	// 		severity: "error",
+	// 		summary: "Error",
+	// 		detail: "Something went wrong",
+	// 		kind: "internal",
+	// 	};
+
+	// 	$setError([diagnostic]);
+	// }
 };

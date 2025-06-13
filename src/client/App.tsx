@@ -5,7 +5,6 @@ import {
 	ResizableHandle,
 	ResizablePanelGroup,
 } from "@/client/components/Resizable";
-import { useStore } from "@/client/store";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,14 +12,7 @@ import {
 	DropdownMenuPortal,
 	DropdownMenuTrigger,
 } from "@/client/components/DropdownMenu";
-import {
-	type FC,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "@/client/contexts/theme";
 import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
 import { Button } from "@/client/components/Button";
@@ -31,7 +23,14 @@ import {
 } from "@/client/components/Tooltip";
 import { rpc } from "@/utils/rpc";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
-import { initWasm, type WasmLoadState } from "@/utils/wasm";
+import {
+	getDynamicParametersOutput,
+	initWasm,
+	type WasmLoadState,
+} from "@/utils/wasm";
+import { defaultCode } from "@/client/snippets";
+import type { PreviewOutput } from "@/gen/types";
+import { useDebouncedValue } from "./hooks/debounce";
 
 /**
  * Load the shared code if present.
@@ -61,16 +60,35 @@ export const App = () => {
 		}
 		return "loading";
 	});
-	const $setCode = useStore((store) => store.setCode);
-	const code = useLoaderData<typeof loader>();
+	const loadedCode = useLoaderData<typeof loader>();
+	const [code, setCode] = useState(loadedCode ?? defaultCode);
+	const [debouncedCode, isDebouncing] = useDebouncedValue(code, 1000);
+	const [parameterValues, setParameterValues] = useState<
+		Record<string, string>
+	>({});
+	const [output, setOutput] = useState<PreviewOutput | null>(null);
 
-	useEffect(() => {
-		if (!code) {
-			return;
-		}
+	const onDownloadOutput = () => {
+		const blob = new Blob([JSON.stringify(output, null, 2)], {
+			type: "application/json",
+		});
 
-		$setCode(code);
-	}, [code, $setCode]);
+		const url = URL.createObjectURL(blob);
+
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = "output.json";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		// Give the click event enough time to fire and then revoke the URL.
+		// This method of doing it doesn't seem great but I'm not sure if there is a
+		// better way.
+		setTimeout(() => {
+			URL.revokeObjectURL(url);
+		}, 100);
+	};
 
 	useEffect(() => {
 		if (!window.go_preview) {
@@ -84,6 +102,19 @@ export const App = () => {
 		}
 	}, []);
 
+	useEffect(() => {
+		getDynamicParametersOutput(debouncedCode, parameterValues)
+			.catch((e) => {
+				console.error(e);
+				setWasmLoadingState("error");
+
+				return null;
+			})
+			.then((output) => {
+				setOutput(output);
+			});
+	}, [debouncedCode, parameterValues]);
+
 	return (
 		<main className="flex h-dvh w-screen flex-col items-center bg-surface-primary">
 			{/* NAV BAR */}
@@ -96,7 +127,7 @@ export const App = () => {
 						</p>
 					</div>
 
-					<ShareButton />
+					<ShareButton code={code} />
 				</div>
 
 				<div className="flex items-center gap-3">
@@ -130,12 +161,17 @@ export const App = () => {
 
 			<ResizablePanelGroup direction={"horizontal"}>
 				{/* EDITOR */}
-				<Editor />
+				<Editor code={code} setCode={setCode} />
 
 				<ResizableHandle className="bg-surface-quaternary" />
 
 				{/* PREVIEW */}
-				<Preview wasmLoadState={wasmLoadState} />
+				<Preview
+					wasmLoadState={wasmLoadState}
+					isDebouncing={isDebouncing}
+					onDownloadOutput={onDownloadOutput}
+					output={output}
+				/>
 			</ResizablePanelGroup>
 		</main>
 	);
@@ -180,15 +216,17 @@ const ThemeSelector: FC = () => {
 	);
 };
 
-const ShareButton: FC = () => {
-	const $code = useStore((state) => state.code);
+type ShareButtonProps = {
+	code: string;
+};
+const ShareButton: FC<ShareButtonProps> = ({ code }) => {
 	const [isCopied, setIsCopied] = useState(() => false);
 	const timeoutId = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-	const onShare = useCallback(async () => {
+	const onShare = async () => {
 		try {
 			const { id } = await rpc.parameters
-				.$post({ json: { code: $code } })
+				.$post({ json: { code } })
 				.then((res) => res.json());
 
 			const { protocol, host } = window.location;
@@ -200,7 +238,7 @@ const ShareButton: FC = () => {
 		} catch (e) {
 			console.error(e);
 		}
-	}, [$code]);
+	};
 
 	useEffect(() => {
 		if (!isCopied) {

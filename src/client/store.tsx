@@ -18,13 +18,11 @@ const defaultErrorsState: ErrorsState = {
 
 type State = {
 	_force: number;
-	code: string;
 	editor: editor.IStandaloneCodeEditor | null;
 	parameters: ParameterWithSource[];
 	form: FormState;
 	owner: WorkspaceOwner;
 	errors: ErrorsState;
-	setCode: (code: string) => void;
 	setError: (diagnostics: Diagnostic[]) => void;
 	toggleShowError: (open?: boolean) => void;
 	setParameters: (parameters: ParameterWithSource[]) => void;
@@ -43,7 +41,6 @@ export const useStore = create<State>()((set) => ({
 	owner: mockUsers.admin,
 	form: {},
 	errors: defaultErrorsState,
-	setCode: (code) => set((_) => ({ code })),
 	setError: (data) =>
 		set((state) => {
 			const errors = state.errors ?? defaultErrorsState;

@@ -8,14 +8,16 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@/client/components/Resizable";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/client/components/Select";
 import * as Tabs from "@/client/components/Tabs";
 import { useTheme } from "@/client/contexts/theme";
-import {
-	type Diagnostic,
-	type InternalDiagnostic,
-	outputToDiagnostics,
-} from "@/client/diagnostics";
-import { useDebouncedValue } from "@/client/hooks/debounce";
+import type { Diagnostic } from "@/client/diagnostics";
 import { useStore } from "@/client/store";
 import type {
 	ParameterWithSource,
@@ -23,7 +25,9 @@ import type {
 	PreviewOutput,
 	WorkspaceOwner,
 } from "@/gen/types";
+import { mockUsers } from "@/owner";
 import { cn } from "@/utils/cn";
+import type { WasmLoadState } from "@/utils/wasm";
 import ReactJsonView from "@microlink/react-json-view";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
@@ -38,49 +42,31 @@ import {
 	XIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import {
-	type FC,
-	type PropsWithChildren,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from "react";
+import { type FC, type PropsWithChildren, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/client/components/Select";
-import { mockUsers } from "@/owner";
-import { checkerModule } from "./snippets";
-import type { WasmLoadState } from "@/utils/wasm";
 
 type PreviewProps = {
 	wasmLoadState: WasmLoadState;
-}
+	isDebouncing: boolean;
+	onDownloadOutput: () => void;
+	output: PreviewOutput | null;
+};
 
-export const Preview: FC<PreviewProps> = ({ wasmLoadState }) => {
-	const $code = useStore((state) => state.code);
+export const Preview: FC<PreviewProps> = ({
+	wasmLoadState,
+	isDebouncing,
+	output,
+}) => {
 	const $errors = useStore((state) => state.errors);
-	const $setError = useStore((state) => state.setError);
 	const $parameters = useStore((state) => state.parameters);
-	const $setParameters = useStore((state) => state.setParameters);
-	const $form = useStore((state) => state.form);
-	const $owner = useStore((state) => state.owner);
 	const $resetForm = useStore((state) => state.resetForm);
-
-	const [debouncedCode, isDebouncing] = useDebouncedValue($code, 1000);
-	const [output, setOutput] = useState<PreviewOutput | null>(() => null);
 
 	const [params] = useSearchParams();
 	const isDebug = useMemo(() => params.has("debug"), [params]);
 
 	const [tab, setTab] = useState(() => "preview");
 
-	const onDownloadOutput = useCallback(() => {
+	const onDownloadOutput = () => {
 		const blob = new Blob([JSON.stringify(output, null, 2)], {
 			type: "application/json",
 		});
@@ -100,62 +86,62 @@ export const Preview: FC<PreviewProps> = ({ wasmLoadState }) => {
 		setTimeout(() => {
 			URL.revokeObjectURL(url);
 		}, 100);
-	}, [output]);
+	};
 
-	useEffect(() => {
-		if (wasmLoadState === "loading" || !window.go_preview) {
-			return;
-		}
+	// useEffect(() => {
+	// 	if (wasmLoadState === "loading" || !window.go_preview) {
+	// 		return;
+	// 	}
 
-		const getOutput = async () => {
-			try {
-				const rawOutput = await window.go_preview?.(
-					{
-						"main.tf": debouncedCode,
-						"checker/main.tf": checkerModule,
-					},
-					$owner,
-					$form,
-				);
+	// 	// const getOutput = async () => {
+	// 	// 	try {
+	// 	// 		const rawOutput = await window.go_preview?.(
+	// 	// 			{
+	// 	// 				"main.tf": code,
+	// 	// 				"checker/main.tf": checkerModule,
+	// 	// 			},
+	// 	// 			$owner,
+	// 	// 			$form,
+	// 	// 		);
 
-				if (rawOutput === undefined) {
-					console.error("Something went wrong");
-				} else {
-					const output = JSON.parse(rawOutput) as PreviewOutput;
-					setOutput(() => output);
+	// 	// 		if (rawOutput === undefined) {
+	// 	// 			console.error("Something went wrong");
+	// 	// 		} else {
+	// 	// 			const output = JSON.parse(rawOutput) as PreviewOutput;
+	// 	// 			setOutput(() => output);
 
-					const errors = outputToDiagnostics(output);
-					$setError(errors);
+	// 	// 			const errors = outputToDiagnostics(output);
+	// 	// 			$setError(errors);
 
-					if (output.diags.length === 0) {
-						$setParameters(output.output?.parameters ?? []);
-					}
-				}
-			} catch (e) {
-				console.error(e);
-				if (e instanceof Error) {
-					const diagnostic: InternalDiagnostic = {
-						severity: "error",
-						summary: e.name,
-						detail: e.message,
-						kind: "internal",
-					};
-					$setError([diagnostic]);
-				} else {
-					const diagnostic: InternalDiagnostic = {
-						severity: "error",
-						summary: "Error",
-						detail: "Something went wrong",
-						kind: "internal",
-					};
+	// 	// 			if (output.diags.length === 0) {
+	// 	// 				$setParameters(output.output?.parameters ?? []);
+	// 	// 			}
+	// 	// 		}
+	// 	// 	} catch (e) {
+	// 	// 		console.error(e);
+	// 	// 		if (e instanceof Error) {
+	// 	// 			const diagnostic: InternalDiagnostic = {
+	// 	// 				severity: "error",
+	// 	// 				summary: e.name,
+	// 	// 				detail: e.message,
+	// 	// 				kind: "internal",
+	// 	// 			};
+	// 	// 			$setError([diagnostic]);
+	// 	// 		} else {
+	// 	// 			const diagnostic: InternalDiagnostic = {
+	// 	// 				severity: "error",
+	// 	// 				summary: "Error",
+	// 	// 				detail: "Something went wrong",
+	// 	// 				kind: "internal",
+	// 	// 			};
 
-					$setError([diagnostic]);
-				}
-			}
-		};
+	// 	// 			$setError([diagnostic]);
+	// 	// 		}
+	// 	// 	}
+	// 	// };
 
-		getOutput();
-	}, [debouncedCode, $setError, wasmLoadState, $setParameters, $form, $owner]);
+	// 	// getOutput();
+	// }, [code, $setError, wasmLoadState, $setParameters, $form, $owner]);
 
 	return (
 		<Tabs.Root
@@ -556,7 +542,7 @@ const FormElement: FC<FormElementProps> = ({ parameter }) => {
 
 	const value = useMemo(() => {
 		const defaultValue =
-			parameter.default_value.value !== "??" 
+			parameter.default_value.value !== "??"
 				? parameter.default_value.value
 				: undefined;
 		return $form[parameter.name] ?? defaultValue;
