@@ -733,6 +733,7 @@ const TableDrawer: FC<TableDrawerProps> = ({
 
 type ViewOutputProps = {
 	parameters: ParameterWithSource[];
+	// parameterValues: Record<string, string>;
 };
 const ViewOutput: FC<ViewOutputProps> = ({ parameters }) => {
 	const [isOpen, setIsOpen] = useState(() => false);

@@ -91,7 +91,7 @@ export const switchInput = `data "coder_parameter" "switch" {
   description  = "The next parameter can be on or off"
   type         = "bool"
   form_type    = "switch"
-  defalt       = true
+  default      = true
   order        = 1
 }`
 

@@ -145,7 +145,11 @@ export const App = () => {
 					return isEqual(currentParameterOmitValue, existingParameterOmitValue);
 				});
 
-				return existing ?? p;
+				if (existing) {
+					existing.value = p.value;
+					return existing;
+				}
+				return p;
 			});
 		});
 	}, [output]);
