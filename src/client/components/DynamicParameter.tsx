@@ -380,8 +380,8 @@ const ParameterField: FC<ParameterFieldProps> = ({
 		case "dropdown":
 			return (
 				<Select
-					onValueChange={onChange}
-					value={value}
+					onValueChange={(v) => onChange(v.substring(5))}
+					value={`data-${value}`}
 					disabled={disabled}
 					required={parameter.required}
 				>
@@ -392,7 +392,10 @@ const ParameterField: FC<ParameterFieldProps> = ({
 					</SelectTrigger>
 					<SelectContent>
 						{parameter.options.map((option) => (
-							<SelectItem key={option.value.value} value={option.value.value}>
+							<SelectItem
+								key={option.value.value}
+								value={`data-${option.value.value}`}
+							>
 								<OptionDisplay option={option} />
 							</SelectItem>
 						))}
@@ -487,9 +490,11 @@ const ParameterField: FC<ParameterFieldProps> = ({
 		case "radio":
 			return (
 				<RadioGroup
-					onValueChange={onChange}
+					onValueChange={(v) => {
+						onChange(v.substring(5));
+					}}
 					disabled={disabled}
-					value={value}
+					value={`data-${value}`}
 					className="relative"
 				>
 					{parameter.options.map((option) => (
@@ -499,7 +504,7 @@ const ParameterField: FC<ParameterFieldProps> = ({
 						>
 							<RadioGroupItem
 								id={`${id}-${option.value.value}`}
-								value={option.value.value}
+								value={`data-${option.value.value}`}
 							/>
 							<Label
 								htmlFor={`${id}-${option.value.value}`}
