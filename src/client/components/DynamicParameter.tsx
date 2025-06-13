@@ -392,7 +392,7 @@ const ParameterField: FC<ParameterFieldProps> = ({
 					</SelectTrigger>
 					<SelectContent>
 						{parameter.options.map((option) => (
-							<SelectItem key={option.value.value} value={option.value.value}>
+							<SelectItem key={option.value.value} value={option.value.value || "??"}>
 								<OptionDisplay option={option} />
 							</SelectItem>
 						))}
@@ -499,7 +499,7 @@ const ParameterField: FC<ParameterFieldProps> = ({
 						>
 							<RadioGroupItem
 								id={`${id}-${option.value.value}`}
-								value={option.value.value}
+								value={option.value.value || "??"}
 							/>
 							<Label
 								htmlFor={`${id}-${option.value.value}`}
