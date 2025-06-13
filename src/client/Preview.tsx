@@ -56,6 +56,7 @@ type PreviewProps = {
 		React.SetStateAction<Record<string, string>>
 	>;
 	parameters: ParameterWithSource[];
+	onReset: () => void;
 };
 
 export const Preview: FC<PreviewProps> = ({
@@ -65,6 +66,7 @@ export const Preview: FC<PreviewProps> = ({
 	parameterValues,
 	setParameterValues,
 	parameters,
+	onReset,
 }) => {
 	const $errors = useStore((state) => state.errors);
 	const [params] = useSearchParams();
@@ -253,7 +255,7 @@ export const Preview: FC<PreviewProps> = ({
 						<div className="flex w-full justify-between gap-3">
 							<Button
 								variant="outline"
-								onClick={() => setParameterValues({})}
+								onClick={onReset}
 								className="w-fit"
 							>
 								Reset form
@@ -552,7 +554,7 @@ const Form: FC<FormProps> = ({
 			.map((p) => {
 				return (
 					<FormElement
-						key={p.name}
+						key={p.uuid}
 						parameter={p}
 						value={parameterValues[p.name]}
 						setParameterValues={setParameterValues}

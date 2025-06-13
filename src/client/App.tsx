@@ -92,6 +92,16 @@ export const App = () => {
 		}, 100);
 	};
 
+	const onReset = () => {
+		setParameterValues({});
+		setParameters((curr) =>
+			curr.map((p) => {
+				p.uuid = window.crypto.randomUUID();
+				return p;
+			}),
+		);
+	};
+
 	useEffect(() => {
 		if (!window.go_preview) {
 			initWasm().then((loadState) => {
@@ -109,9 +119,22 @@ export const App = () => {
 			const newParameters = output?.output?.parameters ?? [];
 
 			return newParameters.map((p) => {
+				// Check if the parameter is already in the array and if it is then keep it.
+				// This allows us to optimize React by not re-rendering parameters that haven't changed.
+				//
+				// We unset value because the value may not be in sync with what we have locally,
+				// and we unset uuid because it's given a new random UUID every time.
 				const existing = curr.find((currP) => {
-					const currentParameterOmitValue = { ...currP, value: undefined };
-					const existingParameterOmitValue = { ...p, value: undefined };
+					const currentParameterOmitValue = {
+						...currP,
+						value: undefined,
+						uuid: undefined,
+					};
+					const existingParameterOmitValue = {
+						...p,
+						value: undefined,
+						uuid: undefined,
+					};
 
 					return isEqual(currentParameterOmitValue, existingParameterOmitValue);
 				});
@@ -193,6 +216,7 @@ export const App = () => {
 					parameterValues={parameterValues}
 					setParameterValues={setParameterValues}
 					parameters={parameters}
+					onReset={onReset}
 				/>
 			</ResizablePanelGroup>
 		</main>
