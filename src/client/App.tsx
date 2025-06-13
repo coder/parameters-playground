@@ -145,6 +145,10 @@ export const App = () => {
 	}, [output]);
 
 	useEffect(() => {
+		if (wasmLoadState !== "loaded") {
+			return;
+		}
+
 		getDynamicParametersOutput(debouncedCode, parameterValues)
 			.catch((e) => {
 				console.error(e);
@@ -155,7 +159,7 @@ export const App = () => {
 			.then((output) => {
 				setOutput(output);
 			});
-	}, [debouncedCode, parameterValues]);
+	}, [debouncedCode, parameterValues, wasmLoadState]);
 
 	return (
 		<main className="flex h-dvh w-screen flex-col items-center bg-surface-primary">
