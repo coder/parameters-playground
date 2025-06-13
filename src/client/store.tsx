@@ -1,5 +1,4 @@
 import type { Diagnostic } from "@/client/diagnostics";
-import type { WorkspaceOwner } from "@/gen/types";
 import type { editor } from "monaco-editor";
 import { create } from "zustand";
 import { defaultCode } from "./snippets";
@@ -16,16 +15,13 @@ const defaultErrorsState: ErrorsState = {
 
 type State = {
 	editor: editor.IStandaloneCodeEditor | null;
-	owner: WorkspaceOwner;
 	errors: ErrorsState;
 	setError: (diagnostics: Diagnostic[]) => void;
 	toggleShowError: (open?: boolean) => void;
 	setEditor: (editor: editor.IStandaloneCodeEditor) => void;
-	setWorkspaceOwner: (owner: WorkspaceOwner) => void;
 };
 
 export const useStore = create<State>()((set) => ({
-	_force: 0,
 	code: window.CODE ?? defaultCode,
 	editor: null,
 	owner: mockUsers.admin,
@@ -48,10 +44,4 @@ export const useStore = create<State>()((set) => ({
 			};
 		}),
 	setEditor: (editor) => set(() => ({ editor })),
-	setWorkspaceOwner: (owner) =>
-		set((state) => ({
-			...state,
-			owner,
-			form: {},
-		})),
 }));

@@ -57,6 +57,7 @@ type PreviewProps = {
 	>;
 	parameters: ParameterWithSource[];
 	onReset: () => void;
+	setOwner: (owner: WorkspaceOwner) => void;
 };
 
 export const Preview: FC<PreviewProps> = ({
@@ -67,6 +68,7 @@ export const Preview: FC<PreviewProps> = ({
 	setParameterValues,
 	parameters,
 	onReset,
+	setOwner,
 }) => {
 	const $errors = useStore((state) => state.errors);
 	const [params] = useSearchParams();
@@ -236,7 +238,7 @@ export const Preview: FC<PreviewProps> = ({
 										) : null}
 									</AnimatePresence>
 								</div>
-								<UserSelect />
+								<UserSelect setOwner={setOwner} />
 							</div>
 						}
 						{parameters.length === 0 ? (
@@ -253,11 +255,7 @@ export const Preview: FC<PreviewProps> = ({
 							</div>
 						)}
 						<div className="flex w-full justify-between gap-3">
-							<Button
-								variant="outline"
-								onClick={onReset}
-								className="w-fit"
-							>
+							<Button variant="outline" onClick={onReset} className="w-fit">
 								Reset form
 							</Button>
 							<ViewOutput parameters={parameters} />
@@ -571,43 +569,42 @@ type FormElementProps = {
 		React.SetStateAction<Record<string, string>>
 	>;
 };
-const FormElement: FC<FormElementProps> = React.memo(({
-	parameter,
-	value,
-	setParameterValues,
-}) => {
-	const defaultValue =
-		parameter.default_value.value !== "??"
-			? parameter.default_value.value
-			: undefined;
+const FormElement: FC<FormElementProps> = React.memo(
+	({ parameter, value, setParameterValues }) => {
+		const defaultValue =
+			parameter.default_value.value !== "??"
+				? parameter.default_value.value
+				: undefined;
 
-	const onValueChange = (value: string) => {
-		setParameterValues((curr) => {
-			return { ...curr, [parameter.name]: value };
-		});
-	};
+		const onValueChange = (value: string) => {
+			setParameterValues((curr) => {
+				return { ...curr, [parameter.name]: value };
+			});
+		};
 
-	return (
-		<DynamicParameter
-			parameter={parameter}
-			value={value ?? defaultValue}
-			autofill={false}
-			onChange={onValueChange}
-			disabled={parameter.styling.disabled}
-		/>
-	);
-});
+		return (
+			<DynamicParameter
+				parameter={parameter}
+				value={value ?? defaultValue}
+				autofill={false}
+				onChange={onValueChange}
+				disabled={parameter.styling.disabled}
+			/>
+		);
+	},
+);
 FormElement.displayName = "FormElement";
 
-const UserSelect: FC = () => {
-	const $setWorkspaceOwner = useStore((state) => state.setWorkspaceOwner);
-
+type UserSelectProps = {
+	setOwner: (owner: WorkspaceOwner) => void;
+};
+const UserSelect: FC<UserSelectProps> = ({ setOwner }) => {
 	return (
 		<Select
 			defaultValue="admin"
 			onValueChange={(value) => {
 				const users: Record<string, WorkspaceOwner | undefined> = mockUsers;
-				$setWorkspaceOwner(users[value] ?? mockUsers.admin);
+				setOwner(users[value] ?? mockUsers.admin);
 			}}
 		>
 			<SelectTrigger className="w-fit min-w-40">

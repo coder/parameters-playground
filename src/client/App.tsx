@@ -1,10 +1,6 @@
 import { Editor } from "@/client/Editor";
 import { Preview } from "@/client/Preview";
-import { Logo } from "@/client/components/Logo";
-import {
-	ResizableHandle,
-	ResizablePanelGroup,
-} from "@/client/components/Resizable";
+import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -12,26 +8,35 @@ import {
 	DropdownMenuPortal,
 	DropdownMenuTrigger,
 } from "@/client/components/DropdownMenu";
-import { type FC, useEffect, useMemo, useRef, useState } from "react";
-import { useTheme } from "@/client/contexts/theme";
-import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
-import { Button } from "@/client/components/Button";
+import { Logo } from "@/client/components/Logo";
+import {
+	ResizableHandle,
+	ResizablePanelGroup,
+} from "@/client/components/Resizable";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
+import { useTheme } from "@/client/contexts/theme";
+import { defaultCode } from "@/client/snippets";
+import type {
+	ParameterWithSource,
+	PreviewOutput,
+	WorkspaceOwner,
+} from "@/gen/types";
 import { rpc } from "@/utils/rpc";
-import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import {
+	type WasmLoadState,
 	getDynamicParametersOutput,
 	initWasm,
-	type WasmLoadState,
 } from "@/utils/wasm";
-import { defaultCode } from "@/client/snippets";
-import type { ParameterWithSource, PreviewOutput } from "@/gen/types";
-import { useDebouncedValue } from "./hooks/debounce";
 import isEqual from "lodash/isEqual";
+import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
+import { type FC, useEffect, useMemo, useRef, useState } from "react";
+import { type LoaderFunctionArgs, useLoaderData } from "react-router";
+import { useDebouncedValue } from "./hooks/debounce";
+import { mockUsers } from "@/owner";
 
 /**
  * Load the shared code if present.
@@ -69,6 +74,7 @@ export const App = () => {
 	>({});
 	const [output, setOutput] = useState<PreviewOutput | null>(null);
 	const [parameters, setParameters] = useState<ParameterWithSource[]>([]);
+	const [owner, setOwner] = useState<WorkspaceOwner>(mockUsers.admin);
 
 	const onDownloadOutput = () => {
 		const blob = new Blob([JSON.stringify(output, null, 2)], {
@@ -149,7 +155,7 @@ export const App = () => {
 			return;
 		}
 
-		getDynamicParametersOutput(debouncedCode, parameterValues)
+		getDynamicParametersOutput(debouncedCode, parameterValues, owner)
 			.catch((e) => {
 				console.error(e);
 				setWasmLoadingState("error");
@@ -159,7 +165,7 @@ export const App = () => {
 			.then((output) => {
 				setOutput(output);
 			});
-	}, [debouncedCode, parameterValues, wasmLoadState]);
+	}, [debouncedCode, parameterValues, wasmLoadState, owner]);
 
 	return (
 		<main className="flex h-dvh w-screen flex-col items-center bg-surface-primary">
@@ -221,6 +227,10 @@ export const App = () => {
 					setParameterValues={setParameterValues}
 					parameters={parameters}
 					onReset={onReset}
+					setOwner={(owner) => {
+						onReset();
+						setOwner(owner);
+					}}
 				/>
 			</ResizablePanelGroup>
 		</main>
