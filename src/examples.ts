@@ -17,7 +17,7 @@ export const examples: Example[] = [
 	},
 	{
 		title: "Example 3",
-		slug: "example-4",
+		slug: "example-3",
 		code: "// Example 3",
 	},
 ];
