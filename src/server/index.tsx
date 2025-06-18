@@ -1,3 +1,4 @@
+import { examples } from "@/examples";
 import { api } from "@/server/api";
 import { Hono } from "hono";
 import { renderToString } from "react-dom/server";
@@ -17,6 +18,15 @@ app.route("/api", api);
 
 // Serves the main web application. This must come after the API route.
 app.get("*", (c) => {
+	const getExampleCode = () => {
+		const { example } = c.req.query();
+		if (!example) {
+			return;
+		}
+
+		return examples.find((e) => e.slug === example)?.code;
+	};
+
 	// Along with the vite React plugin this enables HMR within react while
 	// running the dev server.
 	const { url } = c.req;
@@ -45,6 +55,9 @@ app.get("*", (c) => {
 		: "/wasm_exec.js";
 	const iconPath = import.meta.env.PROD ? "/assets/logo.svg" : "/logo.svg";
 
+	const exampleCode = getExampleCode();
+	const loadExampleCodeScript = `window.EXAMPLE_CODE = "${exampleCode}"`;
+
 	return c.html(
 		[
 			"<!doctype html>",
@@ -64,6 +77,9 @@ app.get("*", (c) => {
 					</head>
 					<body>
 						<div id="root"></div>
+						{exampleCode ? (
+							<script type="module">{loadExampleCodeScript}</script>
+						) : null}
 						<script type="module" src={clientScriptPath}></script>
 					</body>
 				</html>,
