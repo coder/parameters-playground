@@ -20,11 +20,13 @@ import {
 } from "@/client/components/Tooltip";
 import { useTheme } from "@/client/contexts/theme";
 import { defaultCode } from "@/client/snippets";
+import { examples } from "@/examples";
 import type {
 	ParameterWithSource,
 	PreviewOutput,
 	WorkspaceOwner,
 } from "@/gen/types";
+import { mockUsers } from "@/owner";
 import { rpc } from "@/utils/rpc";
 import {
 	type WasmLoadState,
@@ -36,7 +38,6 @@ import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { type LoaderFunctionArgs, useLoaderData } from "react-router";
 import { useDebouncedValue } from "./hooks/debounce";
-import { mockUsers } from "@/owner";
 
 /**
  * Load the shared code if present.
@@ -67,7 +68,9 @@ export const App = () => {
 		return "loading";
 	});
 	const loadedCode = useLoaderData<typeof loader>();
-	const [code, setCode] = useState(loadedCode ?? defaultCode);
+	const [code, setCode] = useState(
+		loadedCode ?? window.EXAMPLE_CODE ?? defaultCode,
+	);
 	const [debouncedCode, isDebouncing] = useDebouncedValue(code, 1000);
 	const [parameterValues, setParameterValues] = useState<
 		Record<string, string>
@@ -203,14 +206,7 @@ export const App = () => {
 					>
 						Docs
 					</a>
-					<a
-						href="https://coder.com"
-						target="_blank"
-						rel="noreferrer"
-						className="font-light text-content-secondary text-sm hover:text-content-primary"
-					>
-						Support
-					</a>
+					<ExampleSelector />
 					<ThemeSelector />
 				</div>
 			</nav>
@@ -328,5 +324,33 @@ const ShareButton: FC<ShareButtonProps> = ({ code }) => {
 			</TooltipTrigger>
 			<TooltipContent>Copied to clipboard</TooltipContent>
 		</Tooltip>
+	);
+};
+
+const ExampleSelector: FC = () => {
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger className="font-light text-content-secondary text-sm hover:text-content-primary">
+				Examples
+			</DropdownMenuTrigger>
+
+			<DropdownMenuPortal>
+				<DropdownMenuContent>
+					{examples.map(({ title, slug }) => {
+						const params = new URLSearchParams();
+						params.append("example", slug);
+
+						const href = `${window.location.origin}/parameters?${params.toString()}`;
+						return (
+							<DropdownMenuItem key={slug} asChild={true}>
+								<a href={href} target="_blank" rel="noreferrer">
+									{title}
+								</a>
+							</DropdownMenuItem>
+						);
+					})}
+				</DropdownMenuContent>
+			</DropdownMenuPortal>
+		</DropdownMenu>
 	);
 };
