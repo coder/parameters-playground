@@ -1,3 +1,5 @@
+import repoExample from "@/examples/repo";
+
 type Example = {
 	title: string;
 	slug: string;
@@ -19,5 +21,10 @@ export const examples: Example[] = [
 		title: "Example 3",
 		slug: "example-3",
 		code: "// Example 3",
+	},
+	{
+		title: "Attach GPU",
+		slug: "attach-gpu",
+		code: repoExample,
 	},
 ];

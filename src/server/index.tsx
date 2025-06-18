@@ -56,7 +56,7 @@ app.get("*", (c) => {
 	const iconPath = import.meta.env.PROD ? "/assets/logo.svg" : "/logo.svg";
 
 	const exampleCode = getExampleCode();
-	const loadExampleCodeScript = `window.EXAMPLE_CODE = "${exampleCode}"`;
+	const loadExampleCodeScript = `window.EXAMPLE_CODE = \`${exampleCode}\``;
 
 	return c.html(
 		[
