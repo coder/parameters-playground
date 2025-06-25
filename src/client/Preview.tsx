@@ -98,61 +98,6 @@ export const Preview: FC<PreviewProps> = ({
 		}, 100);
 	};
 
-	// useEffect(() => {
-	// 	if (wasmLoadState === "loading" || !window.go_preview) {
-	// 		return;
-	// 	}
-
-	// 	// const getOutput = async () => {
-	// 	// 	try {
-	// 	// 		const rawOutput = await window.go_preview?.(
-	// 	// 			{
-	// 	// 				"main.tf": code,
-	// 	// 				"checker/main.tf": checkerModule,
-	// 	// 			},
-	// 	// 			$owner,
-	// 	// 			$form,
-	// 	// 		);
-
-	// 	// 		if (rawOutput === undefined) {
-	// 	// 			console.error("Something went wrong");
-	// 	// 		} else {
-	// 	// 			const output = JSON.parse(rawOutput) as PreviewOutput;
-	// 	// 			setOutput(() => output);
-
-	// 	// 			const errors = outputToDiagnostics(output);
-	// 	// 			$setError(errors);
-
-	// 	// 			if (output.diags.length === 0) {
-	// 	// 				$setParameters(output.output?.parameters ?? []);
-	// 	// 			}
-	// 	// 		}
-	// 	// 	} catch (e) {
-	// 	// 		console.error(e);
-	// 	// 		if (e instanceof Error) {
-	// 	// 			const diagnostic: InternalDiagnostic = {
-	// 	// 				severity: "error",
-	// 	// 				summary: e.name,
-	// 	// 				detail: e.message,
-	// 	// 				kind: "internal",
-	// 	// 			};
-	// 	// 			$setError([diagnostic]);
-	// 	// 		} else {
-	// 	// 			const diagnostic: InternalDiagnostic = {
-	// 	// 				severity: "error",
-	// 	// 				summary: "Error",
-	// 	// 				detail: "Something went wrong",
-	// 	// 				kind: "internal",
-	// 	// 			};
-
-	// 	// 			$setError([diagnostic]);
-	// 	// 		}
-	// 	// 	}
-	// 	// };
-
-	// 	// getOutput();
-	// }, [code, $setError, wasmLoadState, $setParameters, $form, $owner]);
-
 	return (
 		<Tabs.Root
 			defaultValue="preview"
