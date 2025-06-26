@@ -31,8 +31,6 @@
     <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/images/hero-image-dark.png">
     <img alt="Fallback image description" src="./.github/assets/images/hero-image-light.png">
   </picture>
-
-  <img src="./.github/assets/images/hero-image.png" alt="Coder Hero Image">
 </p>
 
 ## Support
