@@ -9,8 +9,8 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: `"Inter", system-ui, sans-serif`,
-				mono: `"DM Mono", monospace`,
+				sans: `"Geist", system-ui, sans-serif`,
+				mono: `"Geist Mono", monospace`,
 			},
 			size: {
 				"icon-lg": "1.5rem",
