@@ -36,29 +36,7 @@ import {
 import isEqual from "lodash/isEqual";
 import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
-import { type LoaderFunctionArgs, useLoaderData } from "react-router";
 import { useDebouncedValue } from "./hooks/debounce";
-
-/**
- * Load the shared code if present.
- */
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-	const { id } = params;
-	if (!id) {
-		return;
-	}
-
-	try {
-		const res = await rpc.parameters[":id"].$get({ param: { id } });
-		if (res.ok) {
-			const { code } = await res.json();
-			return code;
-		}
-	} catch (e) {
-		console.error(`Error loading playground: ${e}`);
-		return;
-	}
-};
 
 export const App = () => {
 	const [wasmLoadState, setWasmLoadingState] = useState<WasmLoadState>(() => {
@@ -67,9 +45,8 @@ export const App = () => {
 		}
 		return "loading";
 	});
-	const loadedCode = useLoaderData<typeof loader>();
 	const [code, setCode] = useState(
-		loadedCode ?? window.EXAMPLE_CODE ?? defaultCode,
+		window.CODE ?? defaultCode,
 	);
 	const [debouncedCode, isDebouncing] = useDebouncedValue(code, 1000);
 	const [parameterValues, setParameterValues] = useState<

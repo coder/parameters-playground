@@ -1,7 +1,9 @@
 import { examples } from "@/examples/code";
-import { api } from "@/server/api";
+import { api } from "@/server/routes/api";
 import { Hono } from "hono";
 import { renderToString } from "react-dom/server";
+import { getShareData } from "./blob";
+import { trimTrailingSlash } from "hono/trailing-slash";
 
 // This must be exported for the dev server to work
 export const app = new Hono();
@@ -16,12 +18,21 @@ app.use("*", async (ctx, next) => {
 });
 app.route("/api", api);
 
+app.use(trimTrailingSlash());
+
 // Serves the main web application. This must come after the API route.
-app.get("*", (c) => {
-	const getExampleCode = () => {
+app.get("/parameters/:shareId?", async (c) => {
+	const getExampleCode = async (): Promise<string | null> => {
+		const { shareId } = c.req.param();
 		const { example } = c.req.query();
+
+		if (shareId) {
+			const shareData = await getShareData(shareId);
+			return shareData?.code ?? null;
+		}
+
 		if (!example) {
-			return;
+			return null;
 		}
 
 		return examples[example];
@@ -54,7 +65,7 @@ app.get("*", (c) => {
 		? "/assets/wasm_exec.js"
 		: "/wasm_exec.js";
 	const iconPath = import.meta.env.PROD ? "/assets/logo.svg" : "/logo.svg";
-	const exampleCode = getExampleCode();
+	const exampleCode = await getExampleCode();
 
 	return c.html(
 		[
@@ -76,7 +87,7 @@ app.get("*", (c) => {
 					<body>
 						<div id="root"></div>
 						{exampleCode ? (
-							<script type="module">{`window.EXAMPLE_CODE = ${JSON.stringify(exampleCode)}`}</script>
+							<script type="module">{`window.CODE = ${JSON.stringify(exampleCode)}`}</script>
 						) : null}
 						<script type="module" src={clientScriptPath}></script>
 					</body>
@@ -85,3 +96,5 @@ app.get("*", (c) => {
 		].join("\n"),
 	);
 });
+
+app.get("*", (c) => c.redirect("/parameters"));
