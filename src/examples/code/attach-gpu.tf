@@ -1,4 +1,5 @@
-export default `locals {
+
+locals {
   coder_git_repos = [
     "coder/coder", "coder/code-server", "coder/weno", "coder/preview"
   ]
@@ -55,4 +56,4 @@ data "coder_parameter" "ml_framework" {
 # can be referenced during provisioning with:
 #
 # data.coder_parameter.ml_framework.value
-#` 
+#

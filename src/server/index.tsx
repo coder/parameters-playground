@@ -1,7 +1,9 @@
-import { examples } from "@/examples";
-import { api } from "@/server/api";
+import { examples } from "@/examples/code";
+import { api } from "@/server/routes/api";
 import { Hono } from "hono";
 import { renderToString } from "react-dom/server";
+import { getShareData } from "./blob";
+import { trimTrailingSlash } from "hono/trailing-slash";
 
 // This must be exported for the dev server to work
 export const app = new Hono();
@@ -16,15 +18,24 @@ app.use("*", async (ctx, next) => {
 });
 app.route("/api", api);
 
+app.use(trimTrailingSlash());
+
 // Serves the main web application. This must come after the API route.
-app.get("*", (c) => {
-	const getExampleCode = () => {
+app.get("/parameters/:shareId?", async (c) => {
+	const getExampleCode = async (): Promise<string | null> => {
+		const { shareId } = c.req.param();
 		const { example } = c.req.query();
-		if (!example) {
-			return;
+
+		if (shareId) {
+			const shareData = await getShareData(shareId);
+			return shareData?.code ?? null;
 		}
 
-		return examples.find((e) => e.slug === example)?.code;
+		if (!example) {
+			return null;
+		}
+
+		return examples[example];
 	};
 
 	// Along with the vite React plugin this enables HMR within react while
@@ -54,9 +65,7 @@ app.get("*", (c) => {
 		? "/assets/wasm_exec.js"
 		: "/wasm_exec.js";
 	const iconPath = import.meta.env.PROD ? "/assets/logo.svg" : "/logo.svg";
-
-	const exampleCode = getExampleCode();
-	const loadExampleCodeScript = `window.EXAMPLE_CODE = \`${exampleCode}\``;
+	const exampleCode = await getExampleCode();
 
 	return c.html(
 		[
@@ -78,7 +87,7 @@ app.get("*", (c) => {
 					<body>
 						<div id="root"></div>
 						{exampleCode ? (
-							<script type="module">{loadExampleCodeScript}</script>
+							<script type="module">{`window.CODE = ${JSON.stringify(exampleCode)}`}</script>
 						) : null}
 						<script type="module" src={clientScriptPath}></script>
 					</body>
@@ -87,3 +96,5 @@ app.get("*", (c) => {
 		].join("\n"),
 	);
 });
+
+app.get("*", (c) => c.redirect("/parameters"));

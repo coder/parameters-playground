@@ -20,7 +20,7 @@ declare global {
 		// Loaded from wasm
 		go_preview?: GoPreviewDef;
 		Go: { new (): Go };
-		EXAMPLE_CODE?: string;
+		CODE?: string;
 	}
 }
 
