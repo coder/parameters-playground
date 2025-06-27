@@ -1,4 +1,4 @@
-import { examples } from "@/examples";
+import { examples } from "@/examples/code";
 import { api } from "@/server/api";
 import { Hono } from "hono";
 import { renderToString } from "react-dom/server";
@@ -24,7 +24,7 @@ app.get("*", (c) => {
 			return;
 		}
 
-		return examples.find((e) => e.slug === example)?.code;
+		return examples[example];
 	};
 
 	// Along with the vite React plugin this enables HMR within react while
@@ -54,9 +54,7 @@ app.get("*", (c) => {
 		? "/assets/wasm_exec.js"
 		: "/wasm_exec.js";
 	const iconPath = import.meta.env.PROD ? "/assets/logo.svg" : "/logo.svg";
-
 	const exampleCode = getExampleCode();
-	const loadExampleCodeScript = `window.EXAMPLE_CODE = \`${exampleCode}\``;
 
 	return c.html(
 		[
@@ -78,7 +76,7 @@ app.get("*", (c) => {
 					<body>
 						<div id="root"></div>
 						{exampleCode ? (
-							<script type="module">{loadExampleCodeScript}</script>
+							<script type="module">{`window.EXAMPLE_CODE = ${JSON.stringify(exampleCode)}`}</script>
 						) : null}
 						<script type="module" src={clientScriptPath}></script>
 					</body>

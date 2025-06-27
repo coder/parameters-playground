@@ -1,30 +1,22 @@
-import repoExample from "@/examples/repo";
+/**
+ * The code in the `src/examples` folder is split up such that client does not
+ * need to import all of the examples at runtime. The other benefit is this
+ * allows us store the example code in `.tf` files and use vite's raw imports
+ * to load the code. Trying to do this on the client causes errors due to the
+ * MIME type, and would require some custom middleware to fix. 
+ */
 
-type Example = {
+export type ExampleSlug = "attach-gpu" | "connections" | "basic-governance" | "form-types";
+
+export type Example = {
 	title: string;
-	slug: string;
-	code: string;
+	slug: ExampleSlug;
 };
 
-export const examples: Example[] = [
-	{
-		title: "Example 1",
-		slug: "example-1",
-		code: "// Example 1",
-	},
-	{
-		title: "Example 2",
-		slug: "example-2",
-		code: "// Example 2",
-	},
-	{
-		title: "Example 3",
-		slug: "example-3",
-		code: "// Example 3",
-	},
-	{
-		title: "Attach GPU",
-		slug: "attach-gpu",
-		code: repoExample,
-	},
-];
+export const examples: Record<ExampleSlug, string> = {
+	"basic-governance": "Basic Governance",
+	"attach-gpu": "Attach GPU",
+	"connections": "Connections Game",
+	"form-types": "Form Types"
+}
+

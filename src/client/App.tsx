@@ -336,7 +336,7 @@ const ExampleSelector: FC = () => {
 
 			<DropdownMenuPortal>
 				<DropdownMenuContent>
-					{examples.map(({ title, slug }) => {
+					{Object.entries(examples).map(([ slug, title ]) => {
 						const params = new URLSearchParams();
 						params.append("example", slug);
 
