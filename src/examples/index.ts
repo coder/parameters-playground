@@ -6,7 +6,7 @@
  * MIME type, and would require some custom middleware to fix. 
  */
 
-export type ExampleSlug = "attach-gpu" | "connections" | "basic-governance" | "form-types";
+export type ExampleSlug = "attach-gpu" | "basic-governance" | "form-types";
 
 export type Example = {
 	title: string;
@@ -16,7 +16,6 @@ export type Example = {
 export const examples: Record<ExampleSlug, string> = {
 	"basic-governance": "Basic Governance",
 	"attach-gpu": "Attach GPU",
-	"connections": "Connections Game",
 	"form-types": "Form Types"
 }
 

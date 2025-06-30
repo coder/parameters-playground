@@ -1,12 +1,10 @@
 import type { ExampleSlug } from "@/examples";
 import attachGpuExample from "@/examples/code/attach-gpu.tf?raw";
-import connectionsExample from "@/examples/code/connections.tf?raw";
 import basicGovExample from "@/examples/code/basic-governance.tf?raw";
 import formTypesExample from "@/examples/code/form-types.tf?raw";
 
 const codeExamples: Record<ExampleSlug, string> = {
 	"attach-gpu": attachGpuExample,
-	connections: connectionsExample,
 	"basic-governance": basicGovExample,
 	"form-types": formTypesExample,
 };
