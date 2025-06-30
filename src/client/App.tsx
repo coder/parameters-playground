@@ -314,10 +314,7 @@ const ExampleSelector: FC = () => {
 			<DropdownMenuPortal>
 				<DropdownMenuContent>
 					{Object.entries(examples).map(([ slug, title ]) => {
-						const params = new URLSearchParams();
-						params.append("example", slug);
-
-						const href = `${window.location.origin}/parameters?${params.toString()}`;
+						const href = `${window.location.origin}/parameters/example/${slug}`;
 						return (
 							<DropdownMenuItem key={slug} asChild={true}>
 								<a href={href} target="_blank" rel="noreferrer">

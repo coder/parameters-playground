@@ -21,12 +21,11 @@ app.route("/api", api);
 app.use(trimTrailingSlash());
 
 // Serves the main web application. This must come after the API route.
-app.get("/parameters/:shareId?", async (c) => {
+app.get("/parameters/:shareId?/:example?", async (c) => {
 	const getExampleCode = async (): Promise<string | null> => {
-		const { shareId } = c.req.param();
-		const { example } = c.req.query();
+		const { shareId, example } = c.req.param();
 
-		if (shareId) {
+		if (shareId && shareId !== "example") {
 			const shareData = await getShareData(shareId);
 			return shareData?.code ?? null;
 		}
@@ -35,7 +34,7 @@ app.get("/parameters/:shareId?", async (c) => {
 			return null;
 		}
 
-		return examples[example];
+		return examples[example] ?? null;
 	};
 
 	// Along with the vite React plugin this enables HMR within react while
