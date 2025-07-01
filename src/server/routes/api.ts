@@ -3,6 +3,8 @@ import { Hono } from "hono";
 import * as v from "valibot";
 import { putShareData } from "@/server/blob";
 
+const MAX_CODE_SIZE = 1024 * 1000; // 1mb
+
 const parameters = new Hono().post(
 	"/",
 	vValidator(
@@ -15,8 +17,7 @@ const parameters = new Hono().post(
 		const data = c.req.valid("json");
 		const bytes = new TextEncoder().encode(JSON.stringify(data));
 
-		// Check if the data is larger than 1mb
-		if (bytes.length > 1024 * 1000) {
+		if (bytes.length > MAX_CODE_SIZE) {
 			console.error("Data larger than 10kb");
 			return c.json({ id: "" }, 500);
 		}
