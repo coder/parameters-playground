@@ -1,9 +1,8 @@
-import path from "node:path";
 import type { FC } from "react";
 
 export const getAssetPath = (assetPath: string): string => {
 	if (import.meta.env.PROD) {
-		const pathParts = assetPath.split(path.sep);
+		const pathParts = assetPath.split("/");
 		return pathParts[pathParts.length - 1];
 	} else {
 		return assetPath;
