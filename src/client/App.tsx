@@ -43,6 +43,7 @@ import {
 } from "lucide-react";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useDebouncedValue } from "./hooks/debounce";
+import { useSearchParams } from "react-router";
 
 export const App = () => {
 	const [wasmLoadState, setWasmLoadingState] = useState<WasmLoadState>(() => {
@@ -309,8 +310,10 @@ const ShareButton: FC<ShareButtonProps> = ({ code }) => {
 };
 
 const ExampleSelector: FC = () => {
+	const [searchParams] = useSearchParams();
+
 	return (
-		<DropdownMenu>
+		<DropdownMenu defaultOpen={searchParams.has("examples")}>
 			<DropdownMenuTrigger className="font-light text-content-secondary text-sm hover:text-content-primary">
 				Examples
 			</DropdownMenuTrigger>
