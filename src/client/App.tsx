@@ -43,9 +43,17 @@ import {
 } from "lucide-react";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useDebouncedValue } from "./hooks/debounce";
-import { useSearchParams } from "react-router";
+import { useBeforeUnload, useSearchParams } from "react-router";
 
 export const App = () => {
+	useBeforeUnload(
+		(e) => {
+			e.preventDefault();
+			return true;
+		},
+		{ capture: true },
+	);
+
 	const [wasmLoadState, setWasmLoadingState] = useState<WasmLoadState>(() => {
 		if (window.go_preview) {
 			return "loaded";
