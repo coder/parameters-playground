@@ -34,7 +34,13 @@ import {
 	initWasm,
 } from "@/utils/wasm";
 import isEqual from "lodash/isEqual";
-import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
+import {
+	ExternalLinkIcon,
+	MoonIcon,
+	ShareIcon,
+	SunIcon,
+	SunMoonIcon,
+} from "lucide-react";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useDebouncedValue } from "./hooks/debounce";
 
@@ -45,9 +51,7 @@ export const App = () => {
 		}
 		return "loading";
 	});
-	const [code, setCode] = useState(
-		window.CODE ?? defaultCode,
-	);
+	const [code, setCode] = useState(window.CODE ?? defaultCode);
 	const [debouncedCode, isDebouncing] = useDebouncedValue(code, 1000);
 	const [parameterValues, setParameterValues] = useState<
 		Record<string, string>
@@ -313,11 +317,12 @@ const ExampleSelector: FC = () => {
 
 			<DropdownMenuPortal>
 				<DropdownMenuContent>
-					{Object.entries(examples).map(([ slug, title ]) => {
+					{Object.entries(examples).map(([slug, title]) => {
 						const href = `${window.location.origin}/parameters/example/${slug}`;
 						return (
 							<DropdownMenuItem key={slug} asChild={true}>
 								<a href={href} target="_blank" rel="noreferrer">
+									<ExternalLinkIcon />
 									{title}
 								</a>
 							</DropdownMenuItem>
