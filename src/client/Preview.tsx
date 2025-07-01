@@ -235,7 +235,7 @@ const PreviewEmptyState = () => {
 						Parameters Playground
 					</p>
 					<p className="text-center font-medium text-content-secondary text-sm">
-						Create dynamic parameters here, I need to figure out a better copy.
+						Create dynamic forms for Workspaces that change based on user input.
 					</p>
 				</div>
 				<a
@@ -369,7 +369,7 @@ const WasmLoading: FC = () => {
 					Loading assets
 				</p>
 				<p className="text-content-secondary text-sm">
-					Add some copy here to explain that this will only take a few moments
+					Loading WebAssembly module, this should only take a few moments.
 				</p>
 			</div>
 		</div>
@@ -383,7 +383,7 @@ const WasmError: FC = () => {
 				Unable to load assets{" "}
 			</p>
 			<p className="text-content-destructive text-sm">
-				Add some copy here to explain that this will only take a few moments
+				There was an error loading the WebAssembly module.
 			</p>
 		</div>
 	);

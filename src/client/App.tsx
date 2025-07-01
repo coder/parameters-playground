@@ -34,31 +34,16 @@ import {
 	initWasm,
 } from "@/utils/wasm";
 import isEqual from "lodash/isEqual";
-import { MoonIcon, ShareIcon, SunIcon, SunMoonIcon } from "lucide-react";
+import {
+	ExternalLinkIcon,
+	MoonIcon,
+	ShareIcon,
+	SunIcon,
+	SunMoonIcon,
+} from "lucide-react";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
-import { type LoaderFunctionArgs, useLoaderData } from "react-router";
 import { useDebouncedValue } from "./hooks/debounce";
-
-/**
- * Load the shared code if present.
- */
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-	const { id } = params;
-	if (!id) {
-		return;
-	}
-
-	try {
-		const res = await rpc.parameters[":id"].$get({ param: { id } });
-		if (res.ok) {
-			const { code } = await res.json();
-			return code;
-		}
-	} catch (e) {
-		console.error(`Error loading playground: ${e}`);
-		return;
-	}
-};
+import { useSearchParams } from "react-router";
 
 export const App = () => {
 	const [wasmLoadState, setWasmLoadingState] = useState<WasmLoadState>(() => {
@@ -67,10 +52,7 @@ export const App = () => {
 		}
 		return "loading";
 	});
-	const loadedCode = useLoaderData<typeof loader>();
-	const [code, setCode] = useState(
-		loadedCode ?? window.EXAMPLE_CODE ?? defaultCode,
-	);
+	const [code, setCode] = useState(window.CODE ?? defaultCode);
 	const [debouncedCode, isDebouncing] = useDebouncedValue(code, 1000);
 	const [parameterValues, setParameterValues] = useState<
 		Record<string, string>
@@ -328,22 +310,22 @@ const ShareButton: FC<ShareButtonProps> = ({ code }) => {
 };
 
 const ExampleSelector: FC = () => {
+	const [searchParams] = useSearchParams();
+
 	return (
-		<DropdownMenu>
+		<DropdownMenu defaultOpen={searchParams.has("examples")}>
 			<DropdownMenuTrigger className="font-light text-content-secondary text-sm hover:text-content-primary">
 				Examples
 			</DropdownMenuTrigger>
 
 			<DropdownMenuPortal>
 				<DropdownMenuContent>
-					{examples.map(({ title, slug }) => {
-						const params = new URLSearchParams();
-						params.append("example", slug);
-
-						const href = `${window.location.origin}/parameters?${params.toString()}`;
+					{Object.entries(examples).map(([slug, title]) => {
+						const href = `${window.location.origin}/parameters/example/${slug}`;
 						return (
 							<DropdownMenuItem key={slug} asChild={true}>
 								<a href={href} target="_blank" rel="noreferrer">
+									<ExternalLinkIcon />
 									{title}
 								</a>
 							</DropdownMenuItem>

@@ -2,22 +2,15 @@ import { TooltipProvider } from "@/client/components/Tooltip";
 import { ThemeProvider } from "@/client/contexts/theme.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { RouterProvider, createBrowserRouter, redirect } from "react-router";
-import { App, loader as appLoader } from "./App.tsx";
+import { RouterProvider, createBrowserRouter } from "react-router";
+import { App } from "./App.tsx";
 import "@/client/index.css";
 import { EditorProvider } from "./contexts/editor.tsx";
 
 const router = createBrowserRouter([
 	{
-		loader: appLoader,
-		path: "/parameters/:id?",
-		Component: App,
-	},
-	{
 		path: "*",
-		loader: () => {
-			return redirect("/parameters");
-		},
+		Component: App,
 	},
 ]);
 
