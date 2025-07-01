@@ -38,3 +38,12 @@ export const BaseHeader = () => {
 		</>
 	);
 };
+
+export const defaultCode = `terraform {
+  required_providers {
+    coder = {
+      source = "coder/coder"
+      version = "2.5.3"
+    }
+  }
+}`;
