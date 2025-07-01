@@ -60,7 +60,7 @@ app.get("/parameters/:shareId?/:example?", async (c, next) => {
 					<body>
 						<div id="root"></div>
 							<script type="module">{`window.CODE = ${JSON.stringify(exampleCode)}`}</script>
-						<script type="module" src={getAssetPath("/src/client/index.tsx")}></script>
+						<script type="module" src={getAssetPath("/src/client/index.tsx", "client.js")}></script>
 					</body>
 				</html>,
 			),

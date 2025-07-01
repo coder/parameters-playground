@@ -1,9 +1,12 @@
 import type { FC } from "react";
 
-export const getAssetPath = (assetPath: string): string => {
+export const getAssetPath = (
+	assetPath: string,
+	prodFileName?: string,
+): string => {
 	if (import.meta.env.PROD) {
 		const pathParts = assetPath.split("/");
-		return pathParts[pathParts.length - 1];
+		return `/assets/${prodFileName ?? pathParts[pathParts.length - 1]}`;
 	} else {
 		return assetPath;
 	}
