@@ -181,7 +181,7 @@ export const App = () => {
 						Coder
 					</a>
 					<a
-						href="https://coder.com"
+						href="https://coder.com/docs/admin/templates/extending-templates/parameters"
 						target="_blank"
 						rel="noreferrer"
 						className="font-light text-content-secondary text-sm hover:text-content-primary"
