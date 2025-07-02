@@ -120,10 +120,7 @@ export const Editor: FC<EditorProps> = ({ code, setCode, parameters }) => {
 										({ name, label, icon: Icon, snippet }, index) => (
 											<DropdownMenuItem
 												key={index}
-												onClick={() =>
-													// setCode(`${code.trimEnd()}\n\n${snippet()}\n`)
-													onAddSnippet(name, snippet)
-												}
+												onClick={() => onAddSnippet(name, snippet)}
 											>
 												<Icon size={24} />
 												{label}
