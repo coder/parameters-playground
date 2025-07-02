@@ -17,7 +17,12 @@ export const baseMockUser: WorkspaceOwner = {
 	],
 };
 
-export type User = "admin" | "developer" | "contractor" | "eu-developer" | "sales";
+export type User =
+	| "admin"
+	| "developer"
+	| "contractor"
+	| "eu-developer"
+	| "sales";
 
 export const mockUsers: Record<User, WorkspaceOwner> = {
 	admin: {
@@ -26,6 +31,17 @@ export const mockUsers: Record<User, WorkspaceOwner> = {
 		full_name: "Admin",
 		email: "admin@coder.com",
 		groups: ["admin"],
+		rbac_roles: [
+			...baseMockUser.rbac_roles,
+			{
+				name: "owner",
+				org_id: "",
+			},
+			{
+				name: "organization-admin",
+				org_id: "09942665-ba1b-4661-be9f-36bf9f738c83",
+			},
+		],
 	},
 	developer: {
 		...baseMockUser,
@@ -48,7 +64,7 @@ export const mockUsers: Record<User, WorkspaceOwner> = {
 		email: "eu.dev@coder.com",
 		groups: ["developer", "eu-helsinki"],
 	},
-	"sales": {
+	sales: {
 		...baseMockUser,
 		name: "sales",
 		full_name: "Sales",
