@@ -14,8 +14,7 @@ import {
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
 import { useTheme } from "@/client/contexts/theme";
-import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
-import type { ParameterFormType } from "@/gen/types";
+import { snippets } from "@/client/snippets";
 import { cn } from "@/utils/cn";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
 import {
@@ -23,11 +22,7 @@ import {
 	ChevronDownIcon,
 	CopyIcon,
 	FileJsonIcon,
-	RadioIcon,
 	SettingsIcon,
-	SquareMousePointerIcon,
-	TextCursorInputIcon,
-	ToggleLeftIcon,
 	ZapIcon,
 } from "lucide-react";
 import { type FC, useEffect, useRef, useState } from "react";
@@ -52,18 +47,6 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 	const onCopy = () => {
 		navigator.clipboard.writeText(code);
 		setCodeCopied(() => true);
-	};
-
-	const onAddSnippet = (formType: ParameterFormType) => {
-		if (formType === "input") {
-			setCode(`${code.trimEnd()}\n\n${textInput}\n`);
-		} else if (formType === "radio") {
-			setCode(`${code.trimEnd()}\n\n${radio}\n`);
-		} else if (formType === "multi-select") {
-			setCode(`${code.trimEnd()}\n\n${multiSelect}\n`);
-		} else if (formType === "switch") {
-			setCode(`${code.trimEnd()}\n\n${switchInput}\n`);
-		}
 	};
 
 	useEffect(() => {
@@ -116,23 +99,17 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 
 							<DropdownMenuPortal>
 								<DropdownMenuContent align="start">
-									<DropdownMenuItem onClick={() => onAddSnippet("input")}>
-										<TextCursorInputIcon width={24} height={24} />
-										Text input
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										onClick={() => onAddSnippet("multi-select")}
-									>
-										<SquareMousePointerIcon width={24} height={24} />
-										Multi-select
-									</DropdownMenuItem>
-									<DropdownMenuItem onClick={() => onAddSnippet("radio")}>
-										<RadioIcon width={24} height={24} />
-										Radio
-									</DropdownMenuItem>
-									<DropdownMenuItem onClick={() => onAddSnippet("switch")}>
-										<ToggleLeftIcon width={24} height={24} /> Switches
-									</DropdownMenuItem>
+									{snippets.map(({ label, icon: Icon, snippet }, index) => (
+										<DropdownMenuItem
+											key={index}
+											onClick={() =>
+												setCode(`${code.trimEnd()}\n\n${snippet()}\n`)
+											}
+										>
+											<Icon size={24} />
+											{label}
+										</DropdownMenuItem>
+									))}
 								</DropdownMenuContent>
 							</DropdownMenuPortal>
 						</DropdownMenu>

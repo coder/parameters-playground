@@ -1,3 +1,14 @@
+import {
+	ChevronDownIcon,
+	LetterTextIcon,
+	RadioIcon,
+	Settings2Icon,
+	SquareMousePointerIcon,
+	TagIcon,
+	TextCursorInputIcon,
+	ToggleLeftIcon,
+} from "lucide-react";
+
 export const defaultCode = `terraform {
   required_providers {
     coder = {
@@ -7,25 +18,53 @@ export const defaultCode = `terraform {
   }
 }`;
 
-export const textInput = `data "coder_parameter" "project-name" {
-  display_name = "An input"
-  name         = "an-input"
-  description  = "What is the name of your project?"
-  order        = 4
+type SnippetFunc = (name?: string, order?: number) => string;
+type Snippet = {
+	label: string;
+	icon: typeof RadioIcon;
+	snippet: SnippetFunc;
+};
+
+export const input: SnippetFunc = (
+	name = "input",
+	order = 1,
+) => `data "coder_parameter" "text-input" {
+  name         = "${name}"
+  display_name = "A text input"
+  description  = "This parameter can be used to input text."
+  order        = ${order}
 
   form_type = "input"
   type      = "string"
   default   = "An input value"
 }`;
 
-export const radio = `data "coder_parameter" "radio" {
-  name         = "radio"
-  display_name = "An example of a radio input"
-  description  = "The next parameter supports a single value."
-  type         = "string"
-  form_type    = "radio"
-  order        = 1
-  default      = "option-1"
+export const textarea: SnippetFunc = (
+	name = "textarea",
+	order = 1,
+) => `data "coder_parameter" "textarea" {
+  name         = "${name}"
+  display_name = "A textarea input"
+  description  = "This parameter can be used to input multiple lines of text"
+  order        = ${order}
+
+  form_type = "textarea"
+  type      = "string"
+  default   = "An input value"
+}`;
+
+export const radio: SnippetFunc = (
+	name = "radio",
+	order = 1,
+) => `data "coder_parameter" "radio" {
+  name         = "${name}"
+  display_name = "A radio input"
+  description  = "This parameter supports selecting a single value out of a list of options"
+  order        = ${order}
+
+  type      = "string"
+  form_type = "radio"
+  default   = "option-1"
 
   option {
     name        = "Option 1"
@@ -52,13 +91,54 @@ export const radio = `data "coder_parameter" "radio" {
   }
 }`;
 
-export const multiSelect = `data "coder_parameter" "multi-select" {
-  name         = "multi-select"
-  display_name = "An example of a multi-select"
-  description  = "The next parameter supports multiple values."
+export const dropdown: SnippetFunc = (
+	name = "dropdown",
+	order = 1,
+) => `data "coder_parameter" "dropdown" {
+  name         = "${name}"
+  display_name = "A dropdown input"
+  description  = "This parameter supports selecting a single value out of a list of options. Especially useful when you have a lot of options."
+  order        = ${order}
+
+  type      = "string"
+  form_type = "dropdown"
+  default   = "option-1"
+
+  option {
+    name        = "Option 1"
+    value       = "option-1"
+    description = "A description for Option 1"
+  }
+
+  option {
+    name        = "Option 2"
+    value       = "option-2"
+    description = "A description for Option 2"
+  }
+
+  option {
+    name        = "Option 3"
+    value       = "option-3"
+    description = "A description for Option 3"
+  }
+
+  option {
+    name        = "Option 4"
+    value       = "option-4"
+    description = "A description for Option 4"
+  }
+}`;
+
+export const multiSelect: SnippetFunc = (
+	name = "multi-select",
+	order = 1,
+) => `data "coder_parameter" "multi-select" {
+  name         = "${name}"
+  display_name = "A multi-select input"
+  description  = "This parameter supports selecting multiple values from a list of options"
   type         = "list(string)"
   form_type    = "multi-select"
-  order        = 1
+  order        = ${order}
 
   option {
     name        = "Option 1"
@@ -85,15 +165,91 @@ export const multiSelect = `data "coder_parameter" "multi-select" {
   }
 }`;
 
-export const switchInput = `data "coder_parameter" "switch" {
-  name         = "switch"
-  display_name = "An example of a switch"
-  description  = "The next parameter can be on or off"
+export const tagSelect: SnippetFunc = (
+	name = "tag-select",
+	order = 1,
+) => `data "coder_parameter" "tag-select" {
+  name         = "${name}"
+  display_name = "A tag-select input"
+  description  = "This parameter supports selecting multiple user inputed values at once"
+  type         = "list(string)"
+  form_type    = "tag-select"
+  order        = ${order}
+}`;
+
+export const switchInput: SnippetFunc = (
+	name = "switch",
+	order = 1,
+) => `data "coder_parameter" "switch" {
+  name         = "${name}"
+  display_name = "A switch input"
+  description  = "This parameter can be toggled between true and false"
   type         = "bool"
   form_type    = "switch"
   default      = true
-  order        = 1
-}`
+  order        = ${order}
+}`;
+
+export const slider: SnippetFunc = (
+	name = "slider",
+	order = 1,
+) => `data "coder_parameter" "slider" {
+  name         = "${name}"
+  display_name = "A slider input"
+  description  = "This parameter supports selecting a number within a given range"
+  type         = "number"
+  form_type    = "slider"
+  default      = 6
+  order        = ${order}
+
+  validation {
+    min = 1
+    max = 10
+  }
+}`;
+
+export const snippets: Snippet[] = [
+	{
+		label: "Text Input",
+		icon: TextCursorInputIcon,
+		snippet: input,
+	},
+	{
+		label: "Textarea",
+		icon: LetterTextIcon,
+		snippet: textarea,
+	},
+	{
+		label: "Radio",
+		icon: RadioIcon,
+		snippet: radio,
+	},
+	{
+		label: "Multi-select",
+		icon: SquareMousePointerIcon,
+		snippet: multiSelect,
+	},
+	{
+		label: "Tag-select",
+		icon: TagIcon,
+		snippet: tagSelect,
+	},
+	{
+		label: "Switch",
+		icon: ToggleLeftIcon,
+		snippet: switchInput,
+	},
+	{
+		label: "Dropdown",
+		icon: ChevronDownIcon,
+		snippet: dropdown,
+	},
+	{
+		label: "Slider",
+		icon: Settings2Icon,
+		snippet: slider,
+	},
+];
 
 export const checkerModule = `
 variable "solutions" {
