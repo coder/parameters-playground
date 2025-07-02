@@ -1,7 +1,7 @@
 import {
-	ChevronDownIcon,
 	LetterTextIcon,
 	RadioIcon,
+	Rows3Icon,
 	Settings2Icon,
 	SquareMousePointerIcon,
 	TagIcon,
@@ -20,7 +20,7 @@ export const defaultCode = `terraform {
 
 export type SnippetFunc = (name?: string, order?: number) => string;
 type Snippet = {
-  name: string;
+	name: string;
 	label: string;
 	icon: typeof RadioIcon;
 	snippet: SnippetFunc;
@@ -211,49 +211,49 @@ export const slider: SnippetFunc = (
 
 export const snippets: Snippet[] = [
 	{
-	  name: "text-input",
+		name: "text-input",
 		label: "Text Input",
 		icon: TextCursorInputIcon,
 		snippet: input,
 	},
 	{
-	  name: "textarea",
+		name: "textarea",
 		label: "Textarea",
 		icon: LetterTextIcon,
 		snippet: textarea,
 	},
 	{
-	  name: "radio",
+		name: "radio",
 		label: "Radio",
 		icon: RadioIcon,
 		snippet: radio,
 	},
 	{
-	  name: "switch",
+		name: "switch",
 		label: "Multi-select",
 		icon: SquareMousePointerIcon,
 		snippet: multiSelect,
 	},
 	{
-	  name: "tag-select",
+		name: "tag-select",
 		label: "Tag-select",
 		icon: TagIcon,
 		snippet: tagSelect,
 	},
 	{
-	  name: "switch",
+		name: "switch",
 		label: "Switch",
 		icon: ToggleLeftIcon,
 		snippet: switchInput,
 	},
 	{
-	  name: "dropdown",
+		name: "dropdown",
 		label: "Dropdown",
-		icon: ChevronDownIcon,
+		icon: Rows3Icon,
 		snippet: dropdown,
 	},
 	{
-	  name: "slider",
+		name: "slider",
 		label: "Slider",
 		icon: Settings2Icon,
 		snippet: slider,
