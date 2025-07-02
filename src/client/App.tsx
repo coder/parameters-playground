@@ -189,7 +189,7 @@ export const App = () => {
 						Coder
 					</a>
 					<a
-						href="https://coder.com"
+						href="https://coder.com/docs/admin/templates/extending-templates/parameters"
 						target="_blank"
 						rel="noreferrer"
 						className="font-light text-content-secondary text-sm hover:text-content-primary"
@@ -203,7 +203,7 @@ export const App = () => {
 
 			<ResizablePanelGroup direction={"horizontal"}>
 				{/* EDITOR */}
-				<Editor code={code} setCode={setCode} />
+				<Editor code={code} setCode={setCode} parameters={parameters} />
 
 				<ResizableHandle className="bg-surface-quaternary" />
 
