@@ -195,7 +195,7 @@ export const App = () => {
 
 			<ResizablePanelGroup direction={"horizontal"}>
 				{/* EDITOR */}
-				<Editor code={code} setCode={setCode} />
+				<Editor code={code} setCode={setCode} parameters={parameters} />
 
 				<ResizableHandle className="bg-surface-quaternary" />
 

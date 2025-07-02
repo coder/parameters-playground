@@ -14,7 +14,7 @@ import {
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
 import { useTheme } from "@/client/contexts/theme";
-import { snippets } from "@/client/snippets";
+import { snippets, type SnippetFunc } from "@/client/snippets";
 import { cn } from "@/utils/cn";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
 import {
@@ -27,26 +27,43 @@ import {
 } from "lucide-react";
 import { type FC, useEffect, useRef, useState } from "react";
 import { useEditor } from "@/client/contexts/editor";
+import type { ParameterWithSource } from "@/gen/types";
 
 type EditorProps = {
 	code: string;
 	setCode: React.Dispatch<React.SetStateAction<string>>;
+	parameters: ParameterWithSource[];
 };
 
-export const Editor: FC<EditorProps> = ({ code, setCode }) => {
+export const Editor: FC<EditorProps> = ({ code, setCode, parameters }) => {
 	const { appliedTheme } = useTheme();
 	const editorRef = useEditor();
+
+	const [tab, setTab] = useState(() => "code");
 
 	const [codeCopied, setCodeCopied] = useState(() => false);
 	const copyTimeoutId = useRef<ReturnType<typeof setTimeout> | undefined>(
 		undefined,
 	);
 
-	const [tab, setTab] = useState(() => "code");
-
 	const onCopy = () => {
 		navigator.clipboard.writeText(code);
 		setCodeCopied(() => true);
+	};
+
+	const onAddSnippet = (name: string, snippet: SnippetFunc) => {
+		const nextInOrder =
+			parameters.reduce(
+				(highestOrder, parameter) =>
+					highestOrder < parameter.order ? parameter.order : highestOrder,
+				0,
+			) + 1;
+
+		const nameCount = parameters.filter((p) => p.name.startsWith(name)).length;
+
+		setCode(
+			`${code.trimEnd()}\n\n${snippet(nameCount > 0 ? `${name}-${nameCount}` : name, nextInOrder)}\n`,
+		);
 	};
 
 	useEffect(() => {
@@ -99,17 +116,20 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 
 							<DropdownMenuPortal>
 								<DropdownMenuContent align="start">
-									{snippets.map(({ label, icon: Icon, snippet }, index) => (
-										<DropdownMenuItem
-											key={index}
-											onClick={() =>
-												setCode(`${code.trimEnd()}\n\n${snippet()}\n`)
-											}
-										>
-											<Icon size={24} />
-											{label}
-										</DropdownMenuItem>
-									))}
+									{snippets.map(
+										({ name, label, icon: Icon, snippet }, index) => (
+											<DropdownMenuItem
+												key={index}
+												onClick={() =>
+													// setCode(`${code.trimEnd()}\n\n${snippet()}\n`)
+													onAddSnippet(name, snippet)
+												}
+											>
+												<Icon size={24} />
+												{label}
+											</DropdownMenuItem>
+										),
+									)}
 								</DropdownMenuContent>
 							</DropdownMenuPortal>
 						</DropdownMenu>
