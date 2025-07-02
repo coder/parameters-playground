@@ -35,6 +35,10 @@ export const input: SnippetFunc = (
   description  = "This parameter can be used to input text."
   order        = ${order}
 
+  styling   = jsonencode({
+    placeholder = "A placeholder that will appear if the input value is empty"
+  })
+
   form_type = "input"
   type      = "string"
   default   = "An input value"
@@ -48,6 +52,10 @@ export const textarea: SnippetFunc = (
   display_name = "A textarea input"
   description  = "This parameter can be used to input multiple lines of text"
   order        = ${order}
+
+  styling   = jsonencode({
+    placeholder = "A placeholder that will appear if the input value is empty"
+  })
 
   form_type = "textarea"
   type      = "string"
@@ -101,6 +109,10 @@ export const dropdown: SnippetFunc = (
   description  = "This parameter supports selecting a single value out of a list of options. Especially useful when you have a lot of options."
   order        = ${order}
 
+  styling   = jsonencode({
+    placeholder = "A placeholder that will appear if the input value is empty"
+  })
+
   type      = "string"
   form_type = "dropdown"
   default   = "option-1"
@@ -137,9 +149,10 @@ export const multiSelect: SnippetFunc = (
   name         = "${name}"
   display_name = "A multi-select input"
   description  = "This parameter supports selecting multiple values from a list of options"
+  order        = ${order}
+
   type         = "list(string)"
   form_type    = "multi-select"
-  order        = ${order}
 
   option {
     name        = "Option 1"
@@ -173,9 +186,10 @@ export const tagSelect: SnippetFunc = (
   name         = "${name}"
   display_name = "A tag-select input"
   description  = "This parameter supports selecting multiple user inputed values at once"
+  order        = ${order}
+
   type         = "list(string)"
   form_type    = "tag-select"
-  order        = ${order}
 }`;
 
 export const switchInput: SnippetFunc = (
@@ -185,10 +199,11 @@ export const switchInput: SnippetFunc = (
   name         = "${name}"
   display_name = "A switch input"
   description  = "This parameter can be toggled between true and false"
+  order        = ${order}
+
   type         = "bool"
   form_type    = "switch"
   default      = true
-  order        = ${order}
 }`;
 
 export const slider: SnippetFunc = (
