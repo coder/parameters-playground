@@ -1,3 +1,4 @@
+import { XIcon } from "lucide-react";
 import { type FC, useId, useMemo } from "react";
 
 type TagInputProps = {
@@ -28,11 +29,15 @@ export const TagInput: FC<TagInputProps> = ({
 				{values.map((value, index) => (
 					<button
 						key={itemIds[index]}
-						className="h-7 rounded-md bg-surface-secondary text-content-secondary"
-						onClick={() => {
+						className="flex h-7 items-center gap-1 rounded-md bg-surface-secondary px-2 text-content-secondary"
+						onClick={(e) => {
+							e.preventDefault();
 							onChange(values.filter((oldValue) => oldValue !== value));
 						}}
-					/>
+					>
+						{value}
+						<XIcon size={16} />
+					</button>
 				))}
 				<input
 					id={id}

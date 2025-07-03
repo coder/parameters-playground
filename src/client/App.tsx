@@ -1,5 +1,13 @@
-import { Editor } from "@/client/Editor";
-import { Preview } from "@/client/Preview";
+import isEqual from "lodash/isEqual";
+import {
+	ExternalLinkIcon,
+	MoonIcon,
+	ShareIcon,
+	SunIcon,
+	SunMoonIcon,
+} from "lucide-react";
+import { type FC, useEffect, useMemo, useRef, useState } from "react";
+import { useBeforeUnload, useSearchParams } from "react-router";
 import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
@@ -19,6 +27,8 @@ import {
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
 import { useTheme } from "@/client/contexts/theme";
+import { Editor } from "@/client/editor/Editor";
+import { Preview } from "@/client/Preview";
 import { defaultCode } from "@/client/snippets";
 import { examples } from "@/examples";
 import type {
@@ -29,21 +39,11 @@ import type {
 import { mockUsers } from "@/owner";
 import { rpc } from "@/utils/rpc";
 import {
-	type WasmLoadState,
 	getDynamicParametersOutput,
 	initWasm,
+	type WasmLoadState,
 } from "@/utils/wasm";
-import isEqual from "lodash/isEqual";
-import {
-	ExternalLinkIcon,
-	MoonIcon,
-	ShareIcon,
-	SunIcon,
-	SunMoonIcon,
-} from "lucide-react";
-import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useDebouncedValue } from "./hooks/debounce";
-import { useBeforeUnload, useSearchParams } from "react-router";
 
 export const App = () => {
 	useBeforeUnload(
@@ -171,7 +171,7 @@ export const App = () => {
 				<div className="flex items-center justify-center gap-6">
 					<div className="flex items-center gap-2">
 						<Logo className="text-content-primary" height={24} />
-						<p className="font-semibold text-content-primary text-2xl">
+						<p className="font-semibold text-2xl text-content-primary">
 							Playground
 						</p>
 					</div>

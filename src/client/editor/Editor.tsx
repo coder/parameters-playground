@@ -1,3 +1,17 @@
+import { Editor as MonacoEditor } from "@monaco-editor/react";
+import {
+	CheckIcon,
+	ChevronDownIcon,
+	CopyIcon,
+	FileJsonIcon,
+	RadioIcon,
+	SquareMousePointerIcon,
+	TextCursorInputIcon,
+	ToggleLeftIcon,
+	UsersIcon,
+	ZapIcon,
+} from "lucide-react";
+import { type FC, useEffect, useRef, useState } from "react";
 import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
@@ -8,30 +22,12 @@ import {
 } from "@/client/components/DropdownMenu";
 import { ResizablePanel } from "@/client/components/Resizable";
 import * as Tabs from "@/client/components/Tabs";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/client/components/Tooltip";
+import { useEditor } from "@/client/contexts/editor";
 import { useTheme } from "@/client/contexts/theme";
+import { Users } from "@/client/editor/Users";
 import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
 import type { ParameterFormType } from "@/gen/types";
 import { cn } from "@/utils/cn";
-import { Editor as MonacoEditor } from "@monaco-editor/react";
-import {
-	CheckIcon,
-	ChevronDownIcon,
-	CopyIcon,
-	FileJsonIcon,
-	RadioIcon,
-	SettingsIcon,
-	SquareMousePointerIcon,
-	TextCursorInputIcon,
-	ToggleLeftIcon,
-	ZapIcon,
-} from "lucide-react";
-import { type FC, useEffect, useRef, useState } from "react";
-import { useEditor } from "@/client/contexts/editor";
 
 type EditorProps = {
 	code: string;
@@ -47,7 +43,7 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 		undefined,
 	);
 
-	const [tab, setTab] = useState(() => "code");
+	const [tab, setTab] = useState(() => "users");
 
 	const onCopy = () => {
 		navigator.clipboard.writeText(code);
@@ -92,17 +88,7 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 					<div className="flex h-12 w-full items-center justify-between border-b border-b-surface-quaternary pr-3">
 						<div className="flex">
 							<Tabs.Trigger icon={FileJsonIcon} label="Code" value="code" />
-							<Tooltip>
-								<TooltipTrigger asChild={true} className="hidden">
-									<Tabs.Trigger
-										icon={SettingsIcon}
-										label="Variables"
-										value="variables"
-										disabled={true}
-									/>
-								</TooltipTrigger>
-								<TooltipContent>Coming soon</TooltipContent>
-							</Tooltip>
+							<Tabs.Trigger icon={UsersIcon} label="Users" value="users" />
 						</div>
 
 						<DropdownMenu>
@@ -186,6 +172,10 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 							}}
 						/>
 					</div>
+				</Tabs.Content>
+
+				<Tabs.Content value="users" asChild={true}>
+					<Users />
 				</Tabs.Content>
 			</ResizablePanel>
 		</Tabs.Root>

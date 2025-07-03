@@ -114,4 +114,3 @@ export const TableCell = React.forwardRef<
 		{...props}
 	/>
 ));
-

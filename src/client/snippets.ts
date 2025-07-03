@@ -93,7 +93,7 @@ export const switchInput = `data "coder_parameter" "switch" {
   form_type    = "switch"
   default      = true
   order        = 1
-}`
+}`;
 
 export const checkerModule = `
 variable "solutions" {

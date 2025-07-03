@@ -23,11 +23,7 @@ export const Slider = React.forwardRef<
 		<SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-surface-secondary data-[disabled]:opacity-40">
 			<SliderPrimitive.Range className="absolute h-full bg-content-primary" />
 		</SliderPrimitive.Track>
-		<SliderPrimitive.Thumb
-			className="block h-4 w-4 rounded-full border border-surface-invert-secondary border-solid bg-surface-primary shadow transition-colors hover:border-content-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-content-primary focus-visible:ring-offset-surface-primary disabled:pointer-events-none data-[disabled]:border-border data-[disabled]:opacity-100"
-		/>
-		<SliderPrimitive.Thumb
-			className="block h-4 w-4 rounded-full border border-surface-invert-secondary border-solid bg-surface-primary shadow transition-colors hover:border-content-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-content-primary focus-visible:ring-offset-surface-primary disabled:pointer-events-none data-[disabled]:border-border data-[disabled]:opacity-100"
-		/>
+		<SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border border-surface-invert-secondary border-solid bg-surface-primary shadow transition-colors hover:border-content-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-content-primary focus-visible:ring-offset-surface-primary disabled:pointer-events-none data-[disabled]:border-border data-[disabled]:opacity-100" />
+		<SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border border-surface-invert-secondary border-solid bg-surface-primary shadow transition-colors hover:border-content-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-content-primary focus-visible:ring-offset-surface-primary disabled:pointer-events-none data-[disabled]:border-border data-[disabled]:opacity-100" />
 	</SliderPrimitive.Root>
 ));

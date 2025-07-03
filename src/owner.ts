@@ -1,6 +1,24 @@
-import type { WorkspaceOwner } from "@/gen/types";
+import * as v from "valibot";
 
-export const baseMockUser: WorkspaceOwner = {
+export const OwnerSchema = v.object({
+	id: v.nullish(v.pipe(v.string()), "cc915c5a-5709-4e32-b442-9000caabd9dd"),
+	name: v.string(),
+	full_name: v.string(),
+	email: v.string(),
+	groups: v.array(v.string()),
+	rbac_roles: v.array(
+		v.object({
+			name: v.string(),
+			org_id: v.string(),
+		}),
+	),
+	ssh_public_key: v.nullish(v.string(), ""),
+	login_type: v.nullish(v.string(), "password"),
+});
+
+export type Owner = v.InferOutput<typeof OwnerSchema>;
+
+export const baseMockUser: Owner = {
 	id: "8d36e355-e775-4c49-9b8d-ac042ed50440",
 	name: "coder",
 	full_name: "Coder",
@@ -15,7 +33,7 @@ export const baseMockUser: WorkspaceOwner = {
 			org_id: "09942665-ba1b-4661-be9f-36bf9f738c83",
 		},
 	],
-};
+} satisfies Owner;
 
 export type User =
 	| "admin"
@@ -24,7 +42,7 @@ export type User =
 	| "eu-developer"
 	| "sales";
 
-export const mockUsers: Record<User, WorkspaceOwner> = {
+export const mockUsers: Record<User, Owner> = {
 	admin: {
 		...baseMockUser,
 		name: "admin",

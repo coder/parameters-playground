@@ -1,8 +1,4 @@
-import type {
-	FriendlyDiagnostic,
-	ParserLog,
-	PreviewOutput,
-} from "@/gen/types";
+import type { FriendlyDiagnostic, ParserLog, PreviewOutput } from "@/gen/types";
 
 type FriendlyDiagnosticWithoutKind = Omit<FriendlyDiagnostic, "extra">;
 
