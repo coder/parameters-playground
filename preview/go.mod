@@ -4,7 +4,8 @@ go 1.24.3
 
 require (
 	github.com/coder/guts v1.5.0
-	github.com/coder/preview v0.0.2-0.20250604144457-c9862a17f652
+	github.com/coder/preview v1.0.3-0.20250701142654-c3d6e86b9393
+	github.com/google/uuid v1.6.0
 	github.com/hashicorp/hcl/v2 v2.23.0
 	github.com/spf13/afero v1.14.0
 )
@@ -31,7 +32,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 // indirect
-	github.com/coder/terraform-provider-coder/v2 v2.5.3 // indirect
+	github.com/coder/terraform-provider-coder/v2 v2.8.0 // indirect
 	github.com/dlclark/regexp2 v1.11.4 // indirect
 	github.com/dop251/goja v0.0.0-20241024094426-79f3a7efcdbd // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4 // indirect
@@ -47,7 +48,6 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect

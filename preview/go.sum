@@ -707,10 +707,10 @@ github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 h1:Om6kYQYDUk5wWbT0t0q
 github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42/go.mod h1:W+zGtBO5Y1IgJhy4+A9GOqVhqLpfZi+vwmdNXUehLA8=
 github.com/coder/guts v1.5.0 h1:a94apf7xMf5jDdg1bIHzncbRiTn3+BvBZgrFSDbUnyI=
 github.com/coder/guts v1.5.0/go.mod h1:0Sbv5Kp83u1Nl7MIQiV2zmacJ3o02I341bkWkjWXSUQ=
-github.com/coder/preview v0.0.2-0.20250604144457-c9862a17f652 h1:GukgWbsop8A3vZXXwYtjJfLOIgLygvFw8I6BF0UuvNo=
-github.com/coder/preview v0.0.2-0.20250604144457-c9862a17f652/go.mod h1:nXz3bBwbU8/9NYI4OISUsoLDFlEREtTozYhJq6FAE8E=
-github.com/coder/terraform-provider-coder/v2 v2.5.3 h1:EwqIIQKe/j8bsR4WyDJ3bD0dVdkfVqJ43TwClyGneUU=
-github.com/coder/terraform-provider-coder/v2 v2.5.3/go.mod h1:kqP2MW/OF5u3QBRPDt84vn1izKjncICFfv26nSb781I=
+github.com/coder/preview v1.0.3-0.20250701142654-c3d6e86b9393 h1:l+m2liikn8JoEv6C22QIV4qseolUfvNsyUNA6JJsD6Y=
+github.com/coder/preview v1.0.3-0.20250701142654-c3d6e86b9393/go.mod h1:efDWGlO/PZPrvdt5QiDhMtTUTkPxejXo9c0wmYYLLjM=
+github.com/coder/terraform-provider-coder/v2 v2.8.0 h1:pbWfegCPI0v8eATgE8kGwIyuaMPgMRIcdLF2GTVkgG0=
+github.com/coder/terraform-provider-coder/v2 v2.8.0/go.mod h1:WrdLSbihuzH1RZhwrU+qmkqEhUbdZT/sjHHdarm5b5g=
 github.com/coder/trivy v0.0.0-20250527170238-9416a59d7019 h1:MHkv/W7l9eRAN9gOG0qZ1TLRGWIIfNi92273vPAQ8Fs=
 github.com/coder/trivy v0.0.0-20250527170238-9416a59d7019/go.mod h1:eqk+w9RLBmbd/cB5XfPZFuVn77cf/A6fB7qmEVeSmXk=
 github.com/containerd/log v0.1.0 h1:TCJt7ioM2cr/tfR8GPbGf9/VRAX8D2B4PjzCpfX540I=
