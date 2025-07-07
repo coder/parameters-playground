@@ -11,6 +11,7 @@ import {
 	PlusIcon,
 	TrashIcon,
 	UploadIcon,
+    XIcon,
 } from "lucide-react";
 import { type FC, useState } from "react";
 import type { InferInput } from "valibot";
@@ -85,16 +86,28 @@ const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
 				<h2 className="font-semibold text-content-primary text-xl">
 					User Data
 				</h2>
-				<Button
-					size="icon"
-					variant="outline"
-					onClick={(e) => {
-						e.preventDefault();
-						onDelete();
-					}}
-				>
-					<TrashIcon />
-				</Button>
+				<div className="flex gap-1">
+					<Button
+						size="icon"
+						variant="subtle"
+						onClick={(e) => {
+							e.preventDefault();
+							onDelete();
+						}}
+					>
+						<TrashIcon />
+					</Button>
+					<Button
+						size="icon"
+						variant="outline"
+						onClick={(e) => {
+							e.preventDefault();
+							setIsEditing(false);
+						}}
+					>
+						<XIcon />
+					</Button>
+				</div>
 			</div>
 			<form
 				className="flex w-full flex-col gap-4"
