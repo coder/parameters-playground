@@ -26,15 +26,22 @@ import { useEditor } from "@/client/contexts/editor";
 import { useTheme } from "@/client/contexts/theme";
 import { Users } from "@/client/editor/Users";
 import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
-import type { ParameterFormType } from "@/gen/types";
+import type { ParameterFormType, WorkspaceOwner } from "@/gen/types";
 import { cn } from "@/utils/cn";
 
 type EditorProps = {
 	code: string;
 	setCode: React.Dispatch<React.SetStateAction<string>>;
+	owners: WorkspaceOwner[];
+	setOwners: (owners: WorkspaceOwner[]) => void;
 };
 
-export const Editor: FC<EditorProps> = ({ code, setCode }) => {
+export const Editor: FC<EditorProps> = ({
+	code,
+	setCode,
+	owners,
+	setOwners,
+}) => {
 	const { appliedTheme } = useTheme();
 	const editorRef = useEditor();
 
@@ -43,7 +50,7 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 		undefined,
 	);
 
-	const [tab, setTab] = useState(() => "users");
+	const [tab, setTab] = useState(() => "code");
 
 	const onCopy = () => {
 		navigator.clipboard.writeText(code);
@@ -175,7 +182,7 @@ export const Editor: FC<EditorProps> = ({ code, setCode }) => {
 				</Tabs.Content>
 
 				<Tabs.Content value="users" asChild={true}>
-					<Users />
+					<Users setUsers={setOwners} users={owners} />
 				</Tabs.Content>
 			</ResizablePanel>
 		</Tabs.Root>

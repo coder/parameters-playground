@@ -36,7 +36,7 @@ import type {
 	PreviewOutput,
 	WorkspaceOwner,
 } from "@/gen/types";
-import { mockUsers } from "@/owner";
+import { baseMockUser, mockUsers } from "@/owner";
 import { rpc } from "@/utils/rpc";
 import {
 	getDynamicParametersOutput,
@@ -44,6 +44,7 @@ import {
 	type WasmLoadState,
 } from "@/utils/wasm";
 import { useDebouncedValue } from "./hooks/debounce";
+import { downloadData } from "./utils";
 
 export const App = () => {
 	useBeforeUnload(
@@ -67,28 +68,14 @@ export const App = () => {
 	>({});
 	const [output, setOutput] = useState<PreviewOutput | null>(null);
 	const [parameters, setParameters] = useState<ParameterWithSource[]>([]);
-	const [owner, setOwner] = useState<WorkspaceOwner>(mockUsers.admin);
+
+	const [owner, setOwner] = useState<WorkspaceOwner>(
+		mockUsers[0] ?? baseMockUser,
+	);
+	const [owners, setOwners] = useState<WorkspaceOwner[]>(mockUsers);
 
 	const onDownloadOutput = () => {
-		const blob = new Blob([JSON.stringify(output, null, 2)], {
-			type: "application/json",
-		});
-
-		const url = URL.createObjectURL(blob);
-
-		const link = document.createElement("a");
-		link.href = url;
-		link.download = "output.json";
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-
-		// Give the click event enough time to fire and then revoke the URL.
-		// This method of doing it doesn't seem great but I'm not sure if there is a
-		// better way.
-		setTimeout(() => {
-			URL.revokeObjectURL(url);
-		}, 100);
+		downloadData(output, "output.json");
 	};
 
 	const onReset = () => {
@@ -203,7 +190,12 @@ export const App = () => {
 
 			<ResizablePanelGroup direction={"horizontal"}>
 				{/* EDITOR */}
-				<Editor code={code} setCode={setCode} />
+				<Editor
+					code={code}
+					setCode={setCode}
+					owners={owners}
+					setOwners={setOwners}
+				/>
 
 				<ResizableHandle className="bg-surface-quaternary" />
 
@@ -217,6 +209,8 @@ export const App = () => {
 					setParameterValues={setParameterValues}
 					parameters={parameters}
 					onReset={onReset}
+					selectedOwner={owner}
+					owners={owners}
 					setOwner={(owner) => {
 						onReset();
 						setOwner(owner);

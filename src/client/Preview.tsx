@@ -1,3 +1,24 @@
+import ReactJsonView from "@microlink/react-json-view";
+import * as Dialog from "@radix-ui/react-dialog";
+import {
+	ActivityIcon,
+	BugIcon,
+	DownloadIcon,
+	ExternalLinkIcon,
+	LoaderIcon,
+	PlayIcon,
+	ScrollTextIcon,
+	SearchCodeIcon,
+	XIcon,
+} from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import React, {
+	type FC,
+	type PropsWithChildren,
+	useMemo,
+	useState,
+} from "react";
+import { useSearchParams } from "react-router";
 import { Button } from "@/client/components/Button";
 import {
 	DynamicParameter,
@@ -17,33 +38,15 @@ import {
 } from "@/client/components/Select";
 import * as Tabs from "@/client/components/Tabs";
 import { useTheme } from "@/client/contexts/theme";
-import { outputToDiagnostics, type Diagnostic } from "@/client/diagnostics";
+import { type Diagnostic, outputToDiagnostics } from "@/client/diagnostics";
 import type {
 	ParameterWithSource,
 	ParserLog,
 	PreviewOutput,
 	WorkspaceOwner,
 } from "@/gen/types";
-import { mockUsers } from "@/owner";
 import { cn } from "@/utils/cn";
 import type { WasmLoadState } from "@/utils/wasm";
-import ReactJsonView from "@microlink/react-json-view";
-import * as Dialog from "@radix-ui/react-dialog";
-import {
-	ActivityIcon,
-	BugIcon,
-	DownloadIcon,
-	ExternalLinkIcon,
-	LoaderIcon,
-	PlayIcon,
-	ScrollTextIcon,
-	SearchCodeIcon,
-	XIcon,
-} from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import React from "react";
-import { type FC, type PropsWithChildren, useMemo, useState } from "react";
-import { useSearchParams } from "react-router";
 
 type PreviewProps = {
 	wasmLoadState: WasmLoadState;
@@ -56,6 +59,8 @@ type PreviewProps = {
 	>;
 	parameters: ParameterWithSource[];
 	onReset: () => void;
+	selectedOwner: WorkspaceOwner;
+	owners: WorkspaceOwner[];
 	setOwner: (owner: WorkspaceOwner) => void;
 };
 
@@ -67,6 +72,8 @@ export const Preview: FC<PreviewProps> = ({
 	setParameterValues,
 	parameters,
 	onReset,
+	selectedOwner,
+	owners,
 	setOwner,
 }) => {
 	const [params] = useSearchParams();
@@ -183,7 +190,11 @@ export const Preview: FC<PreviewProps> = ({
 										) : null}
 									</AnimatePresence>
 								</div>
-								<UserSelect setOwner={setOwner} />
+								<UserSelect
+									setOwner={setOwner}
+									owners={owners}
+									selectedOwner={selectedOwner}
+								/>
 							</div>
 						}
 						{parameters.length === 0 ? (
@@ -551,26 +562,43 @@ const FormElement: FC<FormElementProps> = React.memo(
 FormElement.displayName = "FormElement";
 
 type UserSelectProps = {
+	selectedOwner: WorkspaceOwner;
+	owners: WorkspaceOwner[];
 	setOwner: (owner: WorkspaceOwner) => void;
 };
-const UserSelect: FC<UserSelectProps> = ({ setOwner }) => {
+const UserSelect: FC<UserSelectProps> = ({
+	selectedOwner,
+	owners,
+	setOwner,
+}) => {
+	const selectedMissing = !owners.some(
+		(owner) => selectedOwner.id === owner.id,
+	);
+
 	return (
 		<Select
-			defaultValue="admin"
+			value={selectedOwner.id}
 			onValueChange={(value) => {
-				const users: Record<string, WorkspaceOwner | undefined> = mockUsers;
-				setOwner(users[value] ?? mockUsers.admin);
+				const owner = owners.find((owner) => owner.id === value);
+				if (owner) {
+					setOwner(owner);
+				}
 			}}
 		>
 			<SelectTrigger className="w-fit min-w-40">
 				<SelectValue />
 			</SelectTrigger>
 			<SelectContent>
-				<SelectItem value="admin">Administrator</SelectItem>
-				<SelectItem value="developer">Developer</SelectItem>
-				<SelectItem value="contractor">Contractor</SelectItem>
-				<SelectItem value="eu-developer">EU Developer</SelectItem>
-				<SelectItem value="sales">Sales</SelectItem>
+				{selectedMissing ? (
+					<SelectItem value={selectedOwner.id}>
+						{selectedOwner.full_name || selectedOwner.name}
+					</SelectItem>
+				) : null}
+				{owners.map((owner, index) => (
+					<SelectItem value={owner.id} key={index}>
+						{owner.full_name || owner.name}
+					</SelectItem>
+				))}
 			</SelectContent>
 		</Select>
 	);
@@ -690,6 +718,7 @@ const ViewOutput: FC<ViewOutputProps> = ({ parameters }) => {
 					return true;
 				}
 
+				// biome-ignore lint/correctness/useHookAtTopLevel: It's not a hook
 				const schema = useValidationSchemaForDynamicParameters([p]);
 				schema.validateSync([{ name: p.name, value: p.value.value }]);
 

@@ -3,40 +3,47 @@
  * rather than having to define separate wrappers using hooks.
  */
 
+import { useForm } from "@tanstack/react-form";
+import {
+	DownloadIcon,
+	Ellipsis,
+	PencilIcon,
+	PlusIcon,
+	TrashIcon,
+	UploadIcon,
+} from "lucide-react";
+import { type FC, useState } from "react";
+import type { InferInput } from "valibot";
+import * as v from "valibot";
+import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuPortal,
 	DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
-import { useForm } from "@tanstack/react-form";
-import {
-	DownloadIcon,
-	Ellipsis,
-	PlusIcon,
-	TrashIcon,
-	UploadIcon,
-} from "lucide-react";
-import type { FC } from "react";
-import type { InferInput } from "valibot";
-import { Button } from "@/client/components/Button";
+} from "@/client/components/DropdownMenu";
 import { Input } from "@/client/components/Input";
 import { Label } from "@/client/components/Label";
 import { TagInput } from "@/client/components/TagInput";
-import { OwnerSchema } from "@/owner";
+import type { WorkspaceOwner } from "@/gen/types";
+import { emptyUser, type Owner, OwnerSchema } from "@/owner";
+import { downloadData } from "../utils";
 
-const UserForm: FC = () => {
-	const defaultValues: InferInput<typeof OwnerSchema> = {
-		name: "",
-		email: "",
-		full_name: "",
-		id: "",
-		ssh_public_key: "",
-		rbac_roles: [{ name: "", org_id: "" }],
-		groups: [],
-		login_type: "password",
-	};
+const UserFormSchema = v.object({
+	users: v.array(OwnerSchema),
+});
+type UserForm = v.InferInput<typeof UserFormSchema>;
+
+type UserFormProps = {
+	user: Owner;
+	onSave: (user: Owner) => void;
+	onDelete: () => void;
+};
+const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
+	const [isEditing, setIsEditing] = useState(user.name === "");
+
+	const defaultValues: InferInput<typeof OwnerSchema> = user;
 	const form = useForm({
 		defaultValues,
 		validators: {
@@ -45,10 +52,32 @@ const UserForm: FC = () => {
 		onSubmitInvalid: () => {
 			// TODO
 		},
-		onSubmit: () => {
-			// TODO
+		onSubmit: ({ value }) => {
+			setIsEditing(false);
+			const owner = v.parse(OwnerSchema, value);
+			onSave(owner);
 		},
 	});
+
+	if (!isEditing) {
+		return (
+			<div className="flex w-full items-center justify-between rounded-lg border px-4 py-3">
+				<div className="flex flex-col">
+					<p className="text-content-primary">{user.full_name}</p>
+					<p className="text-content-secondary text-xs">
+						{[
+							user.email,
+							...user.groups,
+							...user.rbac_roles.map(({ name }) => name),
+						].join(" • ")}
+					</p>
+				</div>
+				<Button variant="subtle" size="icon" onClick={() => setIsEditing(true)}>
+					<PencilIcon />
+				</Button>
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex w-full flex-col gap-5 rounded-lg border p-5">
@@ -56,7 +85,14 @@ const UserForm: FC = () => {
 				<h2 className="font-semibold text-content-primary text-xl">
 					User Data
 				</h2>
-				<Button size="icon" variant="outline">
+				<Button
+					size="icon"
+					variant="outline"
+					onClick={(e) => {
+						e.preventDefault();
+						onDelete();
+					}}
+				>
 					<TrashIcon />
 				</Button>
 			</div>
@@ -207,7 +243,24 @@ const UserForm: FC = () => {
 	);
 };
 
-export const Users: FC = () => {
+type UsersProps = {
+	users: WorkspaceOwner[];
+	setUsers: (owners: WorkspaceOwner[]) => void;
+};
+export const Users: FC<UsersProps> = ({ users, setUsers }) => {
+	const defaultValues: UserForm = {
+		users,
+	};
+	const form = useForm({
+		defaultValues,
+		validators: {
+			onChange: UserFormSchema,
+		},
+		onSubmit: ({ value }) => {
+			setUsers(value.users);
+		},
+	});
+
 	return (
 		<div className="flex w-full flex-col gap-4 p-6">
 			<div className="flex items-center justify-between">
@@ -224,7 +277,12 @@ export const Users: FC = () => {
 								<UploadIcon />
 								Upload
 							</DropdownMenuItem>
-							<DropdownMenuItem>
+							<DropdownMenuItem
+								disabled={form.state.errors.length > 0}
+								onClick={() => {
+									downloadData(form.state.values.users, "users.json");
+								}}
+							>
 								<DownloadIcon />
 								Download
 							</DropdownMenuItem>
@@ -232,10 +290,33 @@ export const Users: FC = () => {
 					</DropdownMenuPortal>
 				</DropdownMenu>
 			</div>
-			<div className="">
-				<UserForm />
-			</div>
-			<Button variant="outline">
+			<form.Field name="users" mode="array">
+				{(field) => {
+					return (
+						<div className=" flex flex-col gap-3">
+							{field.state.value.map((_, index) => (
+								<form.Field key={index} name={`users[${index}]`}>
+									{(subField) => (
+										<UserForm
+											user={subField.state.value}
+											key={window.crypto.randomUUID()}
+											onSave={(owner) => {
+												subField.handleChange(owner);
+												form.handleSubmit();
+											}}
+											onDelete={() => {
+												field.removeValue(index);
+												form.handleSubmit();
+											}}
+										/>
+									)}
+								</form.Field>
+							))}
+						</div>
+					);
+				}}
+			</form.Field>
+			<Button onClick={() => form.pushFieldValue("users", emptyUser)}>
 				<PlusIcon />
 				Add a user
 			</Button>
