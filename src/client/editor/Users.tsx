@@ -11,9 +11,9 @@ import {
 	PlusIcon,
 	TrashIcon,
 	UploadIcon,
-    XIcon,
+	XIcon,
 } from "lucide-react";
-import { type FC, useState } from "react";
+import { type FC, useRef, useState } from "react";
 import type { InferInput } from "valibot";
 import * as v from "valibot";
 import { Button } from "@/client/components/Button";
@@ -261,6 +261,28 @@ type UsersProps = {
 	setUsers: (owners: WorkspaceOwner[]) => void;
 };
 export const Users: FC<UsersProps> = ({ users, setUsers }) => {
+	const uploadInputRef = useRef<HTMLInputElement | null>(null);
+
+	const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		e.target.value = "";
+		e.target.files = null;
+		if (!file) {
+			return;
+		}
+
+		const parsedUsers = v.safeParse(
+			v.array(OwnerSchema),
+			JSON.parse(new TextDecoder().decode(await file.bytes())),
+		);
+
+		if (parsedUsers.success) {
+			setUsers(parsedUsers.output);
+		} else {
+			// TODO: Show an error
+		}
+	};
+
 	const defaultValues: UserForm = {
 		users,
 	};
@@ -276,6 +298,13 @@ export const Users: FC<UsersProps> = ({ users, setUsers }) => {
 
 	return (
 		<div className="flex w-full flex-col gap-4 p-6">
+			<input
+				ref={uploadInputRef}
+				onChange={onUpload}
+				className="hidden"
+				type="file"
+				multiple={false}
+			/>
 			<div className="flex items-center justify-between">
 				<h1 className="font-semibold text-3xl text-content-primary">Users</h1>
 				<DropdownMenu>
@@ -286,7 +315,7 @@ export const Users: FC<UsersProps> = ({ users, setUsers }) => {
 					</DropdownMenuTrigger>
 					<DropdownMenuPortal>
 						<DropdownMenuContent align="end">
-							<DropdownMenuItem>
+							<DropdownMenuItem onClick={() => uploadInputRef.current?.click()}>
 								<UploadIcon />
 								Upload
 							</DropdownMenuItem>
