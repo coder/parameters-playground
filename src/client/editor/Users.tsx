@@ -41,7 +41,7 @@ type UserFormProps = {
 	onDelete: () => void;
 };
 const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
-	const [isEditing, setIsEditing] = useState(user.name === "");
+	const [isEditing, setIsEditing] = useState(true || user.name === "");
 
 	const defaultValues: InferInput<typeof UserSchema> = user;
 	const form = useForm({
@@ -80,7 +80,7 @@ const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
 	}
 
 	return (
-		<div className="flex w-full flex-col gap-5 rounded-lg border p-5">
+		<div className="flex w-full flex-col gap-5 rounded-lg border p-5 text-content-primary">
 			<div className="flex w-full items-center justify-between">
 				<h2 className="font-semibold text-content-primary text-xl">
 					User Data
@@ -116,7 +116,7 @@ const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
 					form.handleSubmit();
 				}}
 			>
-				<div className="flex gap-3">
+				<div className="flex gap-3 text-content-primary">
 					<form.Field name="name">
 						{(field) => {
 							return (
