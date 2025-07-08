@@ -21,6 +21,7 @@ declare global {
 		go_preview?: GoPreviewDef;
 		Go: { new (): Go };
 		CODE?: string;
+		USERS?: User[];
 	}
 }
 

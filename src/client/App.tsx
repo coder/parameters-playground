@@ -65,10 +65,10 @@ export const App = () => {
 	const [output, setOutput] = useState<PreviewOutput | null>(null);
 	const [parameters, setParameters] = useState<ParameterWithSource[]>([]);
 
+	const [users, setUsers] = useState<User[]>(window.USERS ?? mockUsers);
 	const [currentUser, setCurrentUser] = useState<User>(
-		mockUsers[0] ?? baseMockUser,
+		users[0] ?? baseMockUser,
 	);
-	const [users, setUsers] = useState<User[]>(mockUsers);
 
 	const onDownloadOutput = () => {
 		downloadData(output, "output.json");
@@ -167,7 +167,7 @@ export const App = () => {
 						</p>
 					</div>
 
-					<ShareButton code={code} />
+					<ShareButton code={code} users={users} />
 				</div>
 
 				<div className="flex items-center gap-3">
@@ -266,15 +266,16 @@ const ThemeSelector: FC = () => {
 
 type ShareButtonProps = {
 	code: string;
+	users: User[];
 };
-const ShareButton: FC<ShareButtonProps> = ({ code }) => {
+const ShareButton: FC<ShareButtonProps> = ({ code, users }) => {
 	const [isCopied, setIsCopied] = useState(() => false);
 	const timeoutId = useRef<ReturnType<typeof setTimeout>>(undefined);
 
 	const onShare = async () => {
 		try {
 			const { id } = await rpc.parameters
-				.$post({ json: { code } })
+				.$post({ json: { code, users } })
 				.then((res) => res.json());
 
 			const { protocol, host } = window.location;

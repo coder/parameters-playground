@@ -1,11 +1,11 @@
+import { Hono } from "hono";
+import { trimTrailingSlash } from "hono/trailing-slash";
+import { renderToString } from "react-dom/server";
 import { examples } from "@/examples/code";
 import { api } from "@/server/routes/api";
-import { Hono } from "hono";
-import { renderToString } from "react-dom/server";
-import { getShareData } from "./blob";
-import { trimTrailingSlash } from "hono/trailing-slash";
-import { BaseHeader, defaultCode, getAssetPath, HmrScript } from "./utils";
+import { getShareData, type ShareData } from "./blob";
 import { notFound } from "./routes/404";
+import { BaseHeader, defaultCode, getAssetPath, HmrScript } from "./utils";
 
 // This must be exported for the dev server to work
 export const app = new Hono();
@@ -26,23 +26,24 @@ app.get("/", (c) => c.redirect("/parameters"));
 
 // Serves the main web application. This must come after the API route.
 app.get("/parameters/:shareId?/:example?", async (c, next) => {
-	const getExampleCode = async (): Promise<string | null> => {
+	const getCodeAndUsers = async (): Promise<ShareData | null> => {
 		const { shareId, example } = c.req.param();
 
 		if (shareId && shareId !== "example") {
 			const shareData = await getShareData(shareId);
-			return shareData?.code ?? null;
+			return shareData;
 		}
 
 		if (example) {
-			return examples[example] ?? null;
+			const code = examples[example];
+			return code ? { code } : null;
 		}
 
-		return defaultCode;
+		return { code: defaultCode };
 	};
 
-	const exampleCode = await getExampleCode();
-	if (!exampleCode) {
+	const codeAndUsers = await getCodeAndUsers();
+	if (!codeAndUsers) {
 		return notFound(c, next);
 	}
 
@@ -59,8 +60,14 @@ app.get("/parameters/:shareId?/:example?", async (c, next) => {
 					</head>
 					<body>
 						<div id="root"></div>
-							<script type="module">{`window.CODE = ${JSON.stringify(exampleCode)}`}</script>
-						<script type="module" src={getAssetPath("/src/client/index.tsx", "client.js")}></script>
+						<script type="module">{`window.CODE = ${JSON.stringify(codeAndUsers.code)}`}</script>
+						{codeAndUsers.users ? (
+							<script type="module">{`window.USERS = ${JSON.stringify(codeAndUsers.users)}`}</script>
+						) : null}
+						<script
+							type="module"
+							src={getAssetPath("/src/client/index.tsx", "client.js")}
+						></script>
 					</body>
 				</html>,
 			),
