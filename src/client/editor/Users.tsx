@@ -41,7 +41,7 @@ type UserFormProps = {
 	onDelete: () => void;
 };
 const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
-	const [isEditing, setIsEditing] = useState(true || user.name === "");
+	const [isEditing, setIsEditing] = useState(user.name === "");
 
 	const defaultValues: InferInput<typeof UserSchema> = user;
 	const form = useForm({
