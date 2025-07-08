@@ -43,8 +43,8 @@ import type {
 	ParameterWithSource,
 	ParserLog,
 	PreviewOutput,
-	WorkspaceOwner,
 } from "@/gen/types";
+import type { User } from "@/user";
 import { cn } from "@/utils/cn";
 import type { WasmLoadState } from "@/utils/wasm";
 
@@ -59,9 +59,9 @@ type PreviewProps = {
 	>;
 	parameters: ParameterWithSource[];
 	onReset: () => void;
-	selectedOwner: WorkspaceOwner;
-	owners: WorkspaceOwner[];
-	setOwner: (owner: WorkspaceOwner) => void;
+	currentUser: User;
+	users: User[];
+	setUsers: (user: User) => void;
 };
 
 export const Preview: FC<PreviewProps> = ({
@@ -72,9 +72,9 @@ export const Preview: FC<PreviewProps> = ({
 	setParameterValues,
 	parameters,
 	onReset,
-	selectedOwner,
-	owners,
-	setOwner,
+	currentUser,
+	users,
+	setUsers,
 }) => {
 	const [params] = useSearchParams();
 	const isDebug = params.has("debug");
@@ -191,9 +191,9 @@ export const Preview: FC<PreviewProps> = ({
 									</AnimatePresence>
 								</div>
 								<UserSelect
-									setOwner={setOwner}
-									owners={owners}
-									selectedOwner={selectedOwner}
+									setUsers={setUsers}
+									users={users}
+									currentUser={currentUser}
 								/>
 							</div>
 						}
@@ -562,26 +562,26 @@ const FormElement: FC<FormElementProps> = React.memo(
 FormElement.displayName = "FormElement";
 
 type UserSelectProps = {
-	selectedOwner: WorkspaceOwner;
-	owners: WorkspaceOwner[];
-	setOwner: (owner: WorkspaceOwner) => void;
+	currentUser: User;
+	users: User[];
+	setUsers: (user: User) => void;
 };
 const UserSelect: FC<UserSelectProps> = ({
-	selectedOwner,
-	owners,
-	setOwner,
+	currentUser,
+	users,
+	setUsers,
 }) => {
-	const selectedMissing = !owners.some(
-		(owner) => selectedOwner.id === owner.id,
+	const selectedMissing = !users.some(
+		(owner) => currentUser.id === owner.id,
 	);
 
 	return (
 		<Select
-			value={selectedOwner.id}
+			value={currentUser.id}
 			onValueChange={(value) => {
-				const owner = owners.find((owner) => owner.id === value);
+				const owner = users.find((owner) => owner.id === value);
 				if (owner) {
-					setOwner(owner);
+					setUsers(owner);
 				}
 			}}
 		>
@@ -590,11 +590,11 @@ const UserSelect: FC<UserSelectProps> = ({
 			</SelectTrigger>
 			<SelectContent>
 				{selectedMissing ? (
-					<SelectItem value={selectedOwner.id}>
-						{selectedOwner.full_name || selectedOwner.name}
+					<SelectItem value={currentUser.id}>
+						{currentUser.full_name || currentUser.name}
 					</SelectItem>
 				) : null}
-				{owners.map((owner, index) => (
+				{users.map((owner, index) => (
 					<SelectItem value={owner.id} key={index}>
 						{owner.full_name || owner.name}
 					</SelectItem>

@@ -1,7 +1,7 @@
 import * as v from "valibot";
 import type { WorkspaceOwner } from "@/gen/types";
 
-export const OwnerSchema = v.object({
+export const UserSchema = v.object({
 	id: v.string(),
 	name: v.string(),
 	full_name: v.string(),
@@ -13,31 +13,27 @@ export const OwnerSchema = v.object({
 			org_id: v.string(),
 		}),
 	),
-	ssh_public_key: v.string(),
-	login_type: v.string(),
-}) satisfies v.GenericSchema<WorkspaceOwner>;
+}) satisfies v.GenericSchema<
+	Omit<WorkspaceOwner, "ssh_public_key" | "login_type">
+>;
 
-export type Owner = v.InferOutput<typeof OwnerSchema>;
+export type User = v.InferOutput<typeof UserSchema>;
 
-export const emptyUser: Owner = {
+export const emptyUser: User = {
 	id: "54e265e8-43b2-46a7-9d1c-b612d63f57b7",
 	name: "",
 	full_name: "",
 	email: "",
-	ssh_public_key: "",
 	groups: [],
-	login_type: "",
 	rbac_roles: [],
 };
 
-export const baseMockUser: Owner = {
+export const baseMockUser: User = {
 	id: "8d36e355-e775-4c49-9b8d-ac042ed50440",
 	name: "coder",
 	full_name: "Coder",
 	email: "coder@coder.com",
-	ssh_public_key: "",
 	groups: ["Everyone"],
-	login_type: "password",
 	rbac_roles: [
 		{ name: "member", org_id: "" },
 		{
@@ -45,9 +41,9 @@ export const baseMockUser: Owner = {
 			org_id: "09942665-ba1b-4661-be9f-36bf9f738c83",
 		},
 	],
-} satisfies Owner;
+} satisfies User;
 
-export const mockUsers: Owner[] = [
+export const mockUsers: User[] = [
 	{
 		...baseMockUser,
 		id: "f7090396-a12b-4477-b56a-eeee60d7fffa",

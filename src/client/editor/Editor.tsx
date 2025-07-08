@@ -26,21 +26,22 @@ import { useEditor } from "@/client/contexts/editor";
 import { useTheme } from "@/client/contexts/theme";
 import { Users } from "@/client/editor/Users";
 import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
-import type { ParameterFormType, WorkspaceOwner } from "@/gen/types";
+import type { ParameterFormType } from "@/gen/types";
+import type { User } from "@/user";
 import { cn } from "@/utils/cn";
 
 type EditorProps = {
 	code: string;
 	setCode: React.Dispatch<React.SetStateAction<string>>;
-	owners: WorkspaceOwner[];
-	setOwners: (owners: WorkspaceOwner[]) => void;
+	users: User[];
+	setUsers: (owners: User[]) => void;
 };
 
 export const Editor: FC<EditorProps> = ({
 	code,
 	setCode,
-	owners,
-	setOwners,
+	users: owners,
+	setUsers: setOwners,
 }) => {
 	const { appliedTheme } = useTheme();
 	const editorRef = useEditor();

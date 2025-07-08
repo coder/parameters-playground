@@ -1,6 +1,6 @@
 import { checkerModule } from "@/client/snippets";
 import type { PreviewOutput, WorkspaceOwner } from "@/gen/types";
-import { baseMockUser } from "@/owner";
+import { baseMockUser, type User } from "@/user";
 
 export type WasmLoadState = "loaded" | "loading" | "error";
 
@@ -58,11 +58,17 @@ export const initWasm = async (): Promise<WasmLoadState> => {
 export const getDynamicParametersOutput = async (
 	code: string,
 	parameterValues: Record<string, string>,
-	owner?: WorkspaceOwner,
+	user?: User,
 ): Promise<PreviewOutput | null> => {
 	if (!window.go_preview) {
 		return null;
 	}
+
+	const owner: WorkspaceOwner = {
+		...(user ?? baseMockUser),
+		ssh_public_key: "",
+		login_type: "",
+	};
 
 	const rawOutput = await window.go_preview(
 		{
@@ -71,7 +77,7 @@ export const getDynamicParametersOutput = async (
 			"checker/main.tf": checkerModule,
 		},
 		parameterValues,
-		owner ?? baseMockUser,
+		owner,
 	);
 
 	if (rawOutput === undefined) {

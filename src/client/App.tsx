@@ -31,12 +31,8 @@ import { Editor } from "@/client/editor/Editor";
 import { Preview } from "@/client/Preview";
 import { defaultCode } from "@/client/snippets";
 import { examples } from "@/examples";
-import type {
-	ParameterWithSource,
-	PreviewOutput,
-	WorkspaceOwner,
-} from "@/gen/types";
-import { baseMockUser, mockUsers } from "@/owner";
+import type { ParameterWithSource, PreviewOutput } from "@/gen/types";
+import { baseMockUser, mockUsers, type User } from "@/user";
 import { rpc } from "@/utils/rpc";
 import {
 	getDynamicParametersOutput,
@@ -69,10 +65,10 @@ export const App = () => {
 	const [output, setOutput] = useState<PreviewOutput | null>(null);
 	const [parameters, setParameters] = useState<ParameterWithSource[]>([]);
 
-	const [owner, setOwner] = useState<WorkspaceOwner>(
+	const [currentUser, setCurrentUser] = useState<User>(
 		mockUsers[0] ?? baseMockUser,
 	);
-	const [owners, setOwners] = useState<WorkspaceOwner[]>(mockUsers);
+	const [users, setUsers] = useState<User[]>(mockUsers);
 
 	const onDownloadOutput = () => {
 		downloadData(output, "output.json");
@@ -87,6 +83,14 @@ export const App = () => {
 			}),
 		);
 	};
+
+	useEffect(() => {
+		const newCurrentUser = users.find((u) => u.id === currentUser.id);
+
+		if (newCurrentUser) {
+			setCurrentUser(() => newCurrentUser);
+		}
+	}, [users, currentUser.id]);
 
 	useEffect(() => {
 		if (!window.go_preview) {
@@ -139,7 +143,7 @@ export const App = () => {
 			return;
 		}
 
-		getDynamicParametersOutput(debouncedCode, parameterValues, owner)
+		getDynamicParametersOutput(debouncedCode, parameterValues, currentUser)
 			.catch((e) => {
 				console.error(e);
 				setWasmLoadingState("error");
@@ -149,7 +153,7 @@ export const App = () => {
 			.then((output) => {
 				setOutput(output);
 			});
-	}, [debouncedCode, parameterValues, wasmLoadState, owner]);
+	}, [debouncedCode, parameterValues, wasmLoadState, currentUser]);
 
 	return (
 		<main className="flex h-dvh w-screen flex-col items-center bg-surface-primary">
@@ -193,8 +197,8 @@ export const App = () => {
 				<Editor
 					code={code}
 					setCode={setCode}
-					owners={owners}
-					setOwners={setOwners}
+					users={users}
+					setUsers={setUsers}
 				/>
 
 				<ResizableHandle className="bg-surface-quaternary" />
@@ -209,11 +213,11 @@ export const App = () => {
 					setParameterValues={setParameterValues}
 					parameters={parameters}
 					onReset={onReset}
-					selectedOwner={owner}
-					owners={owners}
-					setOwner={(owner) => {
+					currentUser={currentUser}
+					users={users}
+					setUsers={(owner) => {
 						onReset();
-						setOwner(owner);
+						setCurrentUser(owner);
 					}}
 				/>
 			</ResizablePanelGroup>

@@ -27,35 +27,34 @@ import {
 import { Input } from "@/client/components/Input";
 import { Label } from "@/client/components/Label";
 import { TagInput } from "@/client/components/TagInput";
-import type { WorkspaceOwner } from "@/gen/types";
-import { emptyUser, type Owner, OwnerSchema } from "@/owner";
+import { emptyUser, type User, UserSchema } from "@/user";
 import { downloadData } from "../utils";
 
 const UserFormSchema = v.object({
-	users: v.array(OwnerSchema),
+	users: v.array(UserSchema),
 });
 type UserForm = v.InferInput<typeof UserFormSchema>;
 
 type UserFormProps = {
-	user: Owner;
-	onSave: (user: Owner) => void;
+	user: User;
+	onSave: (user: User) => void;
 	onDelete: () => void;
 };
 const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
 	const [isEditing, setIsEditing] = useState(user.name === "");
 
-	const defaultValues: InferInput<typeof OwnerSchema> = user;
+	const defaultValues: InferInput<typeof UserSchema> = user;
 	const form = useForm({
 		defaultValues,
 		validators: {
-			onChange: OwnerSchema,
+			onChange: UserSchema,
 		},
 		onSubmitInvalid: () => {
 			// TODO
 		},
 		onSubmit: ({ value }) => {
 			setIsEditing(false);
-			const owner = v.parse(OwnerSchema, value);
+			const owner = v.parse(UserSchema, value);
 			onSave(owner);
 		},
 	});
@@ -257,8 +256,8 @@ const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
 };
 
 type UsersProps = {
-	users: WorkspaceOwner[];
-	setUsers: (owners: WorkspaceOwner[]) => void;
+	users: User[];
+	setUsers: (owners: User[]) => void;
 };
 export const Users: FC<UsersProps> = ({ users, setUsers }) => {
 	const uploadInputRef = useRef<HTMLInputElement | null>(null);
@@ -272,7 +271,7 @@ export const Users: FC<UsersProps> = ({ users, setUsers }) => {
 		}
 
 		const parsedUsers = v.safeParse(
-			v.array(OwnerSchema),
+			v.array(UserSchema),
 			JSON.parse(new TextDecoder().decode(await file.bytes())),
 		);
 
