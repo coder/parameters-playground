@@ -28,8 +28,8 @@ type Snippet = {
 };
 
 export const input: SnippetFunc = (
-	name = "input",
-	order = 1,
+	name,
+	order,
 ) => `data "coder_parameter" "text-input" {
   name         = "${name}"
   display_name = "A text input"
@@ -46,8 +46,8 @@ export const input: SnippetFunc = (
 }`;
 
 export const textarea: SnippetFunc = (
-	name = "textarea",
-	order = 1,
+	name,
+	order,
 ) => `data "coder_parameter" "textarea" {
   name         = "${name}"
   display_name = "A textarea input"
@@ -64,8 +64,8 @@ export const textarea: SnippetFunc = (
 }`;
 
 export const radio: SnippetFunc = (
-	name = "radio",
-	order = 1,
+	name,
+	order,
 ) => `data "coder_parameter" "radio" {
   name         = "${name}"
   display_name = "A radio input"
@@ -102,8 +102,8 @@ export const radio: SnippetFunc = (
 }`;
 
 export const dropdown: SnippetFunc = (
-	name = "dropdown",
-	order = 1,
+	name,
+	order,
 ) => `data "coder_parameter" "dropdown" {
   name         = "${name}"
   display_name = "A dropdown input"
@@ -144,8 +144,8 @@ export const dropdown: SnippetFunc = (
 }`;
 
 export const multiSelect: SnippetFunc = (
-	name = "multi-select",
-	order = 1,
+	name,
+	order,
 ) => `data "coder_parameter" "multi-select" {
   name         = "${name}"
   display_name = "A multi-select input"
@@ -181,8 +181,8 @@ export const multiSelect: SnippetFunc = (
 }`;
 
 export const tagSelect: SnippetFunc = (
-	name = "tag-select",
-	order = 1,
+	name,
+	order,
 ) => `data "coder_parameter" "tag-select" {
   name         = "${name}"
   display_name = "A tag-select input"
@@ -194,8 +194,8 @@ export const tagSelect: SnippetFunc = (
 }`;
 
 export const switchInput: SnippetFunc = (
-	name = "switch",
-	order = 1,
+	name,
+	order,
 ) => `data "coder_parameter" "switch" {
   name         = "${name}"
   display_name = "A switch input"
@@ -208,8 +208,8 @@ export const switchInput: SnippetFunc = (
 }`;
 
 export const slider: SnippetFunc = (
-	name = "slider",
-	order = 1,
+	name,
+	order,
 ) => `data "coder_parameter" "slider" {
   name         = "${name}"
   display_name = "A slider input"
