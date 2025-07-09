@@ -1,8 +1,4 @@
-/** biome-ignore-all lint/correctness/noChildrenProp: below
- * Tanstack Form uses the children prop which lets us keep the component flat
- * rather than having to define separate wrappers using hooks.
- */
-
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { useForm } from "@tanstack/react-form";
 import {
 	DownloadIcon,
@@ -17,6 +13,12 @@ import { type FC, useRef, useState } from "react";
 import type { InferInput } from "valibot";
 import * as v from "valibot";
 import { Button } from "@/client/components/Button";
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+} from "@/client/components/Dialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -34,6 +36,152 @@ const UserFormSchema = v.object({
 	users: v.array(UserSchema),
 });
 type UserForm = v.InferInput<typeof UserFormSchema>;
+
+type LoadUserIssues =
+	| {
+			kind: "json-parse";
+			issue: string;
+	  }
+	| {
+			kind: "valibot-parse";
+			issue: v.InferIssue<typeof UserSchema>[];
+	  };
+
+type UsersProps = {
+	users: User[];
+	setUsers: (owners: User[]) => void;
+};
+export const Users: FC<UsersProps> = ({ users, setUsers }) => {
+	const uploadInputRef = useRef<HTMLInputElement | null>(null);
+	const [loadUserIssues, setLoadUserIssues] = useState<LoadUserIssues | null>(
+		null,
+	);
+
+	const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		e.target.value = "";
+		e.target.files = null;
+		if (!file) {
+			return;
+		}
+
+		let data: unknown;
+		try {
+			data = JSON.parse(new TextDecoder().decode(await file.bytes()));
+		} catch (e) {
+			const errorMessage =
+				e instanceof Error
+					? e.message
+					: "Selected file does not contain valid JSON";
+
+			setLoadUserIssues({
+				kind: "json-parse",
+				issue: errorMessage,
+			});
+
+			return;
+		}
+
+		const parsedUsers = v.safeParse(v.array(UserSchema), data);
+
+		if (parsedUsers.success) {
+			setUsers(parsedUsers.output);
+		} else {
+			setLoadUserIssues({ kind: "valibot-parse", issue: parsedUsers.issues });
+			console.error(parsedUsers.issues);
+		}
+	};
+
+	const defaultValues: UserForm = {
+		users,
+	};
+	const form = useForm({
+		defaultValues,
+		validators: {
+			onChange: UserFormSchema,
+		},
+		onSubmit: ({ value }) => {
+			setUsers(value.users);
+		},
+	});
+
+	return (
+		<>
+			<LoadUserIssueModal
+				issues={loadUserIssues}
+				close={() => setLoadUserIssues(null)}
+			/>
+			<div className="flex w-full flex-col gap-4 p-6">
+				<input
+					ref={uploadInputRef}
+					onChange={onUpload}
+					className="hidden"
+					type="file"
+					multiple={false}
+				/>
+				<div className="flex items-center justify-between">
+					<h1 className="font-semibold text-3xl text-content-primary">Users</h1>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild={true}>
+							<Button variant="outline" size="icon-lg">
+								<Ellipsis />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuPortal>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem
+									onClick={() => uploadInputRef.current?.click()}
+								>
+									<UploadIcon />
+									Upload
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									disabled={form.state.errors.length > 0}
+									onClick={() => {
+										downloadData(form.state.values.users, "users.json");
+									}}
+								>
+									<DownloadIcon />
+									Download
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenuPortal>
+					</DropdownMenu>
+				</div>
+				<form.Field name="users" mode="array">
+					{(field) => {
+						return (
+							<div className=" flex flex-col gap-3">
+								{field.state.value.map((_, index) => (
+									<form.Field key={index} name={`users[${index}]`}>
+										{(subField) => (
+											<UserForm
+												user={subField.state.value}
+												key={window.crypto.randomUUID()}
+												onSave={(owner) => {
+													subField.handleChange(owner);
+													form.handleSubmit();
+												}}
+												onDelete={() => {
+													field.removeValue(index);
+													form.handleSubmit();
+												}}
+											/>
+										)}
+									</form.Field>
+								))}
+							</div>
+						);
+					}}
+				</form.Field>
+				<Button onClick={() => form.pushFieldValue("users", emptyUser)}>
+					<PlusIcon />
+					Add a user
+				</Button>
+			</div>
+		</>
+	);
+};
 
 type UserFormProps = {
 	user: User;
@@ -135,58 +283,49 @@ const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
 							);
 						}}
 					</form.Field>
-					<form.Field
-						name="full_name"
-						children={(field) => {
-							return (
-								<div className="flex w-full flex-col gap-2">
-									<Label>Full name</Label>
-									<Input
-										id={field.name}
-										name={field.name}
-										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={(e) => field.handleChange(e.target.value)}
-										placeholder="Alice Coder"
-									/>
-								</div>
-							);
-						}}
-					/>
-				</div>
-				<form.Field
-					name="email"
-					children={(field) => {
-						return (
+					<form.Field name="full_name">
+						{(field) => (
 							<div className="flex w-full flex-col gap-2">
-								<Label>Email</Label>
+								<Label>Full name</Label>
 								<Input
 									id={field.name}
 									name={field.name}
 									value={field.state.value}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder="alice@coder.com"
+									placeholder="Alice Coder"
 								/>
 							</div>
-						);
-					}}
-				/>
-				<form.Field
-					name="groups"
-					children={(field) => {
-						return (
-							<div className="flex w-full flex-col gap-2">
-								<Label>Groups</Label>
-								<TagInput
-									label="groups"
-									values={field.state.value}
-									onChange={(v) => field.handleChange(v)}
-								/>
-							</div>
-						);
-					}}
-				/>
+						)}
+					</form.Field>
+				</div>
+				<form.Field name="email">
+					{(field) => (
+						<div className="flex w-full flex-col gap-2">
+							<Label>Email</Label>
+							<Input
+								id={field.name}
+								name={field.name}
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(e) => field.handleChange(e.target.value)}
+								placeholder="alice@coder.com"
+							/>
+						</div>
+					)}
+				</form.Field>
+				<form.Field name="groups">
+					{(field) => (
+						<div className="flex w-full flex-col gap-2">
+							<Label>Groups</Label>
+							<TagInput
+								label="groups"
+								values={field.state.value}
+								onChange={(v) => field.handleChange(v)}
+							/>
+						</div>
+					)}
+				</form.Field>
 				<div className="flex flex-col gap-3">
 					<p>RBAC Roles</p>
 					<form.Field name="rbac_roles">
@@ -252,112 +391,45 @@ const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
 	);
 };
 
-type UsersProps = {
-	users: User[];
-	setUsers: (owners: User[]) => void;
+type LoadUserIssueModalProps = {
+	issues: LoadUserIssues | null;
+	close: () => void;
 };
-export const Users: FC<UsersProps> = ({ users, setUsers }) => {
-	const uploadInputRef = useRef<HTMLInputElement | null>(null);
-
-	const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		e.target.value = "";
-		e.target.files = null;
-		if (!file) {
-			return;
+const LoadUserIssueModal: FC<LoadUserIssueModalProps> = ({ issues, close }) => {
+	const getErrorMessages = () => {
+		if (!issues) {
+			return [];
 		}
 
-		const parsedUsers = v.safeParse(
-			v.array(UserSchema),
-			JSON.parse(new TextDecoder().decode(await file.bytes())),
-		);
-
-		if (parsedUsers.success) {
-			setUsers(parsedUsers.output);
-		} else {
-			console.error(parsedUsers.issues);
+		if (issues.kind === "json-parse") {
+			return [issues.issue];
 		}
-	};
 
-	const defaultValues: UserForm = {
-		users,
+		return issues.issue.map((v) => v.message);
 	};
-	const form = useForm({
-		defaultValues,
-		validators: {
-			onChange: UserFormSchema,
-		},
-		onSubmit: ({ value }) => {
-			setUsers(value.users);
-		},
-	});
 
 	return (
-		<div className="flex w-full flex-col gap-4 p-6">
-			<input
-				ref={uploadInputRef}
-				onChange={onUpload}
-				className="hidden"
-				type="file"
-				multiple={false}
-			/>
-			<div className="flex items-center justify-between">
-				<h1 className="font-semibold text-3xl text-content-primary">Users</h1>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild={true}>
-						<Button variant="outline" size="icon-lg">
-							<Ellipsis />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuPortal>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem onClick={() => uploadInputRef.current?.click()}>
-								<UploadIcon />
-								Upload
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								disabled={form.state.errors.length > 0}
-								onClick={() => {
-									downloadData(form.state.values.users, "users.json");
-								}}
-							>
-								<DownloadIcon />
-								Download
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenuPortal>
-				</DropdownMenu>
-			</div>
-			<form.Field name="users" mode="array">
-				{(field) => {
-					return (
-						<div className=" flex flex-col gap-3">
-							{field.state.value.map((_, index) => (
-								<form.Field key={index} name={`users[${index}]`}>
-									{(subField) => (
-										<UserForm
-											user={subField.state.value}
-											key={window.crypto.randomUUID()}
-											onSave={(owner) => {
-												subField.handleChange(owner);
-												form.handleSubmit();
-											}}
-											onDelete={() => {
-												field.removeValue(index);
-												form.handleSubmit();
-											}}
-										/>
-									)}
-								</form.Field>
-							))}
-						</div>
-					);
-				}}
-			</form.Field>
-			<Button onClick={() => form.pushFieldValue("users", emptyUser)}>
-				<PlusIcon />
-				Add a user
-			</Button>
-		</div>
+		<Dialog open={issues !== null}>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle className="text-content-primary text-xl">
+						Could not load users from file
+					</DialogTitle>
+					<DialogDescription className="text-content-secondary">
+						Please check your file and try again.
+					</DialogDescription>
+				</DialogHeader>
+
+				<div className="flex max-h-64 flex-col gap-4 overflow-y-scroll whitespace-pre-wrap rounded-md bg-surface-secondary p-4 font-mono text-content-destructive">
+					{getErrorMessages().map((message, index) => (
+						<p key={index}>{message}</p>
+					))}
+				</div>
+
+				<DialogFooter>
+					<Button onClick={close}>Close</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
 	);
 };
