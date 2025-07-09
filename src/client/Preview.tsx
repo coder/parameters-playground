@@ -244,6 +244,7 @@ const PreviewEmptyState = () => {
 					rel="noreferrer"
 					className="flex items-center gap-0.5 text-content-link text-sm"
 				>
+					<span className="sr-only"> (link opens in new tab)</span>
 					Read the docs
 					<span className="inline">
 						<ExternalLinkIcon width={16} />

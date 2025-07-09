@@ -178,6 +178,7 @@ export const App = () => {
 						rel="noreferrer"
 						className="font-light text-content-secondary text-sm hover:text-content-primary"
 					>
+						<span className="sr-only"> (link opens in new tab)</span>
 						Coder
 					</a>
 					<a
@@ -186,6 +187,7 @@ export const App = () => {
 						rel="noreferrer"
 						className="font-light text-content-secondary text-sm hover:text-content-primary"
 					>
+						<span className="sr-only"> (link opens in new tab)</span>
 						Docs
 					</a>
 					<ExampleSelector />
@@ -325,6 +327,7 @@ const ExampleSelector: FC = () => {
 						return (
 							<DropdownMenuItem key={slug} asChild={true}>
 								<a href={href} target="_blank" rel="noreferrer">
+									<span className="sr-only"> (link opens in new tab)</span>
 									<ExternalLinkIcon />
 									{title}
 								</a>
