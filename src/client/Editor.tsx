@@ -52,18 +52,12 @@ export const Editor: FC<EditorProps> = ({ code, setCode, parameters }) => {
 	};
 
 	const onAddSnippet = (name: string, snippet: SnippetFunc) => {
-		const nextInOrder =
-			parameters.reduce(
-				(highestOrder, parameter) =>
-					highestOrder < parameter.order ? parameter.order : highestOrder,
-				0,
-			) + 1;
-
 		const nameCount = parameters.filter((p) => p.name.startsWith(name)).length;
 
-		setCode(
-			`${code.trimEnd()}\n\n${snippet(nameCount > 0 ? `${name}-${nameCount}` : name, nextInOrder)}\n`,
-		);
+		const nextInOrder = 1 + Math.max(0, ...parameters.map((p) => p.order));
+		const newName = nameCount > 0 ? `${name}-${nameCount}` : name;
+		const newSnippet = snippet(newName, nextInOrder);
+		setCode(`${code.trimEnd()}\n\n${newSnippet}\n`);
 	};
 
 	useEffect(() => {
