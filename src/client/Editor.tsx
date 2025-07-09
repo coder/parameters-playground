@@ -1,3 +1,13 @@
+import { Editor as MonacoEditor } from "@monaco-editor/react";
+import {
+	CheckIcon,
+	ChevronDownIcon,
+	CopyIcon,
+	FileJsonIcon,
+	SettingsIcon,
+	ZapIcon,
+} from "lucide-react";
+import { type FC, useEffect, useState } from "react";
 import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
@@ -13,21 +23,11 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
-import { useTheme } from "@/client/contexts/theme";
-import { snippets, type SnippetFunc } from "@/client/snippets";
-import { cn } from "@/utils/cn";
-import { Editor as MonacoEditor } from "@monaco-editor/react";
-import {
-	CheckIcon,
-	ChevronDownIcon,
-	CopyIcon,
-	FileJsonIcon,
-	SettingsIcon,
-	ZapIcon,
-} from "lucide-react";
-import { type FC, useEffect, useRef, useState } from "react";
 import { useEditor } from "@/client/contexts/editor";
+import { useTheme } from "@/client/contexts/theme";
+import { type SnippetFunc, snippets } from "@/client/snippets";
 import type { ParameterWithSource } from "@/gen/types";
+import { cn } from "@/utils/cn";
 
 type EditorProps = {
 	code: string;
@@ -42,9 +42,6 @@ export const Editor: FC<EditorProps> = ({ code, setCode, parameters }) => {
 	const [tab, setTab] = useState(() => "code");
 
 	const [codeCopied, setCodeCopied] = useState(() => false);
-	const copyTimeoutId = useRef<ReturnType<typeof setTimeout> | undefined>(
-		undefined,
-	);
 
 	const onCopy = () => {
 		navigator.clipboard.writeText(code);
@@ -65,13 +62,11 @@ export const Editor: FC<EditorProps> = ({ code, setCode, parameters }) => {
 			return;
 		}
 
-		clearTimeout(copyTimeoutId.current);
-
-		copyTimeoutId.current = setTimeout(() => {
+		const copyTimeoutId = setTimeout(() => {
 			setCodeCopied(() => false);
 		}, 1000);
 
-		return () => clearTimeout(copyTimeoutId.current);
+		return () => clearTimeout(copyTimeoutId);
 	}, [codeCopied]);
 
 	return (
