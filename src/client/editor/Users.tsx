@@ -88,7 +88,6 @@ export const Users: FC<UsersProps> = ({ users, setUsers }) => {
 			setUsers(parsedUsers.output);
 		} else {
 			setLoadUserIssues({ kind: "valibot-parse", issue: parsedUsers.issues });
-			console.error(parsedUsers.issues);
 		}
 	};
 
