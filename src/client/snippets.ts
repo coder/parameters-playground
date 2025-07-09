@@ -19,7 +19,7 @@ export const defaultCode = `terraform {
   }
 }`;
 
-export type SnippetFunc = (name?: string, order?: number) => string;
+export type SnippetFunc = (name: string, order: number) => string;
 type Snippet = {
 	name: string;
 	label: string;
