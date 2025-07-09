@@ -1,5 +1,6 @@
 import {
 	LetterTextIcon,
+	type LucideIcon,
 	RadioIcon,
 	Rows3Icon,
 	Settings2Icon,
@@ -22,7 +23,7 @@ export type SnippetFunc = (name?: string, order?: number) => string;
 type Snippet = {
 	name: string;
 	label: string;
-	icon: typeof RadioIcon;
+	icon: LucideIcon;
 	snippet: SnippetFunc;
 };
 
