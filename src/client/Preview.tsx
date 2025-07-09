@@ -239,9 +239,12 @@ const PreviewEmptyState = () => {
 					</p>
 				</div>
 				<a
-					href="#todo"
+					href="https://coder.com/docs/admin/templates/extending-templates/parameters"
+					target="_blank"
+					rel="noreferrer"
 					className="flex items-center gap-0.5 text-content-link text-sm"
 				>
+					<span className="sr-only"> (link opens in new tab)</span>
 					Read the docs
 					<span className="inline">
 						<ExternalLinkIcon width={16} />
