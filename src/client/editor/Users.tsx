@@ -49,9 +49,6 @@ const UserForm: FC<UserFormProps> = ({ user, onSave, onDelete }) => {
 		validators: {
 			onChange: UserSchema,
 		},
-		onSubmitInvalid: () => {
-			// TODO
-		},
 		onSubmit: ({ value }) => {
 			setIsEditing(false);
 			const owner = v.parse(UserSchema, value);
@@ -278,7 +275,7 @@ export const Users: FC<UsersProps> = ({ users, setUsers }) => {
 		if (parsedUsers.success) {
 			setUsers(parsedUsers.output);
 		} else {
-			// TODO: Show an error
+			console.error(parsedUsers.issues);
 		}
 	};
 
