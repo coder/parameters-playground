@@ -4,14 +4,10 @@ import {
 	ChevronDownIcon,
 	CopyIcon,
 	FileJsonIcon,
-	RadioIcon,
-	SquareMousePointerIcon,
-	TextCursorInputIcon,
-	ToggleLeftIcon,
 	UsersIcon,
 	ZapIcon,
 } from "lucide-react";
-import { type FC, useEffect, useRef, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
@@ -25,8 +21,8 @@ import * as Tabs from "@/client/components/Tabs";
 import { useEditor } from "@/client/contexts/editor";
 import { useTheme } from "@/client/contexts/theme";
 import { Users } from "@/client/editor/Users";
-import { multiSelect, radio, switchInput, textInput } from "@/client/snippets";
-import type { ParameterFormType } from "@/gen/types";
+import { type SnippetFunc, snippets } from "@/client/snippets";
+import type { ParameterWithSource } from "@/gen/types";
 import type { User } from "@/user";
 import { cn } from "@/utils/cn";
 
@@ -35,39 +31,35 @@ type EditorProps = {
 	setCode: React.Dispatch<React.SetStateAction<string>>;
 	users: User[];
 	setUsers: (owners: User[]) => void;
+	parameters: ParameterWithSource[];
 };
 
 export const Editor: FC<EditorProps> = ({
 	code,
 	setCode,
-	users: owners,
-	setUsers: setOwners,
+	users,
+	setUsers,
+	parameters,
 }) => {
 	const { appliedTheme } = useTheme();
 	const editorRef = useEditor();
 
-	const [codeCopied, setCodeCopied] = useState(() => false);
-	const copyTimeoutId = useRef<ReturnType<typeof setTimeout> | undefined>(
-		undefined,
-	);
-
 	const [tab, setTab] = useState(() => "code");
+
+	const [codeCopied, setCodeCopied] = useState(() => false);
 
 	const onCopy = () => {
 		navigator.clipboard.writeText(code);
 		setCodeCopied(() => true);
 	};
 
-	const onAddSnippet = (formType: ParameterFormType) => {
-		if (formType === "input") {
-			setCode(`${code.trimEnd()}\n\n${textInput}\n`);
-		} else if (formType === "radio") {
-			setCode(`${code.trimEnd()}\n\n${radio}\n`);
-		} else if (formType === "multi-select") {
-			setCode(`${code.trimEnd()}\n\n${multiSelect}\n`);
-		} else if (formType === "switch") {
-			setCode(`${code.trimEnd()}\n\n${switchInput}\n`);
-		}
+	const onAddSnippet = (name: string, snippet: SnippetFunc) => {
+		const nameCount = parameters.filter((p) => p.name.startsWith(name)).length;
+
+		const nextInOrder = 1 + Math.max(0, ...parameters.map((p) => p.order));
+		const newName = nameCount > 0 ? `${name}-${nameCount}` : name;
+		const newSnippet = snippet(newName, nextInOrder);
+		setCode(`${code.trimEnd()}\n\n${newSnippet}\n`);
 	};
 
 	useEffect(() => {
@@ -75,13 +67,11 @@ export const Editor: FC<EditorProps> = ({
 			return;
 		}
 
-		clearTimeout(copyTimeoutId.current);
-
-		copyTimeoutId.current = setTimeout(() => {
+		const copyTimeoutId = setTimeout(() => {
 			setCodeCopied(() => false);
 		}, 1000);
 
-		return () => clearTimeout(copyTimeoutId.current);
+		return () => clearTimeout(copyTimeoutId);
 	}, [codeCopied]);
 
 	return (
@@ -110,23 +100,17 @@ export const Editor: FC<EditorProps> = ({
 
 							<DropdownMenuPortal>
 								<DropdownMenuContent align="start">
-									<DropdownMenuItem onClick={() => onAddSnippet("input")}>
-										<TextCursorInputIcon width={24} height={24} />
-										Text input
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										onClick={() => onAddSnippet("multi-select")}
-									>
-										<SquareMousePointerIcon width={24} height={24} />
-										Multi-select
-									</DropdownMenuItem>
-									<DropdownMenuItem onClick={() => onAddSnippet("radio")}>
-										<RadioIcon width={24} height={24} />
-										Radio
-									</DropdownMenuItem>
-									<DropdownMenuItem onClick={() => onAddSnippet("switch")}>
-										<ToggleLeftIcon width={24} height={24} /> Switches
-									</DropdownMenuItem>
+									{snippets.map(
+										({ name, label, icon: Icon, snippet }, index) => (
+											<DropdownMenuItem
+												key={index}
+												onClick={() => onAddSnippet(name, snippet)}
+											>
+												<Icon size={24} />
+												{label}
+											</DropdownMenuItem>
+										),
+									)}
 								</DropdownMenuContent>
 							</DropdownMenuPortal>
 						</DropdownMenu>
@@ -183,7 +167,7 @@ export const Editor: FC<EditorProps> = ({
 				</Tabs.Content>
 
 				<Tabs.Content value="users" asChild={true}>
-					<Users setUsers={setOwners} users={owners} />
+					<Users setUsers={setUsers} users={users} />
 				</Tabs.Content>
 			</ResizablePanel>
 		</Tabs.Root>
