@@ -110,7 +110,7 @@ export const Users: FC<UsersProps> = ({ users, setUsers }) => {
 				issues={loadUserIssues}
 				close={() => setLoadUserIssues(null)}
 			/>
-			<div className="flex w-full flex-col gap-4 p-6">
+			<div className="flex h-full w-full flex-col gap-4 overflow-y-scroll p-6">
 				<input
 					ref={uploadInputRef}
 					onChange={onUpload}
