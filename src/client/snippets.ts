@@ -205,8 +205,6 @@ export const switchInput: SnippetFunc = (
   type         = "bool"
   form_type    = "switch"
   default      = true
-<<<<<<< HEAD
-  order        = 1
 }`;
 
 export const slider: SnippetFunc = (
