@@ -200,6 +200,7 @@ export const App = () => {
 					setCode={setCode}
 					users={users}
 					setUsers={setUsers}
+					parameters={parameters}
 				/>
 
 				<ResizableHandle className="bg-surface-quaternary" />
