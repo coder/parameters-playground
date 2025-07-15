@@ -44,6 +44,20 @@ import { AnimatePresence, motion } from "motion/react";
 import React from "react";
 import { type FC, type PropsWithChildren, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
+import { MultiSelectComboBox } from "./components/NewMultiSelectCombobox";
+
+const options = [
+	{ value: "apple", label: "Apple", group: "Fruit" },
+	{ value: "banana", label: "Banana", group: "Fruit" },
+	{ value: "carrot", label: "Carrot", group: "Vegetable" },
+	{ value: "orange", label: "Orange", group: "Fruit" },
+	{ value: "broccoli", label: "Broccoli", group: "Vegetable" },
+	{ value: "grape", label: "Grape", group: "Fruit" },
+	{ value: "spinach", label: "Spinach", group: "Vegetable" },
+	{ value: "mango", label: "Mango", group: "Fruit" },
+	{ value: "potato", label: "Potato", group: "Vegetable" },
+	{ value: "kiwi", label: "Kiwi", group: "Fruit" },
+];
 
 type PreviewProps = {
 	wasmLoadState: WasmLoadState;
@@ -186,6 +200,9 @@ export const Preview: FC<PreviewProps> = ({
 								<UserSelect setOwner={setOwner} />
 							</div>
 						}
+						<MultiSelectComboBox
+							options={options}
+						/>
 						{parameters.length === 0 ? (
 							<div className="flex h-full w-full items-center justify-center overflow-x-clip rounded-xl border p-4">
 								<PreviewEmptyState />
