@@ -4,8 +4,9 @@ import { Hono } from "hono";
 import { renderToString } from "react-dom/server";
 import { getShareData } from "./blob";
 import { trimTrailingSlash } from "hono/trailing-slash";
-import { BaseHeader, defaultCode, getAssetPath, HmrScript } from "./utils";
+import { BaseHeader, getAssetPath, HmrScript } from "./utils";
 import { notFound } from "./routes/404";
+import defaultExample from "@/examples/code/default.tf?raw";
 
 // This must be exported for the dev server to work
 export const app = new Hono();
@@ -38,7 +39,7 @@ app.get("/parameters/:shareId?/:example?", async (c, next) => {
 			return examples[example] ?? null;
 		}
 
-		return defaultCode;
+		return defaultExample;
 	};
 
 	const exampleCode = await getExampleCode();
@@ -59,8 +60,11 @@ app.get("/parameters/:shareId?/:example?", async (c, next) => {
 					</head>
 					<body>
 						<div id="root"></div>
-							<script type="module">{`window.CODE = ${JSON.stringify(exampleCode)}`}</script>
-						<script type="module" src={getAssetPath("/src/client/index.tsx", "client.js")}></script>
+						<script type="module">{`window.CODE = ${JSON.stringify(exampleCode)}`}</script>
+						<script
+							type="module"
+							src={getAssetPath("/src/client/index.tsx", "client.js")}
+						></script>
 					</body>
 				</html>,
 			),
