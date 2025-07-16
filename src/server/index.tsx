@@ -4,8 +4,9 @@ import { renderToString } from "react-dom/server";
 import { examples } from "@/examples/code";
 import { api } from "@/server/routes/api";
 import { getShareData, type ShareData } from "./blob";
+import { BaseHeader, getAssetPath, HmrScript } from "./utils";
 import { notFound } from "./routes/404";
-import { BaseHeader, defaultCode, getAssetPath, HmrScript } from "./utils";
+import defaultExample from "@/examples/code/default.tf?raw";
 
 // This must be exported for the dev server to work
 export const app = new Hono();
@@ -39,7 +40,7 @@ app.get("/parameters/:shareId?/:example?", async (c, next) => {
 			return code ? { code } : null;
 		}
 
-		return { code: defaultCode };
+		return { code: defaultExample };
 	};
 
 	const codeAndUsers = await getCodeAndUsers();
