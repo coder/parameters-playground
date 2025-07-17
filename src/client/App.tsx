@@ -86,7 +86,6 @@ export const App = () => {
 
 	useEffect(() => {
 		const newCurrentUser = users.find((u) => u.id === currentUser.id);
-
 		if (newCurrentUser) {
 			setCurrentUser(() => newCurrentUser);
 		}
