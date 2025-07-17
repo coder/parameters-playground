@@ -6,11 +6,6 @@
 	},
 	"files": {
 		"includes": ["!src/client/gen/types.ts","!pnpm-lock.yaml"],
-		"experimentalScannerIgnores": [
-			"src/client/gen/types.ts",
-			"pnpm-lock.yaml"
-			
-		],
 		"ignoreUnknown": true
 	},
 	"linter": {
