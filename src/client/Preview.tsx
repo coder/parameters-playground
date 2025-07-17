@@ -569,14 +569,8 @@ type UserSelectProps = {
 	users: User[];
 	setUsers: (user: User) => void;
 };
-const UserSelect: FC<UserSelectProps> = ({
-	currentUser,
-	users,
-	setUsers,
-}) => {
-	const selectedMissing = !users.some(
-		(owner) => currentUser.id === owner.id,
-	);
+const UserSelect: FC<UserSelectProps> = ({ currentUser, users, setUsers }) => {
+	const selectedMissing = users.every((user) => currentUser.id !== user.id);
 
 	return (
 		<Select
