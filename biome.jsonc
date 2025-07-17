@@ -5,6 +5,7 @@
 		"clientKind": "git"
 	},
 	"files": {
+		"includes": ["!src/client/gen/types.ts","!pnpm-lock.yaml"],
 		"experimentalScannerIgnores": [
 			"src/client/gen/types.ts",
 			"pnpm-lock.yaml"
@@ -16,25 +17,30 @@
 		"rules": {
 			"a11y": {
 				"noSvgWithoutTitle": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"useButtonType": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"useSemanticElements": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				}
 			},
 			"style": {
 				"noNonNullAssertion": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"noParameterAssign": {
 					"level": "off",
 					"options": {}
 				},
 				"useDefaultParameterLast": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"useSelfClosingElements": {
 					"level": "off",
@@ -43,7 +49,8 @@
 			},
 			"suspicious": {
 				"noArrayIndexKey": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"noConsole": {
 					"level": "error",
@@ -52,7 +59,8 @@
 					}
 				},
 				"noThenProperty": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				}
 			},
 			"nursery": {
@@ -60,5 +68,5 @@
 			}
 		}
 	},
-	"$schema": "https://biomejs.dev/schemas/2.0.6/schema.json"
+	"$schema": "https://biomejs.dev/schemas/2.1.1/schema.json"
 }
