@@ -1,5 +1,13 @@
-import { Editor } from "@/client/Editor";
-import { Preview } from "@/client/Preview";
+import isEqual from "lodash/isEqual";
+import {
+	ExternalLinkIcon,
+	MoonIcon,
+	ShareIcon,
+	SunIcon,
+	SunMoonIcon,
+} from "lucide-react";
+import { type FC, useEffect, useMemo, useRef, useState } from "react";
+import { useBeforeUnload, useSearchParams } from "react-router";
 import { Button } from "@/client/components/Button";
 import {
 	DropdownMenu,
@@ -19,31 +27,20 @@ import {
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
 import { useTheme } from "@/client/contexts/theme";
+import { Editor } from "@/client/editor/Editor";
+import { Preview } from "@/client/Preview";
 import { defaultCode } from "@/client/snippets";
 import { examples } from "@/examples";
-import type {
-	ParameterWithSource,
-	PreviewOutput,
-	WorkspaceOwner,
-} from "@/gen/types";
-import { mockUsers } from "@/owner";
+import type { ParameterWithSource, PreviewOutput } from "@/gen/types";
+import { baseMockUser, mockUsers, type User } from "@/user";
 import { rpc } from "@/utils/rpc";
 import {
-	type WasmLoadState,
 	getDynamicParametersOutput,
 	initWasm,
+	type WasmLoadState,
 } from "@/utils/wasm";
-import isEqual from "lodash/isEqual";
-import {
-	ExternalLinkIcon,
-	MoonIcon,
-	ShareIcon,
-	SunIcon,
-	SunMoonIcon,
-} from "lucide-react";
-import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useDebouncedValue } from "./hooks/debounce";
-import { useBeforeUnload, useSearchParams } from "react-router";
+import { downloadData } from "./utils";
 
 export const App = () => {
 	useBeforeUnload(
@@ -67,28 +64,14 @@ export const App = () => {
 	>({});
 	const [output, setOutput] = useState<PreviewOutput | null>(null);
 	const [parameters, setParameters] = useState<ParameterWithSource[]>([]);
-	const [owner, setOwner] = useState<WorkspaceOwner>(mockUsers.admin);
+
+	const [users, setUsers] = useState<User[]>(window.USERS ?? mockUsers);
+	const [currentUser, setCurrentUser] = useState<User>(
+		users[0] ?? baseMockUser,
+	);
 
 	const onDownloadOutput = () => {
-		const blob = new Blob([JSON.stringify(output, null, 2)], {
-			type: "application/json",
-		});
-
-		const url = URL.createObjectURL(blob);
-
-		const link = document.createElement("a");
-		link.href = url;
-		link.download = "output.json";
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-
-		// Give the click event enough time to fire and then revoke the URL.
-		// This method of doing it doesn't seem great but I'm not sure if there is a
-		// better way.
-		setTimeout(() => {
-			URL.revokeObjectURL(url);
-		}, 100);
+		downloadData(output, "output.json");
 	};
 
 	const onReset = () => {
@@ -100,6 +83,13 @@ export const App = () => {
 			}),
 		);
 	};
+
+	useEffect(() => {
+		const newCurrentUser = users.find((u) => u.id === currentUser.id);
+		if (newCurrentUser) {
+			setCurrentUser(() => newCurrentUser);
+		}
+	}, [users, currentUser.id]);
 
 	useEffect(() => {
 		if (!window.go_preview) {
@@ -152,7 +142,7 @@ export const App = () => {
 			return;
 		}
 
-		getDynamicParametersOutput(debouncedCode, parameterValues, owner)
+		getDynamicParametersOutput(debouncedCode, parameterValues, currentUser)
 			.catch((e) => {
 				console.error(e);
 				setWasmLoadingState("error");
@@ -162,7 +152,7 @@ export const App = () => {
 			.then((output) => {
 				setOutput(output);
 			});
-	}, [debouncedCode, parameterValues, wasmLoadState, owner]);
+	}, [debouncedCode, parameterValues, wasmLoadState, currentUser]);
 
 	return (
 		<main className="flex h-dvh w-screen flex-col items-center bg-surface-primary">
@@ -171,12 +161,12 @@ export const App = () => {
 				<div className="flex items-center justify-center gap-6">
 					<div className="flex items-center gap-2">
 						<Logo className="text-content-primary" height={24} />
-						<p className="font-semibold text-content-primary text-2xl">
+						<p className="font-semibold text-2xl text-content-primary">
 							Playground
 						</p>
 					</div>
 
-					<ShareButton code={code} />
+					<ShareButton code={code} users={users} />
 				</div>
 
 				<div className="flex items-center gap-3">
@@ -204,8 +194,13 @@ export const App = () => {
 			</nav>
 
 			<ResizablePanelGroup direction={"horizontal"}>
-				{/* EDITOR */}
-				<Editor code={code} setCode={setCode} parameters={parameters} />
+				<Editor
+					code={code}
+					setCode={setCode}
+					users={users}
+					setUsers={setUsers}
+					parameters={parameters}
+				/>
 
 				<ResizableHandle className="bg-surface-quaternary" />
 
@@ -219,9 +214,11 @@ export const App = () => {
 					setParameterValues={setParameterValues}
 					parameters={parameters}
 					onReset={onReset}
-					setOwner={(owner) => {
+					currentUser={currentUser}
+					users={users}
+					setUsers={(owner) => {
 						onReset();
-						setOwner(owner);
+						setCurrentUser(owner);
 					}}
 				/>
 			</ResizablePanelGroup>
@@ -270,15 +267,16 @@ const ThemeSelector: FC = () => {
 
 type ShareButtonProps = {
 	code: string;
+	users: User[];
 };
-const ShareButton: FC<ShareButtonProps> = ({ code }) => {
+const ShareButton: FC<ShareButtonProps> = ({ code, users }) => {
 	const [isCopied, setIsCopied] = useState(() => false);
 	const timeoutId = useRef<ReturnType<typeof setTimeout>>(undefined);
 
 	const onShare = async () => {
 		try {
 			const { id } = await rpc.parameters
-				.$post({ json: { code } })
+				.$post({ json: { code, users } })
 				.then((res) => res.json());
 
 			const { protocol, host } = window.location;

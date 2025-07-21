@@ -4,7 +4,7 @@ import {
 	ChevronDownIcon,
 	CopyIcon,
 	FileJsonIcon,
-	SettingsIcon,
+	UsersIcon,
 	ZapIcon,
 } from "lucide-react";
 import { type FC, useEffect, useState } from "react";
@@ -18,24 +18,29 @@ import {
 } from "@/client/components/DropdownMenu";
 import { ResizablePanel } from "@/client/components/Resizable";
 import * as Tabs from "@/client/components/Tabs";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/client/components/Tooltip";
 import { useEditor } from "@/client/contexts/editor";
 import { useTheme } from "@/client/contexts/theme";
+import { Users } from "@/client/editor/Users";
 import { type SnippetFunc, snippets } from "@/client/snippets";
 import type { ParameterWithSource } from "@/gen/types";
+import type { User } from "@/user";
 import { cn } from "@/utils/cn";
 
 type EditorProps = {
 	code: string;
 	setCode: React.Dispatch<React.SetStateAction<string>>;
+	users: User[];
+	setUsers: (owners: User[]) => void;
 	parameters: ParameterWithSource[];
 };
 
-export const Editor: FC<EditorProps> = ({ code, setCode, parameters }) => {
+export const Editor: FC<EditorProps> = ({
+	code,
+	setCode,
+	users,
+	setUsers,
+	parameters,
+}) => {
 	const { appliedTheme } = useTheme();
 	const editorRef = useEditor();
 
@@ -81,17 +86,7 @@ export const Editor: FC<EditorProps> = ({ code, setCode, parameters }) => {
 					<div className="flex h-12 w-full items-center justify-between border-b border-b-surface-quaternary pr-3">
 						<div className="flex">
 							<Tabs.Trigger icon={FileJsonIcon} label="Code" value="code" />
-							<Tooltip>
-								<TooltipTrigger asChild={true} className="hidden">
-									<Tabs.Trigger
-										icon={SettingsIcon}
-										label="Variables"
-										value="variables"
-										disabled={true}
-									/>
-								</TooltipTrigger>
-								<TooltipContent>Coming soon</TooltipContent>
-							</Tooltip>
+							<Tabs.Trigger icon={UsersIcon} label="Users" value="users" />
 						</div>
 
 						<DropdownMenu>
@@ -169,6 +164,10 @@ export const Editor: FC<EditorProps> = ({ code, setCode, parameters }) => {
 							}}
 						/>
 					</div>
+				</Tabs.Content>
+
+				<Tabs.Content value="users" asChild={true}>
+					<Users setUsers={setUsers} users={users} />
 				</Tabs.Content>
 			</ResizablePanel>
 		</Tabs.Root>

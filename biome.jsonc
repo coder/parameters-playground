@@ -2,74 +2,66 @@
 	"vcs": {
 		"enabled": true,
 		"useIgnoreFile": true,
-		"clientKind": "git",
-		"root": ".."
+		"clientKind": "git"
 	},
 	"files": {
-		"ignore": [
-			"e2e/**/*Generated.ts",
-			"pnpm-lock.yaml"
-		],
+		"includes": ["!src/client/gen/types.ts","!pnpm-lock.yaml"],
 		"ignoreUnknown": true
 	},
 	"linter": {
 		"rules": {
 			"a11y": {
 				"noSvgWithoutTitle": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"useButtonType": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"useSemanticElements": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				}
 			},
 			"style": {
 				"noNonNullAssertion": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"noParameterAssign": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"useDefaultParameterLast": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
 				"useSelfClosingElements": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				}
 			},
 			"suspicious": {
 				"noArrayIndexKey": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				},
-				"noConsoleLog": {
-					"level": "error"
+				"noConsole": {
+					"level": "error",
+					"options": {
+						"allow": ["error"]
+					}
 				},
 				"noThenProperty": {
-					"level": "off"
+					"level": "off",
+					"options": {}
 				}
 			},
 			"nursery": {
-				"useSortedClasses": "error",
-				"noRestrictedImports": {
-					"level": "error",
-					"options": {
-						"paths": {
-							"@mui/material": "Use @mui/material/<name> instead. See: https://material-ui.com/guides/minimizing-bundle-size/.",
-							"@mui/icons-material": "Use @mui/icons-material/<name> instead. See: https://material-ui.com/guides/minimizing-bundle-size/.",
-							"@mui/material/Avatar": "Use components/Avatar/Avatar instead.",
-							"@mui/material/Alert": "Use components/Alert/Alert instead.",
-							"@mui/material/Popover": "Use components/Popover/Popover instead.",
-							"@mui/material/Typography": "Use native HTML elements instead. Eg: <span>, <p>, <h1>, etc.",
-							"@mui/material/Box": "Use a <div> instead.",
-							"@mui/material/styles": "Import from @emotion/react instead.",
-							"lodash": "Use lodash/<name> instead."
-						}
-					}
-				}
+				"useSortedClasses": "error"
 			}
 		}
 	},
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json"
+	"$schema": "https://biomejs.dev/schemas/2.1.1/schema.json"
 }

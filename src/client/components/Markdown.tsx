@@ -57,7 +57,7 @@ export const Markdown: FC<MarkdownProps> = (props) => {
 					);
 				},
 
-				hr: () => <hr className="my-3"/>,
+				hr: () => <hr className="my-3" />,
 
 				pre: ({ node, children }) => {
 					if (!node || !node.children) {

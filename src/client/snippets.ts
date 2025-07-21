@@ -245,7 +245,7 @@ export const snippets: Snippet[] = [
 		snippet: radio,
 	},
 	{
-		name: "switch",
+		name: "multi-select",
 		label: "Multi-select",
 		icon: SquareMousePointerIcon,
 		snippet: multiSelect,

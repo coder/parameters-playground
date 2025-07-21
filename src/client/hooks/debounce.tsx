@@ -89,7 +89,7 @@ export function useDebouncedValue<T = unknown>(
 	const [isDebouncing, setIsDebouncing] = useState(false);
 
 	useEffect(() => {
-    setIsDebouncing(() => true);
+		setIsDebouncing(() => true);
 		const timeoutId = window.setTimeout(() => {
 			setDebouncedValue(value);
 			setIsDebouncing(() => false);

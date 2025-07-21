@@ -4,13 +4,7 @@ import type { LucideProps } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 export const Root: FC<Tabs.TabsProps> = ({ children, ...rest }) => {
-	return (
-		<Tabs.Root
-			{...rest}
-		>
-			{children}
-		</Tabs.Root>
-	);
+	return <Tabs.Root {...rest}>{children}</Tabs.Root>;
 };
 
 export const List: FC<Tabs.TabsListProps> = ({
@@ -19,7 +13,10 @@ export const List: FC<Tabs.TabsListProps> = ({
 	...rest
 }) => {
 	return (
-		<Tabs.List {...rest} className={cn("flex h-12 max-h-12 w-full border-b", className)}>
+		<Tabs.List
+			{...rest}
+			className={cn("flex h-12 max-h-12 w-full border-b", className)}
+		>
 			{children}
 		</Tabs.List>
 	);
@@ -39,7 +36,7 @@ export const Trigger: FC<TriggerProps> = ({
 		<Tabs.Trigger
 			{...rest}
 			className={cn(
-				"flex min-w-[120px] items-center gap-2 border-x border-x-transparent px-4 py-3 text-center text-content-secondary text-sm transition-colors hover:bg-surface-secondary hover:text-content-primary data-[disabled]:cursor-not-allowed data-[state=active]:border-x-border data-[state=active]:bg-surface-secondary data-[state=active]:text-content-primary data-[disabled]:hover:bg-inherit data-[disabled]:hover:text-content-secondary data-[state=active]:first:border-l-transparent",
+				"flex min-w-[120px] items-center gap-2 border-x border-x-transparent px-4 py-3 text-center text-content-secondary text-sm transition-colors hover:bg-surface-secondary hover:text-content-primary data-[disabled]:cursor-not-allowed data-[state=active]:border-x-border data-[state=active]:bg-surface-secondary data-[state=active]:text-content-primary data-[disabled]:hover:bg-inherit data-[disabled]:hover:text-content-secondary data-[state=active]:first:border-l-transparent last:border-r last:border-r-border",
 				className,
 			)}
 		>
