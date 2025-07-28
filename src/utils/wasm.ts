@@ -4,7 +4,7 @@ import { baseMockUser, type User } from "@/user";
 
 export type WasmLoadState = "loaded" | "loading" | "error";
 
-type GoPreviewDef = (
+export type GoPreviewDef = (
 	/**
 	 * A virtual filetree
 	 */
@@ -13,15 +13,18 @@ type GoPreviewDef = (
 	owner: WorkspaceOwner,
 ) => Promise<string>;
 
-// Extend the Window object to include the Go related code that is added from
-// wasm_exec.js and our loaded Go code.
-declare global {
-	interface Window {
+export type ExtendedWindow = {
 		// Loaded from wasm
 		go_preview?: GoPreviewDef;
 		Go: { new (): Go };
 		CODE?: string;
 		USERS?: User[];
+	};
+
+// Extend the Window object to include the Go related code that is added from
+// wasm_exec.js and our loaded Go code.
+declare global {
+	interface Window extends ExtendedWindow {
 	}
 }
 
