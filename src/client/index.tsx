@@ -1,8 +1,8 @@
-import { TooltipProvider } from "@/client/components/Tooltip";
-import { ThemeProvider } from "@/client/contexts/theme.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { RouterProvider, createBrowserRouter } from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import { TooltipProvider } from "@/client/components/Tooltip";
+import { ThemeProvider } from "@/client/contexts/theme.tsx";
 import { App } from "./App.tsx";
 import "@/client/index.css";
 import { EditorProvider } from "./contexts/editor.tsx";
