@@ -1,8 +1,8 @@
 import type { editor as monaco } from "monaco-editor";
 import {
+	createContext,
 	type FC,
 	type PropsWithChildren,
-	createContext,
 	useContext,
 	useRef,
 } from "react";
@@ -24,7 +24,7 @@ export const useEditor = () => {
 	const editor = useContext(EditorContext);
 
 	if (!editor) {
-		throw new Error("useEditor must eb used within an EditorProvider");
+		throw new Error("useEditor must be used within an EditorProvider");
 	}
 
 	return editor;
