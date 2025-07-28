@@ -376,7 +376,10 @@ const ErrorBlock: FC<ErroBlockPorps> = ({ diagnostic }) => {
 
 const WasmLoading: FC = () => {
 	return (
-		<div className="flex w-full max-w-xs flex-col items-center justify-center gap-2 rounded-xl border border-[#38BDF8] bg-surface-tertiary p-4">
+		<div
+			className="flex w-full max-w-xs flex-col items-center justify-center gap-2 rounded-xl border border-[#38BDF8] bg-surface-tertiary p-4"
+			data-testid="wasm-loading-modal"
+		>
 			<LoaderIcon className="animate-spin text-content-primary" />
 			<div className="text-center">
 				<p className="font-semibold text-content-primary text-xl">
@@ -392,7 +395,10 @@ const WasmLoading: FC = () => {
 
 const WasmError: FC = () => {
 	return (
-		<div className="flex w-full max-w-xs flex-col items-center justify-center gap-2 rounded-xl border border-border-destructive bg-surface-tertiary p-4 text-center">
+		<div
+			className="flex w-full max-w-xs flex-col items-center justify-center gap-2 rounded-xl border border-border-destructive bg-surface-tertiary p-4 text-center"
+			data-testid="wasm-error-modal"
+		>
 			<p className="font-semibold text-content-primary text-xl">
 				Unable to load assets{" "}
 			</p>

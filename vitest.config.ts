@@ -8,7 +8,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
-    setupFiles: ['./src/test/setup.ts'],
+    // setupFiles: ['./src/test/setup.ts'],
     css: true,
     // Include coverage configuration
     coverage: {
@@ -32,7 +32,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
+      '@': path.resolve(__dirname, './src'),
+      "monaco-editor": "./src/__mocks__/monaco-editor.ts"
     }
   }
 })

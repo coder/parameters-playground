@@ -92,22 +92,4 @@ export const getDynamicParametersOutput = async (
 	const output = JSON.parse(rawOutput) as PreviewOutput;
 
 	return output;
-	// if (e instanceof Error) {
-	// 	const diagnostic: InternalDiagnostic = {
-	// 		severity: "error",
-	// 		summary: e.name,
-	// 		detail: e.message,
-	// 		kind: "internal",
-	// 	};
-	// 	$setError([diagnostic]);
-	// } else {
-	// 	const diagnostic: InternalDiagnostic = {
-	// 		severity: "error",
-	// 		summary: "Error",
-	// 		detail: "Something went wrong",
-	// 		kind: "internal",
-	// 	};
-
-	// 	$setError([diagnostic]);
-	// }
 };
