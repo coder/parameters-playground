@@ -1,17 +1,23 @@
 import type { EditorProps } from "@monaco-editor/react";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { render, screen, waitFor } from "@testing-library/react";
+import {
+	cleanup,
+	render,
+	screen,
+	waitFor,
+} from "@testing-library/react";
 import type { FC } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@/client/App";
 import { EditorProvider } from "@/client/contexts/editor";
 import { ThemeProvider } from "@/client/contexts/theme";
-import { initWasm } from "@/utils/wasm";
-import defaultExample from "@/examples/code/default.tf?raw";
 import attachGPUExample from "@/examples/code/attach-gpu.tf?raw";
+import defaultExample from "@/examples/code/default.tf?raw";
+import { initWasm } from "@/utils/wasm";
 
 vi.mock("@/utils/wasm", async () => {
+	const { getDynamicParametersOutput } = await import("@/utils/wasm");
 	return {
 		initWasm: vi
 			.fn<typeof initWasm>(async () => {
@@ -22,7 +28,7 @@ vi.mock("@/utils/wasm", async () => {
 				return "loaded";
 			})
 			.mockResolvedValue("loaded"),
-		getDynamicParametersOutput: vi.fn(async () => null),
+		getDynamicParametersOutput: vi.fn(getDynamicParametersOutput),
 	};
 });
 
@@ -31,7 +37,7 @@ vi.mock("@monaco-editor/react", () => ({
 		<textarea
 			data-testid="monaco-editor"
 			value={value}
-			onChange={(e) =>
+			onChange={(e) => {
 				onChange?.(e.target.value, {
 					changes: [],
 					eol: "\n",
@@ -40,8 +46,8 @@ vi.mock("@monaco-editor/react", () => ({
 					isRedoing: false,
 					isFlush: false,
 					isEolChange: false,
-				})
-			}
+				});
+			}}
 			{...props}
 		/>
 	),
@@ -72,6 +78,9 @@ describe("App - Initial State Setup", () => {
 		delete window.USERS;
 		delete window.go_preview;
 		vi.clearAllMocks();
+	});
+	afterEach(() => {
+		cleanup();
 	});
 
 	it("should show the loading modal while the wasm module is loading", async () => {
@@ -114,3 +123,4 @@ describe("App - Initial State Setup", () => {
 		expect(screen.findByDisplayValue(attachGPUExample));
 	});
 });
+
