@@ -3,7 +3,10 @@ import {
 	CheckIcon,
 	ChevronDownIcon,
 	CopyIcon,
+	ExternalLinkIcon,
 	FileJsonIcon,
+	NotebookPenIcon,
+	PlusIcon,
 	UsersIcon,
 	ZapIcon,
 } from "lucide-react";
@@ -22,6 +25,7 @@ import { useEditor } from "@/client/contexts/editor";
 import { useTheme } from "@/client/contexts/theme";
 import { Users } from "@/client/editor/Users";
 import { type SnippetFunc, snippets } from "@/client/snippets";
+import { examples } from "@/examples";
 import type { ParameterWithSource } from "@/gen/types";
 import type { User } from "@/user";
 import { cn } from "@/utils/cn";
@@ -89,31 +93,63 @@ export const Editor: FC<EditorProps> = ({
 							<Tabs.Trigger icon={UsersIcon} label="Users" value="users" />
 						</div>
 
-						<DropdownMenu>
-							<DropdownMenuTrigger className="flex w-fit min-w-[140px] cursor-pointer items-center justify-between rounded-md border bg-surface-primary px-2 py-1.5 text-content-secondary transition-colors hover:text-content-primary data-[state=open]:text-content-primary">
-								<div className="flex items-center justify-center gap-2">
-									<ZapIcon width={18} height={18} />
-									<p className="text-xs">Snippets</p>
-								</div>
-								<ChevronDownIcon width={18} height={18} />
-							</DropdownMenuTrigger>
+						<div className="flex items-center gap-2">
+							<DropdownMenu>
+								<DropdownMenuTrigger className="flex w-fit min-w-[140px] cursor-pointer items-center justify-between rounded-md border bg-surface-primary px-2 py-1.5 text-content-secondary transition-colors hover:text-content-primary data-[state=open]:text-content-primary">
+									<div className="flex items-center justify-center gap-2">
+										<ZapIcon width={18} height={18} />
+										<p className="text-xs">Snippets</p>
+									</div>
+									<PlusIcon width={18} height={18} />
+								</DropdownMenuTrigger>
 
-							<DropdownMenuPortal>
-								<DropdownMenuContent align="start">
-									{snippets.map(
-										({ name, label, icon: Icon, snippet }, index) => (
-											<DropdownMenuItem
-												key={index}
-												onClick={() => onAddSnippet(name, snippet)}
-											>
-												<Icon size={24} />
-												{label}
-											</DropdownMenuItem>
-										),
-									)}
-								</DropdownMenuContent>
-							</DropdownMenuPortal>
-						</DropdownMenu>
+								<DropdownMenuPortal>
+									<DropdownMenuContent align="start">
+										{snippets.map(
+											({ name, label, icon: Icon, snippet }, index) => (
+												<DropdownMenuItem
+													key={index}
+													onClick={() => onAddSnippet(name, snippet)}
+												>
+													<Icon size={24} />
+													{label}
+												</DropdownMenuItem>
+											),
+										)}
+									</DropdownMenuContent>
+								</DropdownMenuPortal>
+							</DropdownMenu>
+
+							<DropdownMenu>
+								<DropdownMenuTrigger className="flex w-fit min-w-[140px] cursor-pointer items-center justify-between rounded-md border bg-surface-primary px-2 py-1.5 text-content-secondary transition-colors hover:text-content-primary data-[state=open]:text-content-primary">
+									<div className="flex items-center justify-center gap-2">
+										<NotebookPenIcon width={18} height={18} />
+										<p className="text-xs">Examples</p>
+									</div>
+									<ChevronDownIcon width={18} height={18} />
+								</DropdownMenuTrigger>
+
+								<DropdownMenuPortal>
+									<DropdownMenuContent>
+										{Object.entries(examples).map(([slug, title]) => {
+											const href = `${window.location.origin}/parameters/example/${slug}`;
+											return (
+												<DropdownMenuItem key={slug} asChild={true}>
+													<a href={href} target="_blank" rel="noreferrer">
+														<span className="sr-only">
+															{" "}
+															(link opens in new tab)
+														</span>
+														<ExternalLinkIcon />
+														{title}
+													</a>
+												</DropdownMenuItem>
+											);
+										})}
+									</DropdownMenuContent>
+								</DropdownMenuPortal>
+							</DropdownMenu>
+						</div>
 					</div>
 				</Tabs.List>
 
