@@ -108,7 +108,7 @@ export const Editor: FC<EditorProps> = ({
 										{snippets.map(
 											({ name, label, icon: Icon, snippet }, index) => (
 												<DropdownMenuItem
-													key={index}
+													key={`${label}-${index}`}
 													onClick={() => onAddSnippet(name, snippet)}
 												>
 													<Icon size={24} />
@@ -131,21 +131,26 @@ export const Editor: FC<EditorProps> = ({
 
 								<DropdownMenuPortal>
 									<DropdownMenuContent>
-										{Object.entries(examples).map(([slug, title]) => {
-											const href = `${window.location.origin}/parameters/example/${slug}`;
-											return (
-												<DropdownMenuItem key={slug} asChild={true}>
-													<a href={href} target="_blank" rel="noreferrer">
-														<span className="sr-only">
-															{" "}
-															(link opens in new tab)
-														</span>
-														<ExternalLinkIcon />
-														{title}
-													</a>
-												</DropdownMenuItem>
-											);
-										})}
+										{Object.entries(examples)
+											.sort()
+											.map(([slug, title], index) => {
+												const href = `${window.location.origin}/parameters/example/${slug}`;
+												return (
+													<DropdownMenuItem
+														key={`${slug}-${index}`}
+														asChild={true}
+													>
+														<a href={href} target="_blank" rel="noreferrer">
+															<span className="sr-only">
+																{" "}
+																(link opens in new tab)
+															</span>
+															<ExternalLinkIcon />
+															{title}
+														</a>
+													</DropdownMenuItem>
+												);
+											})}
 									</DropdownMenuContent>
 								</DropdownMenuPortal>
 							</DropdownMenu>
