@@ -96,10 +96,10 @@ export const Editor: FC<EditorProps> = ({
 						<div className="flex items-center gap-2">
 							<DropdownMenu>
 								<DropdownMenuTrigger className="flex w-fit min-w-[140px] cursor-pointer items-center justify-between rounded-md border bg-surface-primary px-2 py-1.5 text-content-secondary transition-colors hover:text-content-primary data-[state=open]:text-content-primary">
-									<div className="flex items-center justify-center gap-2">
+									<span className="flex items-center justify-center gap-2 text-xs">
 										<ZapIcon width={18} height={18} />
-										<span className="text-xs">Snippets</span>
-									</div>
+										Snippets
+									</span>
 									<PlusIcon width={18} height={18} />
 								</DropdownMenuTrigger>
 
@@ -122,10 +122,10 @@ export const Editor: FC<EditorProps> = ({
 
 							<DropdownMenu>
 								<DropdownMenuTrigger className="flex w-fit min-w-[140px] cursor-pointer items-center justify-between rounded-md border bg-surface-primary px-2 py-1.5 text-content-secondary transition-colors hover:text-content-primary data-[state=open]:text-content-primary">
-									<div className="flex items-center justify-center gap-2">
+									<span className="flex items-center justify-center gap-2 text-xs">
 										<NotebookPenIcon width={18} height={18} />
-										<span className="text-xs">Examples</span>
-									</div>
+										Example
+									</span>
 									<ChevronDownIcon width={18} height={18} />
 								</DropdownMenuTrigger>
 
