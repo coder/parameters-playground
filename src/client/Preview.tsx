@@ -622,7 +622,7 @@ const TableDrawer: FC<TableDrawerProps> = ({
 	...rest
 }) => {
 	return (
-		<Dialog.Root {...rest} modal={true} open={open} onOpenChange={onOpenChange}>
+		<Dialog.Root {...rest} modal={true} open={open} onOpenChange={onOpenChange} data-testid="foo">
 			{children}
 
 			<Dialog.Portal forceMount={true}>
