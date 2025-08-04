@@ -7,16 +7,10 @@ terraform {
   }
 }
 
-# This example shows new form types and conditionality using dynamic parameters. 
-# When starting from scratch, retain the providers block above.
-# 
-# In the playground, you can get started with: 
-# - snippets for parameter types
-# - example forms for advanced use
-# - documentation for how and when to enable Dynamic Parameters.
-# 
-# You can edit user data in the "users" tab, and share your form via URL.
-# Enjoy Dynamic Parameters!
+# Welcome to the Parameters Playground. You can:
+# - edit user data in the "users" tab
+# - share your form via URL
+# - delete the Terraform below to start from scratch
 
 locals {
   ides = [
