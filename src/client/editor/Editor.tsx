@@ -131,11 +131,11 @@ export const Editor: FC<EditorProps> = ({
 									<DropdownMenuContent>
 										{Object.entries(examples)
 											.sort()
-											.map(([slug, title], index) => {
+											.map(([slug, title]) => {
 												const href = `${window.location.origin}/parameters/example/${slug}`;
 												return (
 													<DropdownMenuItem
-														key={`${slug}-${index}`}
+														key={slug}
 														asChild={true}
 													>
 														<a href={href} target="_blank" rel="noreferrer">
