@@ -105,17 +105,15 @@ export const Editor: FC<EditorProps> = ({
 
 								<DropdownMenuPortal>
 									<DropdownMenuContent align="start">
-										{snippets.map(
-											({ name, label, icon: Icon, snippet }, index) => (
-												<DropdownMenuItem
-													key={`${label}-${index}`}
-													onClick={() => onAddSnippet(name, snippet)}
-												>
-													<Icon size={24} />
-													{label}
-												</DropdownMenuItem>
-											),
-										)}
+										{snippets.map(({ name, label, icon: Icon, snippet }) => (
+											<DropdownMenuItem
+												key={label}
+												onClick={() => onAddSnippet(name, snippet)}
+											>
+												<Icon size={24} />
+												{label}
+											</DropdownMenuItem>
+										))}
 									</DropdownMenuContent>
 								</DropdownMenuPortal>
 							</DropdownMenu>
@@ -141,12 +139,12 @@ export const Editor: FC<EditorProps> = ({
 														asChild={true}
 													>
 														<a href={href} target="_blank" rel="noreferrer">
+															<ExternalLinkIcon />
+															{title}
 															<span className="sr-only">
 																{" "}
 																(link opens in new tab)
 															</span>
-															<ExternalLinkIcon />
-															{title}
 														</a>
 													</DropdownMenuItem>
 												);
