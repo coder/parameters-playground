@@ -153,13 +153,15 @@ const ParameterLabel: FC<ParameterLabelProps> = ({
 				<Label
 					htmlFor={id}
 					className="flex flex-wrap gap-2 font-medium text-content-primary text-sm"
+					role="button"
+					onClick={onGoToDefinition}
 				>
-					<button className="flex hover:underline" onClick={onGoToDefinition}>
+					<span className="flex hover:underline">
 						{displayName}
 						{parameter.required && (
 							<span className="text-content-destructive">*</span>
 						)}
-					</button>
+					</span>
 					{!parameter.mutable && (
 						<TooltipProvider delayDuration={100}>
 							<Tooltip>
