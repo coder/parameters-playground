@@ -151,6 +151,7 @@ const ParameterLabel: FC<ParameterLabelProps> = ({
 		<div className="flex items-start gap-2">
 			<div className="flex w-full flex-col gap-1">
 				<Label
+					id={`${id}-label`}
 					htmlFor={id}
 					className="flex flex-wrap gap-2 font-medium text-content-primary text-sm"
 					role="button"
@@ -498,6 +499,7 @@ const ParameterField: FC<ParameterFieldProps> = ({
 					disabled={disabled}
 					value={`data-${value}`}
 					className="relative"
+					aria-labelledby={`${id}-label`}
 				>
 					{parameter.options.map((option) => (
 						<div
