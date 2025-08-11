@@ -21,9 +21,7 @@ export const putShareData = async (data: ShareData): Promise<string> => {
 	return id;
 };
 
-export const getShareData = async (
-	id: string,
-): Promise<ShareData | null> => {
+export const getShareData = async (id: string): Promise<ShareData | null> => {
 	try {
 		const { url } = await head(`${BLOG_PATH}/${id}.json`);
 		const res = await fetch(url);

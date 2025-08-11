@@ -7,8 +7,8 @@ import {
 	type ComponentPropsWithoutRef,
 	type ElementRef,
 	type FC,
-	type HTMLAttributes,
 	forwardRef,
+	type HTMLAttributes,
 } from "react";
 import { cn } from "@/utils/cn";
 

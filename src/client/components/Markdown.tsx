@@ -1,3 +1,17 @@
+import isEqual from "lodash/isEqual";
+import {
+	type FC,
+	type HTMLProps,
+	isValidElement,
+	memo,
+	type ReactElement,
+	type ReactNode,
+} from "react";
+import ReactMarkdown, { type Options } from "react-markdown";
+import { NavLink } from "react-router";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { dracula } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import gfm from "remark-gfm";
 import {
 	Table,
 	TableBody,
@@ -5,21 +19,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/client/components/Table";
-import isEqual from "lodash/isEqual";
-import {
-	type FC,
-	type HTMLProps,
-	type ReactElement,
-	type ReactNode,
-	isValidElement,
-	memo,
-} from "react";
-import ReactMarkdown, { type Options } from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dracula } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import gfm from "remark-gfm";
 import { cn } from "@/utils/cn";
-import { NavLink } from "react-router";
 
 interface MarkdownProps {
 	/**

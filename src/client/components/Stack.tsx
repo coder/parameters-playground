@@ -1,5 +1,5 @@
-import { cn } from "@/utils/cn";
 import { forwardRef } from "react";
+import { cn } from "@/utils/cn";
 
 type StackProps = {
 	className?: string;

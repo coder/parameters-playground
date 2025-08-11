@@ -1,8 +1,8 @@
 import type { Handler } from "hono";
-import { BaseHeader } from "../utils";
-import { renderToString } from "react-dom/server";
-import type { FC } from "react";
 import { ArrowRightIcon } from "lucide-react";
+import type { FC } from "react";
+import { renderToString } from "react-dom/server";
+import { BaseHeader } from "../utils";
 
 export const notFound: Handler = (c) => {
 	return c.html(

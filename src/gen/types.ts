@@ -2,37 +2,37 @@
 
 // From types/diagnostics.go
 export interface DiagnosticExtra {
-    code: string;
-    // empty interface{} type, falling back to unknown
-    Wrapped: unknown;
+	code: string;
+	// empty interface{} type, falling back to unknown
+	Wrapped: unknown;
 }
 
 // From types/diagnostics.go
 export type DiagnosticSeverityString = string;
 
 // From types/diagnostics.go
-export type Diagnostics = (FriendlyDiagnostic)[];
+export type Diagnostics = FriendlyDiagnostic[];
 
 // From hcl/structure.go
 export interface File {
-    Body: unknown;
-    Bytes: string;
-    // empty interface{} type, falling back to unknown
-    Nav: unknown;
+	Body: unknown;
+	Bytes: string;
+	// empty interface{} type, falling back to unknown
+	Nav: unknown;
 }
 
 // From apitypes/apitypes.go
 export interface FriendlyDiagnostic {
-    severity: DiagnosticSeverityString;
-    summary: string;
-    detail: string;
-    extra: DiagnosticExtra;
+	severity: DiagnosticSeverityString;
+	summary: string;
+	detail: string;
+	extra: DiagnosticExtra;
 }
 
 // From apitypes/apitypes.go
 export interface NullHCLString {
-    value: string;
-    valid: boolean;
+	value: string;
+	valid: boolean;
 }
 
 // From apitypes/apitypes.go
@@ -40,50 +40,61 @@ export type OptionType = "bool" | "list(string)" | "number" | "string";
 
 // From apitypes/apitypes.go
 export interface Output {
-    parameters: ParameterWithSource[];
-    files: Record<string, File | null> | null;
+	parameters: ParameterWithSource[];
+	files: Record<string, File | null> | null;
 }
 
 // From types/parameter.go
 export interface Parameter extends ParameterData {
-    value: NullHCLString;
-    diagnostics: Diagnostics;
+	value: NullHCLString;
+	diagnostics: Diagnostics;
 }
 
 // From types/parameter.go
 export interface ParameterData {
-    name: string;
-    display_name: string;
-    description: string;
-    type: ParameterType;
-    form_type: ParameterFormType;
-    styling: ParameterStyling;
-    mutable: boolean;
-    default_value: NullHCLString;
-    icon: string;
-    options: (ParameterOption)[];
-    validations: (ParameterValidation)[];
-    required: boolean;
-    order: number;
-    ephemeral: boolean;
+	name: string;
+	display_name: string;
+	description: string;
+	type: ParameterType;
+	form_type: ParameterFormType;
+	styling: ParameterStyling;
+	mutable: boolean;
+	default_value: NullHCLString;
+	icon: string;
+	options: ParameterOption[];
+	validations: ParameterValidation[];
+	required: boolean;
+	order: number;
+	ephemeral: boolean;
 }
 
 // From provider/formtype.go
-export type ParameterFormType = "checkbox" | "" | "dropdown" | "error" | "input" | "multi-select" | "radio" | "slider" | "switch" | "tag-select" | "textarea";
+export type ParameterFormType =
+	| "checkbox"
+	| ""
+	| "dropdown"
+	| "error"
+	| "input"
+	| "multi-select"
+	| "radio"
+	| "slider"
+	| "switch"
+	| "tag-select"
+	| "textarea";
 
 // From types/parameter.go
 export interface ParameterOption {
-    name: string;
-    description: string;
-    value: NullHCLString;
-    icon: string;
+	name: string;
+	description: string;
+	value: NullHCLString;
+	icon: string;
 }
 
 // From types/parameter.go
 export interface ParameterStyling {
-    placeholder?: string;
-    disabled?: boolean;
-    label?: string;
+	placeholder?: string;
+	disabled?: boolean;
+	label?: string;
 }
 
 // From types/enum.go
@@ -91,67 +102,65 @@ export type ParameterType = string;
 
 // From types/parameter.go
 export interface ParameterValidation {
-    validation_error: string;
-    validation_regex: string | null;
-    validation_min: number | null;
-    validation_max: number | null;
-    validation_monotonic: string | null;
+	validation_error: string;
+	validation_regex: string | null;
+	validation_min: number | null;
+	validation_max: number | null;
+	validation_monotonic: string | null;
 }
 
 // From apitypes/apitypes.go
 export interface ParameterWithSource extends Parameter {
-    uuid: string;
-    type_range: Range;
-    def_range: Range;
+	uuid: string;
+	type_range: Range;
+	def_range: Range;
 }
 
 // From apitypes/apitypes.go
 export interface ParserLog {
-    time: string;
-    level: string;
-    msg: string;
-    prefix: string;
-    root: string;
-    err: string;
+	time: string;
+	level: string;
+	msg: string;
+	prefix: string;
+	root: string;
+	err: string;
 }
 
 // From hcl/pos.go
 export interface Pos {
-    Line: number;
-    Column: number;
-    Byte: number;
+	Line: number;
+	Column: number;
+	Byte: number;
 }
 
 // From apitypes/apitypes.go
 export interface PreviewOutput {
-    output: Output | null;
-    diags: Diagnostics;
-    parser_logs?: ParserLog[];
+	output: Output | null;
+	diags: Diagnostics;
+	parser_logs?: ParserLog[];
 }
 
 // From hcl/pos.go
 export interface Range {
-    Filename: string;
-    Start: Pos;
-    End: Pos;
+	Filename: string;
+	Start: Pos;
+	End: Pos;
 }
 
 // From apitypes/apitypes.go
 export interface WorkspaceOwner {
-    id: string;
-    name: string;
-    full_name: string;
-    email: string;
-    ssh_public_key: string;
-    groups: string[];
-    login_type: string;
-    rbac_roles: WorkspaceOwnerRBACRole[];
+	id: string;
+	name: string;
+	full_name: string;
+	email: string;
+	ssh_public_key: string;
+	groups: string[];
+	login_type: string;
+	rbac_roles: WorkspaceOwnerRBACRole[];
 }
 
 // From types/owner.go
 export interface WorkspaceOwnerRBACRole {
-    name: string;
-    org_id: string;
+	name: string;
+	org_id: string;
 }
-
-

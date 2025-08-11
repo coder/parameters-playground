@@ -1,8 +1,8 @@
 import type { editor as monaco } from "monaco-editor";
 import {
+	createContext,
 	type FC,
 	type PropsWithChildren,
-	createContext,
 	useContext,
 	useRef,
 } from "react";

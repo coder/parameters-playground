@@ -1,6 +1,6 @@
-import type { FC } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import type { LucideProps } from "lucide-react";
+import type { FC } from "react";
 import { cn } from "@/utils/cn";
 
 export const Root: FC<Tabs.TabsProps> = ({ children, ...rest }) => {

@@ -3,6 +3,20 @@
  * @see {@link https://shadcnui-expansions.typeart.cc/docs/multiple-selector}
  */
 import { Command as CommandPrimitive, useCommandState } from "cmdk";
+import { ChevronDown, X } from "lucide-react";
+import {
+	type ComponentProps,
+	type ComponentPropsWithoutRef,
+	forwardRef,
+	type KeyboardEvent,
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { Badge } from "@/client/components/Badge";
 import {
 	Command,
@@ -11,20 +25,6 @@ import {
 	CommandList,
 } from "@/client/components/Command";
 import { useDebouncedValue } from "@/client/hooks/debounce";
-import { ChevronDown, X } from "lucide-react";
-import {
-	type ComponentProps,
-	type ComponentPropsWithoutRef,
-	type KeyboardEvent,
-	type ReactNode,
-	forwardRef,
-	useCallback,
-	useEffect,
-	useImperativeHandle,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
 import { cn } from "@/utils/cn";
 
 export interface Option {
