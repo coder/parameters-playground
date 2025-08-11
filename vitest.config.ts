@@ -10,18 +10,6 @@ export default defineConfig({
 		globals: true,
 		environment: "happy-dom",
 		css: true,
-		// Include coverage configuration
-		coverage: {
-			provider: "v8",
-			reporter: ["text", "json", "html"],
-			exclude: [
-				"node_modules/",
-				"src/test/",
-				"**/*.d.ts",
-				"**/*.config.*",
-				"src/vite-env.d.ts",
-			],
-		},
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
 			"monaco-editor": "./src/__mocks__/monaco-editor.ts",
