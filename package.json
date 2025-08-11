@@ -90,5 +90,5 @@
     "vite-plugin-vercel": "^9.0.7",
     "vitest": "^3.2.4"
   },
-  "packageManager": "pnpm@10.14.0"
+  "packageManager": "pnpm@10"
 }
