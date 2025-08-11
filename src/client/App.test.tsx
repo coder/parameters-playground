@@ -83,12 +83,19 @@ describe("App - Initial State Setup", () => {
 		cleanup();
 	});
 
-	it("should show the loading modal while the wasm module is loading", async () => {
+	it("should show the loading modal while the wasm module is loading, and not show it once it has been loaded", async () => {
 		render(<TestApp />);
 
 		await waitFor(() => {
 			expect(screen.getByText("Loading assets"));
 		});
+
+		await waitFor(async () => {
+			expect(initWasm).toHaveBeenCalled();
+		});
+
+		expect(screen.queryByTestId("wasm-loading-modal")).toBeNull();
+		expect(screen.queryByTestId("wasm-error-modal")).toBeNull();
 	});
 
 	it("should call initWasm", async () => {
@@ -97,17 +104,6 @@ describe("App - Initial State Setup", () => {
 		await waitFor(() => {
 			expect(initWasm).toHaveBeenCalled();
 		});
-	});
-
-	it("should not show the loading modal after the wasm has been loaded", async () => {
-		render(<TestApp />);
-
-		await waitFor(async () => {
-			expect(initWasm).toHaveBeenCalled();
-		});
-
-		expect(screen.queryByTestId("wasm-loading-modal")).toBeNull();
-		expect(screen.queryByTestId("wasm-error-modal")).toBeNull();
 	});
 
 	it("should use the default example if `window.CODE` is not defined", async () => {
