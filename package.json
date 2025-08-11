@@ -81,5 +81,5 @@
     "vite": "^6.3.5",
     "vite-plugin-vercel": "^9.0.7"
   },
-  "packageManager": "pnpm@10"
+  "packageManager": "pnpm@10.14.0"
 }

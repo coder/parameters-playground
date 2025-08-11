@@ -679,7 +679,7 @@ const isValidParameterOption = (
 			if (Array.isArray(parsed)) {
 				values = parsed;
 			}
-		} catch (e) {
+		} catch (_e) {
 			return false;
 		}
 

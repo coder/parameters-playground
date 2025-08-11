@@ -12,7 +12,7 @@ export const Stack = forwardRef<HTMLDivElement, StackProps>((props, ref) => {
 		<div
 			{...divProps}
 			ref={ref}
-			className={cn("flex flex-col gap-4 flex-wrap max-w-full", className)}
+			className={cn("flex max-w-full flex-col flex-wrap gap-4", className)}
 		>
 			{children}
 		</div>

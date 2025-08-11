@@ -458,6 +458,7 @@ export const MultiSelectCombobox = forwardRef<
 				filter={commandFilter()}
 			>
 				{/* biome-ignore lint/a11y/useKeyWithClickEvents: onKeyDown is not needed here */}
+				{/* biome-ignore lint/a11y/noStaticElementInteractions: This code is pulled from coder/coder and should be fixed there */}
 				<div
 					className={cn(
 						"h-10 min-h-10 rounded-md border border-border border-solid pr-3 text-sm focus-within:ring-2 focus-within:ring-content-link",
@@ -472,7 +473,7 @@ export const MultiSelectCombobox = forwardRef<
 						inputRef?.current?.focus();
 					}}
 				>
-					<div className="flex items-center justify-between h-full">
+					<div className="flex h-full items-center justify-between">
 						<div className="relative flex flex-wrap gap-1">
 							{selected.map((option) => {
 								return (
@@ -593,7 +594,7 @@ export const MultiSelectCombobox = forwardRef<
 							}}
 						>
 							{isLoading ? (
-								<>{loadingIndicator}</>
+								loadingIndicator
 							) : (
 								<>
 									{EmptyItem()}
