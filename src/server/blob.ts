@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import * as v from "valibot";
 import { UserSchema } from "@/user";
 
-export const BLOG_PATH = "parameters/share";
+const BLOG_PATH = "parameters/share";
 
 export const ShareDataSchema = v.object({
 	code: v.string(),

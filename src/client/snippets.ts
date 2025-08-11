@@ -27,7 +27,7 @@ type Snippet = {
 	snippet: SnippetFunc;
 };
 
-export const input: SnippetFunc = (
+const input: SnippetFunc = (
 	name,
 	order,
 ) => `data "coder_parameter" "text-input" {
@@ -45,7 +45,7 @@ export const input: SnippetFunc = (
   default   = "An input value"
 }`;
 
-export const textarea: SnippetFunc = (
+const textarea: SnippetFunc = (
 	name,
 	order,
 ) => `data "coder_parameter" "textarea" {
@@ -63,7 +63,7 @@ export const textarea: SnippetFunc = (
   default   = "An input value"
 }`;
 
-export const radio: SnippetFunc = (
+const radio: SnippetFunc = (
 	name,
 	order,
 ) => `data "coder_parameter" "radio" {
@@ -101,7 +101,7 @@ export const radio: SnippetFunc = (
   }
 }`;
 
-export const dropdown: SnippetFunc = (
+const dropdown: SnippetFunc = (
 	name,
 	order,
 ) => `data "coder_parameter" "dropdown" {
@@ -143,7 +143,7 @@ export const dropdown: SnippetFunc = (
   }
 }`;
 
-export const multiSelect: SnippetFunc = (
+const multiSelect: SnippetFunc = (
 	name,
 	order,
 ) => `data "coder_parameter" "multi-select" {
@@ -180,7 +180,7 @@ export const multiSelect: SnippetFunc = (
   }
 }`;
 
-export const tagSelect: SnippetFunc = (
+const tagSelect: SnippetFunc = (
 	name,
 	order,
 ) => `data "coder_parameter" "tag-select" {
@@ -193,7 +193,7 @@ export const tagSelect: SnippetFunc = (
   form_type    = "tag-select"
 }`;
 
-export const switchInput: SnippetFunc = (
+const switchInput: SnippetFunc = (
 	name,
 	order,
 ) => `data "coder_parameter" "switch" {
@@ -207,7 +207,7 @@ export const switchInput: SnippetFunc = (
   default      = true
 }`;
 
-export const slider: SnippetFunc = (
+const slider: SnippetFunc = (
 	name,
 	order,
 ) => `data "coder_parameter" "slider" {
