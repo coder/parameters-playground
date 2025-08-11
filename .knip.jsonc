@@ -6,10 +6,5 @@
 		"**/gen/*",
 		// Components are vendored from coder/coder
 		"./src/client/components/*"
-	],
-	"ignoreDependencies": [
-		"@types/react-virtualized-auto-sizer",
-		"jest_workaround",
-		"ts-proto"
 	]
 }

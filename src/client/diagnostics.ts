@@ -2,16 +2,16 @@ import type { FriendlyDiagnostic, ParserLog, PreviewOutput } from "@/gen/types";
 
 type FriendlyDiagnosticWithoutKind = Omit<FriendlyDiagnostic, "extra">;
 
-export type ParameterDiagnostic = {
+type ParameterDiagnostic = {
 	kind: "parameter";
 	parameterName: string;
 } & FriendlyDiagnosticWithoutKind;
 
-export type TopLevelDiagnostic = {
+type TopLevelDiagnostic = {
 	kind: "top-level";
 } & FriendlyDiagnosticWithoutKind;
 
-export type InternalDiagnostic = {
+type InternalDiagnostic = {
 	kind: "internal";
 } & FriendlyDiagnosticWithoutKind;
 

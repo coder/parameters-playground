@@ -8,11 +8,6 @@
 
 export type ExampleSlug = "attach-gpu" | "basic-governance" | "form-types";
 
-export type Example = {
-	title: string;
-	slug: ExampleSlug;
-};
-
 export const examples: Record<ExampleSlug, string> = {
 	"basic-governance": "Basic Governance",
 	"attach-gpu": "Attach GPU",
