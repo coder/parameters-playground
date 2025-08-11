@@ -5,7 +5,7 @@
 		"clientKind": "git"
 	},
 	"files": {
-		"includes": ["src/**/*", "!src/client/gen/types.ts","!pnpm-lock.yaml"],
+		"includes": ["**/*.config.ts", "src/**/*", "!src/client/gen/types.ts","!pnpm-lock.yaml"],
 		"ignoreUnknown": true
 	},
 	"linter": {
