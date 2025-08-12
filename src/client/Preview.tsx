@@ -160,7 +160,7 @@ export const Preview: FC<PreviewProps> = ({
 							wasmLoadState !== "loaded" || (showErrors && errors.length > 0)
 						}
 						className={cn(
-							"flex h-full w-full flex-col items-start gap-4 p-5 ",
+							"flex h-full w-full flex-col items-start gap-4 p-5",
 							(wasmLoadState !== "loaded" ||
 								(showErrors && errors.length > 0)) &&
 								"pointer-events-none",

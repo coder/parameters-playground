@@ -11,14 +11,7 @@
  * Debounce utilities can make sense if they can be called directly outside the
  * component or in a useEffect call, though.
  */
-import { useCallback, useEffect, useRef, useState } from "react";
-
-type useDebouncedFunctionReturn<Args extends unknown[]> = Readonly<{
-	debounced: (...args: Args) => void;
-
-	// Mainly here to make interfacing with useEffect cleanup functions easier
-	cancelDebounce: () => void;
-}>;
+import { useEffect, useState } from "react";
 
 /**
  * Takes any value, and returns out a debounced version of it.
