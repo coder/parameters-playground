@@ -4,9 +4,9 @@
  */
 import type { DialogProps } from "@radix-ui/react-dialog";
 import { Command as CommandPrimitive } from "cmdk";
+import { Dialog, DialogContent } from "@/client/components/Dialog";
 import { Search } from "lucide-react";
 import { type FC, forwardRef } from "react";
-import { Dialog, DialogContent } from "@/client/components/Dialog";
 import { cn } from "@/utils/cn";
 
 export const Command = forwardRef<

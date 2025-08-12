@@ -6,15 +6,15 @@
  * @see {@link https://www.figma.com/design/WfqIgsTFXN2BscBSSyXWF8/Coder-kit?node-id=656-2354&t=CiGt5le3yJEwMH4M-0}
  */
 
+import { cn } from "@/utils/cn";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
 import {
 	type ComponentPropsWithoutRef,
 	type ElementRef,
-	forwardRef,
 	type HTMLAttributes,
+	forwardRef,
 } from "react";
-import { cn } from "@/utils/cn";
 
 export const DropdownMenu = DropdownMenuPrimitive.Root;
 

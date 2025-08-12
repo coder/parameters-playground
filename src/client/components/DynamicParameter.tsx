@@ -1,13 +1,5 @@
-import {
-	CircleAlert,
-	Info,
-	LinkIcon,
-	Settings,
-	TriangleAlert,
-} from "lucide-react";
-import { type FC, useEffect, useId, useRef, useState } from "react";
-import * as Yup from "yup";
 import { Badge } from "@/client/components/Badge";
+
 import { Checkbox } from "@/client/components/Checkbox";
 import { Input } from "@/client/components/Input";
 import { Label } from "@/client/components/Label";
@@ -34,7 +26,6 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/client/components/Tooltip";
-import { useEditor } from "@/client/contexts/editor";
 import { useDebouncedValue } from "@/client/hooks/debounce";
 import { useEffectEvent } from "@/client/hooks/hookPolyfills";
 import type {
@@ -42,6 +33,16 @@ import type {
 	ParameterWithSource as Parameter,
 	ParameterOption,
 } from "@/gen/types";
+import {
+	CircleAlert,
+	Info,
+	LinkIcon,
+	Settings,
+	TriangleAlert,
+} from "lucide-react";
+import { type FC, useEffect, useId, useRef, useState } from "react";
+import * as Yup from "yup";
+import { useEditor } from "@/client/contexts/editor";
 
 interface WorkspaceBuildParameter {
 	readonly name: string;
@@ -679,7 +680,7 @@ const isValidParameterOption = (
 			if (Array.isArray(parsed)) {
 				values = parsed;
 			}
-		} catch (_e) {
+		} catch (e) {
 			return false;
 		}
 

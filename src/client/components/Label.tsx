@@ -3,7 +3,7 @@
  * @see {@link https://ui.shadcn.com/docs/components/label}
  */
 import * as LabelPrimitive from "@radix-ui/react-label";
-import { cva, type VariantProps } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 import { forwardRef } from "react";
 
 import { cn } from "@/utils/cn";
