@@ -1,5 +1,6 @@
 import {
 	cleanup,
+	findByTestId,
 	getByLabelText,
 	queryAllByLabelText,
 	render,
@@ -68,6 +69,13 @@ describe("Preview - Rendering", () => {
 		cleanup();
 	});
 
+	it("should render the empty state when no parameters are present", async () => {
+		const page = render(<TestApp parameters={[]} />);
+
+		expect(findByTestId(page.container, "preview-empty-state"));
+	  
+	})
+
 	it("should render the default example as expected", async () => {
 		const page = render(<TestApp parameters={defaultExampleParameters} />);
 
@@ -86,7 +94,7 @@ describe("Preview - Rendering", () => {
 			page.container,
 			"How do you want to format the options of the next parameter?Immutable",
 		);
-		expect(formTypeSelects).length(4);
+		expect(formTypeSelects).toHaveLength(4);
 
 		expect(formTypeSelects[0].innerText).toBe("Radio Selector");
 
