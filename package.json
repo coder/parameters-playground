@@ -58,7 +58,6 @@
   "devDependencies": {
     "@biomejs/biome": "^2.1.4",
     "@hono/vite-dev-server": "^0.19.1",
-    "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
     "@types/lodash": "^4.17.17",
     "@types/node": "^22.15.21",
