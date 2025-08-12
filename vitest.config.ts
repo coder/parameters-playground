@@ -7,7 +7,6 @@ import { defineConfig } from "vite";
 export default defineConfig({
 	plugins: [react()],
 	test: {
-		globals: true,
 		environment: "happy-dom",
 		css: true,
 		alias: {
