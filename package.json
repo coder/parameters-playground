@@ -10,7 +10,11 @@
     "lint:biome": "pnpm biome lint --error-on-warnings .",
     "lint:knip": "pnpm knip",
     "lint:circular-dep": "pnpm dpdm --no-tree --no-warning -T ./src/client/index.tsx && pnpm dpdm --no-tree --no-warning -T ./src/server/index.tsx",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@hono/valibot-validator": "^0.5.2",
@@ -54,6 +58,8 @@
   "devDependencies": {
     "@biomejs/biome": "^2.1.4",
     "@hono/vite-dev-server": "^0.19.1",
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.3.0",
     "@types/lodash": "^4.17.17",
     "@types/node": "^22.15.21",
     "@types/react": "^19.1.2",
@@ -63,11 +69,13 @@
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.21",
     "dpdm": "^3.14.0",
+    "happy-dom": "^18.0.1",
     "knip": "^5.62.0",
     "postcss": "^8.5.3",
     "tailwindcss": "3",
     "typescript": "~5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
   },
-  "packageManager": "pnpm@10.14.0"
+  "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"
 }
