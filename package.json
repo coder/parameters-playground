@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build && vite build --mode=client",
+    "lint": "pnpm run lint:biome && pnpm run lint:knip && pnpm run lint:circular-dep",
     "lint:biome": "pnpm biome lint --error-on-warnings .",
+    "lint:knip": "pnpm knip",
+    "lint:circular-dep": "pnpm dpdm --no-tree --no-warning -T ./src/client/index.tsx && pnpm dpdm --no-tree --no-warning -T ./src/server/index.tsx",
     "preview": "vite preview"
   },
   "dependencies": {
