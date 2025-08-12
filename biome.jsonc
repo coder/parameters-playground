@@ -5,7 +5,16 @@
 		"clientKind": "git"
 	},
 	"files": {
-		"includes": ["**/*.config.ts", "src/**/*", "!src/client/gen/types.ts","!pnpm-lock.yaml"],
+		"includes": [
+			"**/*.config.ts",
+			"src/**/*",
+			"!src/client/gen/types.ts",
+			"!pnpm-lock.yaml",
+			// Since components are vendored from coder/coder it would be a pain to have
+			// to fix lint issues every time we update the components here by copying the
+			// new ones in.
+			"!src/client/components/*"
+		],
 		"ignoreUnknown": true
 	},
 	"linter": {
@@ -63,5 +72,6 @@
 			}
 		}
 	},
-	"$schema": "https://biomejs.dev/schemas/2.1.1/schema.json"
+	"$schema": "https://biomejs.dev/schemas/2.1.4/schema.json"
 }
+

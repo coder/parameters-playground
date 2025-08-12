@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import * as v from "valibot";
 import { UserSchema } from "@/user";
 
-export const BLOG_PATH = "parameters/share";
+const BLOG_PATH = "parameters/share";
 
 export const ShareDataSchema = v.object({
 	code: v.string(),
@@ -21,9 +21,7 @@ export const putShareData = async (data: ShareData): Promise<string> => {
 	return id;
 };
 
-export const getShareData = async (
-	id: string,
-): Promise<ShareData | null> => {
+export const getShareData = async (id: string): Promise<ShareData | null> => {
 	try {
 		const { url } = await head(`${BLOG_PATH}/${id}.json`);
 		const res = await fetch(url);

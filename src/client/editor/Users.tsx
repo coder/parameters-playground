@@ -150,7 +150,7 @@ export const Users: FC<UsersProps> = ({ users, setUsers }) => {
 				<form.Field name="users" mode="array">
 					{(field) => {
 						return (
-							<div className=" flex flex-col gap-3">
+							<div className="flex flex-col gap-3">
 								{field.state.value.map((_, index) => (
 									<form.Field key={index} name={`users[${index}]`}>
 										{(subField) => (

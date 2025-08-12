@@ -2,11 +2,11 @@ import { Hono } from "hono";
 import { trimTrailingSlash } from "hono/trailing-slash";
 import { renderToString } from "react-dom/server";
 import { examples } from "@/examples/code";
+import defaultExample from "@/examples/code/default.tf?raw";
 import { api } from "@/server/routes/api";
 import { getShareData, type ShareData } from "./blob";
-import { BaseHeader, getAssetPath, HmrScript } from "./utils";
 import { notFound } from "./routes/404";
-import defaultExample from "@/examples/code/default.tf?raw";
+import { BaseHeader, getAssetPath, HmrScript } from "./utils";
 
 // This must be exported for the dev server to work
 export const app = new Hono();

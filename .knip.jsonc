@@ -1,0 +1,13 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"entry": ["./src/client/index.tsx", "./src/server/index.tsx"],
+	"project": ["./src/**/*.ts", "./src/**/*.tsx"],
+	"ignore": [
+		"**/gen/*",
+		// Since components are vendored from coder/coder it would be a pain to have
+		// to fix lint issues every time we update the components here by copying the
+		// new ones in.
+		"./src/client/components/*"
+	]
+}
+
