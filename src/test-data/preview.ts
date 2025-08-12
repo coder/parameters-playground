@@ -833,3 +833,16 @@ export const formTypesExampleParameters: ParameterWithSource[] = [
 		},
 	},
 ];
+
+export const defaultExampleParamterValues: Record<string, string> = {
+	single_select: "radio",
+	single: "bravo-value",
+	number_format: "input",
+	number: "48",
+	boolean_format: "radio",
+	boolean: "false",
+	list_format: "radio",
+	list: JSON.stringify(["red"]),
+	like_it: "true",
+	satisfaction: "38",
+};

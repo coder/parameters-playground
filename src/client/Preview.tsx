@@ -235,7 +235,10 @@ export const Preview: FC<PreviewProps> = ({
 
 const PreviewEmptyState = () => {
 	return (
-		<div className="flex flex-col items-center justify-center gap-3" data-testid="preview-empty-state">
+		<div
+			className="flex flex-col items-center justify-center gap-3"
+			data-testid="preview-empty-state"
+		>
 			<div className="flex items-center justify-center rounded-[6px] bg-highlight-sky p-2">
 				<ActivityIcon className="text-content-invert" width={24} height={24} />
 			</div>

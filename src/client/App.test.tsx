@@ -1,11 +1,6 @@
 import type { EditorProps } from "@monaco-editor/react";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import {
-	cleanup,
-	render,
-	screen,
-	waitFor,
-} from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import type { FC } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
