@@ -8,7 +8,6 @@ export default defineConfig({
 	plugins: [react()],
 	test: {
 		environment: "happy-dom",
-		css: true,
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
 			"monaco-editor": "./src/__mocks__/monaco-editor.ts",
