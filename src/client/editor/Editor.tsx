@@ -96,56 +96,61 @@ export const Editor: FC<EditorProps> = ({
 						<div className="flex items-center gap-2">
 							<DropdownMenu>
 								<DropdownMenuTrigger className="flex w-fit min-w-[140px] cursor-pointer items-center justify-between rounded-md border bg-surface-primary px-2 py-1.5 text-content-secondary transition-colors hover:text-content-primary data-[state=open]:text-content-primary">
-									<div className="flex items-center justify-center gap-2">
+									<span className="flex items-center justify-center gap-2 text-xs">
 										<ZapIcon width={18} height={18} />
-										<p className="text-xs">Snippets</p>
-									</div>
+										Snippets
+									</span>
 									<PlusIcon width={18} height={18} />
 								</DropdownMenuTrigger>
 
 								<DropdownMenuPortal>
 									<DropdownMenuContent align="start">
-										{snippets.map(
-											({ name, label, icon: Icon, snippet }, index) => (
-												<DropdownMenuItem
-													key={index}
-													onClick={() => onAddSnippet(name, snippet)}
-												>
-													<Icon size={24} />
-													{label}
-												</DropdownMenuItem>
-											),
-										)}
+										{snippets.map(({ name, label, icon: Icon, snippet }) => (
+											<DropdownMenuItem
+												key={label}
+												onClick={() => onAddSnippet(name, snippet)}
+											>
+												<Icon size={24} />
+												{label}
+											</DropdownMenuItem>
+										))}
 									</DropdownMenuContent>
 								</DropdownMenuPortal>
 							</DropdownMenu>
 
 							<DropdownMenu>
 								<DropdownMenuTrigger className="flex w-fit min-w-[140px] cursor-pointer items-center justify-between rounded-md border bg-surface-primary px-2 py-1.5 text-content-secondary transition-colors hover:text-content-primary data-[state=open]:text-content-primary">
-									<div className="flex items-center justify-center gap-2">
+									<span className="flex items-center justify-center gap-2 text-xs">
 										<NotebookPenIcon width={18} height={18} />
-										<p className="text-xs">Examples</p>
-									</div>
+										Example
+									</span>
 									<ChevronDownIcon width={18} height={18} />
 								</DropdownMenuTrigger>
 
 								<DropdownMenuPortal>
 									<DropdownMenuContent>
-										{Object.entries(examples).map(([slug, title]) => {
-											const href = `${window.location.origin}/parameters/example/${slug}`;
-											return (
-												<DropdownMenuItem key={slug} asChild={true}>
-													<a href={href} target="_blank" rel="noreferrer">
-														<span className="sr-only">
-															{" "}
-															(link opens in new tab)
-														</span>
-														<ExternalLinkIcon />
-														{title}
-													</a>
-												</DropdownMenuItem>
-											);
-										})}
+										{Object.entries(examples)
+											.sort(([_slugA, titleA], [_slugB, titleB]) => {
+												return titleA.localeCompare(titleB)
+											})
+											.map(([slug, title]) => {
+												const href = `${window.location.origin}/parameters/example/${slug}`;
+												return (
+													<DropdownMenuItem
+														key={slug}
+														asChild={true}
+													>
+														<a href={href} target="_blank" rel="noreferrer">
+															<ExternalLinkIcon />
+															{title}
+															<span className="sr-only">
+																{" "}
+																(link opens in new tab)
+															</span>
+														</a>
+													</DropdownMenuItem>
+												);
+											})}
 									</DropdownMenuContent>
 								</DropdownMenuPortal>
 							</DropdownMenu>
