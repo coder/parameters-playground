@@ -130,7 +130,9 @@ export const Editor: FC<EditorProps> = ({
 								<DropdownMenuPortal>
 									<DropdownMenuContent>
 										{Object.entries(examples)
-											.sort()
+											.sort(([_slugA, titleA], [_slugB, titleB]) => {
+												return titleA.localeCompare(titleB)
+											})
 											.map(([slug, title]) => {
 												const href = `${window.location.origin}/parameters/example/${slug}`;
 												return (
