@@ -151,15 +151,18 @@ const ParameterLabel: FC<ParameterLabelProps> = ({
 		<div className="flex items-start gap-2">
 			<div className="flex w-full flex-col gap-1">
 				<Label
+					id={`${id}-label`}
 					htmlFor={id}
 					className="flex flex-wrap gap-2 font-medium text-content-primary text-sm"
+					role="button"
+					onClick={onGoToDefinition}
 				>
-					<button className="flex hover:underline" onClick={onGoToDefinition}>
+					<span className="flex hover:underline" onClick={onGoToDefinition}>
 						{displayName}
 						{parameter.required && (
 							<span className="text-content-destructive">*</span>
 						)}
-					</button>
+					</span>
 					{!parameter.mutable && (
 						<TooltipProvider delayDuration={100}>
 							<Tooltip>
@@ -496,6 +499,7 @@ const ParameterField: FC<ParameterFieldProps> = ({
 					disabled={disabled}
 					value={`data-${value}`}
 					className="relative"
+					aria-labelledby={`${id}-label`}
 				>
 					{parameter.options.map((option) => (
 						<div
