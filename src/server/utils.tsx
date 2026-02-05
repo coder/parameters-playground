@@ -37,6 +37,17 @@ export const BaseHeader = () => {
 			<link rel="icon" type="image/svg+xml" href={getAssetPath("/logo.svg")} />
 			<link rel="stylesheet" href={getAssetPath("/src/client/index.css")} />
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+			{/* Google Analytics */}
+			<script
+				async
+				src="https://www.googletagmanager.com/gtag/js?id=G-9FM9TCREF6"
+			/>
+			<script>
+				{`window.dataLayer = window.dataLayer || [];
+				function gtag(){dataLayer.push(arguments);}
+				gtag('js', new Date());
+				gtag('config', 'G-9FM9TCREF6');`}
+			</script>
 		</>
 	);
 };
