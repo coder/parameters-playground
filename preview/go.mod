@@ -5,6 +5,7 @@ go 1.24.3
 require (
 	github.com/coder/guts v1.5.0
 	github.com/coder/preview v0.0.2-0.20250604144457-c9862a17f652
+	github.com/google/uuid v1.6.0
 	github.com/hashicorp/hcl/v2 v2.23.0
 	github.com/spf13/afero v1.14.0
 )
@@ -47,7 +48,6 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -78,7 +78,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/samber/lo v1.50.0 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect
-	github.com/ulikunitz/xz v0.5.12 // indirect
+	github.com/ulikunitz/xz v0.5.14 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
