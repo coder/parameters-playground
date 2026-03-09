@@ -74,30 +74,22 @@ export const getDynamicParametersOutput = async (
 		owner ?? baseMockUser,
 	);
 
-	if (rawOutput === undefined) {
-		console.error("Something went wrong");
-		return null;
+	if (rawOutput === undefined || rawOutput === '') {
+		console.error("go_preview returned empty output");
+		return {
+			output: null,
+			diags: [
+				{
+					severity: "error",
+					summary: "Failed to parse Terraform configuration",
+					detail: "The Terraform configuration could not be parsed. Please check for syntax errors.",
+					extra: { code: "", Wrapped: null },
+				},
+			],
+		};
 	}
 
 	const output = JSON.parse(rawOutput) as PreviewOutput;
 
 	return output;
-	// if (e instanceof Error) {
-	// 	const diagnostic: InternalDiagnostic = {
-	// 		severity: "error",
-	// 		summary: e.name,
-	// 		detail: e.message,
-	// 		kind: "internal",
-	// 	};
-	// 	$setError([diagnostic]);
-	// } else {
-	// 	const diagnostic: InternalDiagnostic = {
-	// 		severity: "error",
-	// 		summary: "Error",
-	// 		detail: "Something went wrong",
-	// 		kind: "internal",
-	// 	};
-
-	// 	$setError([diagnostic]);
-	// }
 };
