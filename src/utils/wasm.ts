@@ -38,12 +38,31 @@ declare class Go {
 export const initWasm = async (): Promise<WasmLoadState> => {
 	try {
 		const goWasm = new window.Go();
-		const result = await WebAssembly.instantiateStreaming(
-			fetch(
-				import.meta.env.PROD
-					? "/assets/build/preview.wasm"
-					: "/build/preview.wasm",
-			),
+		const wasmUrl = import.meta.env.PROD
+			? "/assets/build/preview.wasm.gz"
+			: "/build/preview.wasm.gz";
+
+		const resp = await fetch(wasmUrl);
+		if (!resp.ok) {
+			throw new Error(`Failed to fetch wasm: ${resp.status}`);
+		}
+
+		let wasmBytes = await resp.arrayBuffer();
+
+		// The .wasm.gz file may be transparently decompressed by the
+		// server/CDN (via content-encoding: gzip), or served as raw gzip
+		// bytes. Detect which case we're in by checking for the gzip magic
+		// number (0x1f 0x8b) and decompress if needed.
+		const header = new Uint8Array(wasmBytes, 0, 2);
+		if (header[0] === 0x1f && header[1] === 0x8b) {
+			const ds = new DecompressionStream("gzip");
+			const blob = new Blob([wasmBytes]);
+			const decompressed = blob.stream().pipeThrough(ds);
+			wasmBytes = await new Response(decompressed).arrayBuffer();
+		}
+
+		const result = await WebAssembly.instantiate(
+			wasmBytes,
 			goWasm.importObject,
 		);
 
@@ -81,30 +100,22 @@ export const getDynamicParametersOutput = async (
 		owner,
 	);
 
-	if (rawOutput === undefined) {
-		console.error("Something went wrong");
-		return null;
+	if (rawOutput === undefined || rawOutput === '') {
+		console.error("go_preview returned empty output");
+		return {
+			output: null,
+			diags: [
+				{
+					severity: "error",
+					summary: "Failed to parse Terraform configuration",
+					detail: "The Terraform configuration could not be parsed. Please check for syntax errors.",
+					extra: { code: "", Wrapped: null },
+				},
+			],
+		};
 	}
 
 	const output = JSON.parse(rawOutput) as PreviewOutput;
 
 	return output;
-	// if (e instanceof Error) {
-	// 	const diagnostic: InternalDiagnostic = {
-	// 		severity: "error",
-	// 		summary: e.name,
-	// 		detail: e.message,
-	// 		kind: "internal",
-	// 	};
-	// 	$setError([diagnostic]);
-	// } else {
-	// 	const diagnostic: InternalDiagnostic = {
-	// 		severity: "error",
-	// 		summary: "Error",
-	// 		detail: "Something went wrong",
-	// 		kind: "internal",
-	// 	};
-
-	// 	$setError([diagnostic]);
-	// }
 };

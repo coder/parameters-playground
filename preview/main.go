@@ -57,7 +57,19 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 
 	tf, err := fileTreeFS(p[0])
 	if err != nil {
-		return err
+		data, _ := json.Marshal(apitypes.PreviewOutput{
+			Output:     nil,
+			ParserLogs: l.entries,
+			Diags: types.Diagnostics{
+				{
+					Severity: hcl.DiagError,
+					Summary:  "Failed to read file tree",
+					Detail:   err.Error(),
+					Extra:    types.DiagnosticExtra{},
+				},
+			},
+		})
+		return js.ValueOf(string(data))
 	}
 
 	handler := slog.NewJSONHandler(l, nil)
@@ -93,14 +105,39 @@ func tfpreview(this js.Value, p []js.Value) (output any) {
 		Logger:          logger,
 	}, tf)
 
-	data, _ := json.Marshal(apitypes.PreviewOutput{
-		Output: &apitypes.Output{
+	var outputPayload *apitypes.Output
+	if pOutput != nil {
+		outputPayload = &apitypes.Output{
 			Parameters: apitypes.WithSource(pOutput.Parameters),
-			Files:      pOutput.Files,
-		},
+			// Files are intentionally omitted. hcl.File contains interface
+			// and function types (e.g. hclsyntax expressions) that cannot be
+			// reliably JSON-marshalled, causing json.Marshal to return an
+			// empty result for certain Terraform constructs (e.g. == comparisons
+			// in count expressions). The frontend does not use the files field.
+		}
+	}
+
+	data, err := json.Marshal(apitypes.PreviewOutput{
+		Output:     outputPayload,
 		Diags:      types.Diagnostics(diags),
 		ParserLogs: l.entries,
 	})
+	if err != nil {
+		logger.Error("json.Marshal failed", "err", err)
+		// Return a minimal error response
+		errData, _ := json.Marshal(apitypes.PreviewOutput{
+			Diags: types.Diagnostics{
+				{
+					Severity: hcl.DiagError,
+					Summary:  "Failed to marshal output",
+					Detail:   err.Error(),
+					Extra:    types.DiagnosticExtra{},
+				},
+			},
+			ParserLogs: l.entries,
+		})
+		return js.ValueOf(string(errData))
+	}
 
 	return js.ValueOf(string(data))
 }
