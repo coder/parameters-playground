@@ -25,3 +25,6 @@ dist-ssr
 
 .vercel
 .env*.local
+
+# Uncompressed wasm binary (built from source, committed as .wasm.gz)
+public/build/preview.wasm

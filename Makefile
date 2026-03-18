@@ -5,7 +5,8 @@ build-wasm: build/preview.wasm
 # TODO: remove vendoring workaround
 build/preview.wasm: $(GO_SRC_FILES)
 	cd preview
-	GOOS=js GOARCH=wasm go build -C ./preview -o ../public/build/preview.wasm
+	GOOS=js GOARCH=wasm go build -C ./preview -ldflags="-s -w" -trimpath -o ../public/build/preview.wasm
+	gzip -9 -f public/build/preview.wasm
 
 .PHONY: gen-types
 gen-types: src/gen/types.ts
