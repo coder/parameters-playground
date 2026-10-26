@@ -63,7 +63,7 @@ const vercelConfigPlugin = () => ({
 		await fs.writeFile(
 			path.join(distPath, "functions", "index.func", ".vc-config.json"),
 			JSON.stringify({
-				runtime: "nodejs20.x",
+				runtime: "nodejs22.x",
 				handler: "index.js",
 				launcherType: "Nodejs",
 				shouldAddHelpers: true,
